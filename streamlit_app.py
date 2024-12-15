@@ -234,22 +234,18 @@ def click_button():
     st.session_state.clicked = True
     open_chatbot()
 
-#st.button('FoamRobo', on_click=click_button)
+''
 
-column1, column2 = st.columns([1,1])
-with column1:
-    st.empty()
-with column2:
-    #img = Image.open("https://cdn-icons-png.flaticon.com/512/32/32213.png")
-    from streamlit_extras.stylable_container import stylable_container
+from streamlit_float import *
 
-    # Create buttons with st.button
-    with stylable_container(
-        "green",
-        css_styles="""
-        button {
-            background-color: #FFFFFF;
-            color: purple;
-        }""",
-    ):
-        st.button(":material/robot_2:", on_click=click_button)
+# Float feature initialization
+float_init()
+
+# Container with expand/collapse button
+button_container = st.container()
+with button_container:
+    st.button(":material/robot_2:", on_click=click_button, type="primary")
+
+button_css = float_css_helper(width="2.2rem", right="2rem", bottom="0rem", transition=0)
+
+button_container.float(button_css)
