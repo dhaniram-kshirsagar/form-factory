@@ -1,1 +1,8 @@
 streamlit
+pandas
+openai
+llama-index
+llama-index-llms-openai
+nltk
+pypdf
+streamlit_extras
