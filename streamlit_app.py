@@ -12,6 +12,8 @@ from modules.data import data
 from modules.chatbot import chatbot
 
 from modules.performance import performance as p
+from modules.home import homepage as h
+from modules.metrics import metrics as m
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
@@ -20,11 +22,16 @@ st.set_page_config(
     layout='wide',
 )
 
+page = 'Home'
+# Sidebar for navigation 
+st.sidebar.title('Navigation') 
+page = st.sidebar.selectbox( 'Select a page:', ('Home', 'Performance Section', 'Metrics Section', 'Profile Section') )
 
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
 
 gdp_df = data.get_gdp_data()
+factories_df = data.getFactoryDataProfit()
 
 # -----------------------------------------------------------------------------
 # Draw the actual page
@@ -44,8 +51,14 @@ Analysis of foram factory performance and maintenance data.
 ''
 ''
 ''
-
-p.performancePage(gdp_df)
+if page == 'Home':
+    h.displayHome()
+elif page == 'Performance Section': 
+    st.title('Performance Dashboard')
+    p.performancePage(gdp_df)
+elif page == 'Metrics Section': 
+    st.title('Metrics Section')
+    m.metricsPage(factories_df)  
 
 def click_button():
     st.session_state.clicked = True

@@ -48,3 +48,12 @@ def get_gdp_data():
 
     return gdp_df
 
+
+@st.cache_data
+def getFactoryDataProfit(): 
+    DATA_FILENAME = Path(__file__).parent.parent/'data/factorydata.csv'
+    raw_profit_df =  pd.read_csv(DATA_FILENAME)
+    selected_columns = ['FactoryID', 'Date', 'ProductionVolume', 'TotalProfit', 'ProfitPerUnit'] 
+    # Create a new DataFrame with the selected columns
+    df_selected = raw_profit_df[selected_columns]
+    return df_selected
