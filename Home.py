@@ -20,8 +20,6 @@ st.set_page_config(
 )
 
 
-st.header('🤖  Foram Factories')
-
 # page = 'Home'
 # # Sidebar for navigation 
 # st.sidebar.title('Navigation') 
@@ -31,25 +29,19 @@ st.header('🤖  Foram Factories')
 # Declare some useful functions.
 
 
-factories_df = data.getFactoryDataProfit()
-
+factories_df = data.getFactoryComplexDataProfit()
+factories_df['Year'] = pd.DatetimeIndex(factories_df['date']).year
+factories_df['Month'] = pd.DatetimeIndex(factories_df['date']).month
 # -----------------------------------------------------------------------------
 # Draw the actual page
 
 # Set the title that appears at the top of the page.
 '''
-# :factory: Foam Factory Dashboard
+# :factory: Factory Status
 
-Analysis of foram factory performance and maintenance data.
 '''
 
 # Add some spacing
-''
-''
-
-
-''
-''
 ''
 
 m.metricsPage(factories_df)
@@ -66,8 +58,6 @@ m.metricsPage(factories_df)
 def click_button():
     st.session_state.clicked = True
     chatbot.open_chatbot()
-
-''
 
 from streamlit_float import *
 

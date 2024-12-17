@@ -3,11 +3,10 @@ import pandas as pd
 import math
 from pathlib import Path
 
+def yearFilter(factory_profit_df): 
 
-def yearFilter(gdp_df): 
-
-    min_value = gdp_df['Year'].min()
-    max_value = gdp_df['Year'].max()
+    min_value = factory_profit_df['Year'].min()
+    max_value = factory_profit_df['Year'].max()
 
     from_year, to_year = st.slider(
         'Which years are you interested in?',
@@ -16,75 +15,64 @@ def yearFilter(gdp_df):
         value=[min_value, max_value])
 
     return from_year, to_year
-    
-    
-def selectedCountry(gdp_df) :
-    countries = gdp_df['Country Code'].unique()
 
-    if not len(countries):
-        st.warning("Select at least one country")
+def selectedFactories(factory_profit_df):
+    factories = factory_profit_df['FactoryID'].unique()
 
-    selected_countries = st.multiselect(
-        'Which countries would you like to view?',
-        countries,
-        ['DEU', 'FRA', 'GBR', 'BRA', 'MEX', 'JPN'])
+    selected_factories = st.multiselect(
+        'Which factories would you like to view?',
+        factories,
+        ['F1', 'F5', 'F10'])
     
-    return selected_countries
+    return selected_factories
 
-def lineGraph(gdp_df, selected_countries, from_year, to_year):
+def lineGraph(factory_profit_df, selected_factories, from_year, to_year):
         
     # Filter the data
-    filtered_gdp_df = gdp_df[
-        (gdp_df['Country Code'].isin(selected_countries))
-        & (gdp_df['Year'] <= to_year)
-        & (from_year <= gdp_df['Year'])
+    filtered_factory_df = factory_profit_df[
+        (factory_profit_df['FactoryID'].isin(selected_factories))
+        & (factory_profit_df['Year'] <= to_year)
+        & (from_year <= factory_profit_df['Year'])
     ]
 
     colgraph = st.columns(2)
 
     with colgraph[0]:
-        st.header('GDP123', divider='gray')
+        st.header('Profit', divider='gray')
 
         ''
 
         st.line_chart(
-            filtered_gdp_df,
-            x='Year',
-            y='GDP',
-            color='Country Code',
+            filtered_factory_df,
+            x='Date',
+            y='TotalProfit',
+            color='FactoryID',
         )
 
         ''
         ''
 
     with colgraph[1]:
-        st.header('GDP over time', divider='gray')
+        st.header('Profit Per Unit', divider='gray')
 
         ''
 
         st.line_chart(
-            filtered_gdp_df,
-            x='Year',
-            y='GDP',
-            color='Country Code',
+            filtered_factory_df,
+            x='Date',
+            y='ProfitPerUnit',
+            color='FactoryID',
         )
 
-def performancePage(gdp_df):
-    from_year, to_year = yearFilter(gdp_df)
-    selected_countries = selectedCountry(gdp_df)
-
-    lineGraph(gdp_df, selected_countries, from_year, to_year)
-
-    ''
-    ''
-
-    first_year = gdp_df[gdp_df['Year'] == from_year]
-    last_year = gdp_df[gdp_df['Year'] == to_year]
-
-    st.header(f'GDP in {to_year}', divider='gray')
+def performancePage(factory_profit_df):
+    from_year, to_year = yearFilter(factory_profit_df)
+    selected_factories = selectedFactories(factory_profit_df)
+    lineGraph(factory_profit_df, selected_factories, from_year, to_year)
 
     ''
+    ''
 
+""" 
     cols = st.columns(4)
 
     for i, country in enumerate(selected_countries):
@@ -106,7 +94,6 @@ def performancePage(gdp_df):
                 value=f'{last_gdp:,.0f}B',
                 delta=growth,
                 delta_color=delta_color
-            )
+            ) """
 
-
-
+ 
