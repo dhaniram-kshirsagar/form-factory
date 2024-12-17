@@ -10,61 +10,54 @@ from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
 from modules.data import data
 from modules.chatbot import chatbot
-
-from modules.performance import performance as p
-from modules.home import homepage as h
 from modules.metrics import metrics as m
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
-    page_title='Foam Factories Dashboard',
+    page_title='Foam Factories',
     page_icon=':factory:', # This is an emoji shortcode. Could be a URL too.
     layout='wide',
 )
 
-page = 'Home'
-# Sidebar for navigation 
-st.sidebar.title('Navigation') 
-page = st.sidebar.selectbox( 'Select a page:', ('Home', 'Performance Section', 'Metrics Section', 'Profile Section') )
+
+# page = 'Home'
+# # Sidebar for navigation 
+# st.sidebar.title('Navigation') 
+# page = st.sidebar.selectbox( 'Select a page:', ('Home', 'Performance Section', 'Metrics Section', 'Profile Section') )
 
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
 
-gdp_df = data.get_gdp_data()
-factories_df = data.getFactoryDataProfit()
 
+factories_df = data.getFactoryComplexDataProfit()
+factories_df['Year'] = pd.DatetimeIndex(factories_df['date']).year
+factories_df['Month'] = pd.DatetimeIndex(factories_df['date']).month
 # -----------------------------------------------------------------------------
 # Draw the actual page
 
 # Set the title that appears at the top of the page.
 '''
-# :factory: Foam Factory Dashboard
+# :factory: Factory Status
 
-Analysis of foram factory performance and maintenance data.
 '''
 
 # Add some spacing
 ''
-''
 
+m.metricsPage(factories_df)
 
-''
-''
-''
-if page == 'Home':
-    h.displayHome()
-elif page == 'Performance Section': 
-    st.title('Performance Dashboard')
-    p.performancePage(gdp_df)
-elif page == 'Metrics Section': 
-    st.title('Metrics Section')
-    m.metricsPage(factories_df)  
+# if page == 'Home':
+#     h.displayHome()
+# elif page == 'Performance Section': 
+#     st.title('Performance Dashboard')
+#     p.performancePage(gdp_df)
+# elif page == 'Metrics Section': 
+#     st.title('Metrics Section')
+#     m.metricsPage(factories_df)  
 
 def click_button():
     st.session_state.clicked = True
     chatbot.open_chatbot()
-
-''
 
 from streamlit_float import *
 
