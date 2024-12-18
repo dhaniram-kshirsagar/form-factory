@@ -51,7 +51,7 @@ def get_gdp_data():
 
 @st.cache_data
 def getFactoryDataProfit(): 
-    DATA_FILENAME = Path(__file__).parent.parent/'data/factorydata.csv'
+    DATA_FILENAME = Path(__file__).parent.parent/'data/sample-data/factorydata.csv'
     raw_profit_df =  pd.read_csv(DATA_FILENAME)
     selected_columns = ['FactoryID', 'Date', 'ProductionVolume', 'TotalProfit', 'ProfitPerUnit'] 
     # Create a new DataFrame with the selected columns
@@ -60,7 +60,7 @@ def getFactoryDataProfit():
 
 @st.cache_data
 def getFactoryComplexDataProfit(): 
-    DATA_FILENAME = Path(__file__).parent.parent/'data/Complex_Expanded_Factory_Data.csv'
+    DATA_FILENAME = Path(__file__).parent.parent/'data/large-data/Complex_Expanded_Factory_Data.csv'
     raw_df =  pd.read_csv(DATA_FILENAME)
 
     from os import replace
@@ -71,3 +71,10 @@ def getFactoryComplexDataProfit():
     raw_df = raw_df.rename(columns=col_rename_lst)
 
     return raw_df
+
+from llama_index.core import SimpleDirectoryReader
+
+@st.cache_resource(show_spinner=False)
+def load_data_for_llm():
+    reader = SimpleDirectoryReader(input_dir=Path(__file__).parent.parent/'data/large-data', recursive=True)
+    return reader.load_data()
