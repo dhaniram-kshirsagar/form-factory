@@ -46,18 +46,19 @@ def open_chatbot():
             # Add response to message history
             st.session_state.messages.append(message)
 
+
+from modules.data import data as d
+
 @st.cache_resource(show_spinner=False)
 def load_data():
-    reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
-    docs = reader.load_data()
+    docs = d.load_data_for_llm()
     Settings.llm = OpenAI(
         model="gpt-3.5-turbo",
         temperature=0.2,
         system_prompt="""You are an expert on 
-        the Streamlit Python library and your 
-        job is to answer technical questions. 
+        the foam factories performance data and maintenance questions. 
         Assume that all questions are related 
-        to the Streamlit Python library. Keep 
+        to the foam factories performance and maintenance. Keep 
         your answers technical and based on 
         facts – do not hallucinate features.""",
     )
