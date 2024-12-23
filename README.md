@@ -1,8 +1,8 @@
-# 🎈 Foam Factory
+# 🏭 Foam Factory
 
 Foam factory app
 
-### How to run it on your own machine
+### How to run it on your own machine 🪟
 
 1. Install the requirements
 
@@ -17,7 +17,7 @@ Foam factory app
    ```
 
 
-### Deploy it on lenode [NOTE following can be containerized as well]
+### Deploy it on lenode [NOTE following can be containerized as well] 💻
 
 1. Checkout from github
 
