@@ -1,6 +1,4 @@
-# 🏭 Foam Factory
-
-Foam factory app
+# 🏭 Foam Factory Data Intelligence
 
 ### How to run it on your own machine 🪟
 
