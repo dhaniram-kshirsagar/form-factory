@@ -17,7 +17,7 @@ Foam factory app
    ```
 
 
---------Deploy on lenode [NOTE following can be containerized as well]
+### Deploy it on lenode [NOTE following can be containerized as well]
 
 1. Checkout from github
 
