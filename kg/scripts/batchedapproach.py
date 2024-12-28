@@ -6,9 +6,14 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # Define the URI and credentials for your Neo4j database
-uri = "neo4j://localhost:7687"
+""" uri = "neo4j://localhost:7687"
+username = "neo4j"
+password = "neo4j123" """
+
+uri = "neo4j://172.104.129.10:7687"  # Default URI for Neo4j
 username = "neo4j"
 password = "neo4j123"
+
 
 # Create a Neo4j driver instance
 driver = GraphDatabase.driver(uri, auth=(username, password))
@@ -24,7 +29,9 @@ def run_query(query, parameters=None):
         return None
 
 # Read the CSV file into a DataFrame
-csv_file_path = 'C:/Development/workspace/kg-creations/data.csv'  # Update with your actual file path
+#csv_file_path = 'C:/Development/workspace/kg-creations/data.csv'  # Update with your actual file path
+csv_file_path = '/home/dhani/form-factory/kg/scripts/data.csv'  # Update with your actual file path
+
 df = pd.read_csv(csv_file_path)
 
 # Replace NaN values with a default value (e.g., empty string)
@@ -34,8 +41,9 @@ df = df.fillna('')
 print(df.info())
 print(df.head())
 
-# Generate unique identifiers for machines
-df['unique_machine_id'] = df['Location'] + '_' + df['Factory'] + '_' + df['Machine Type']
+# Generate unique identifiers for factories and machines
+df['unique_factory_id'] = df['Location'] + '_' + df['Factory']
+df['unique_machine_id'] = df['unique_factory_id'] + '_' + df['Machine Type']
 df['Date'] = pd.to_datetime(df['Date']).dt.strftime('%Y-%m-%d')  # Convert date to the correct format
 
 # Create City nodes
@@ -53,16 +61,17 @@ for city in unique_cities:
 
 # Create Factory nodes and establish LOCATED_IN relationships
 factory_queries = []
-for index, row in df.iterrows():
+unique_factories = df[['Location', 'unique_factory_id']].drop_duplicates()
+for index, row in unique_factories.iterrows():
     factory_queries.append({
         'query': """
-            MATCH (c:City {name: $city})
-            MERGE (f:Factory {factory_id: $factory, location: $city})
+            MATCH (c:City {name: $location})
+            MERGE (f:Factory {factory_id: $factory, location: $location})
             MERGE (f)-[:LOCATED_IN]->(c)
         """,
         'parameters': {
-            'factory': row['Factory'],
-            'city': row['Location']
+            'factory': row['unique_factory_id'],
+            'location': row['Location']
         }
     })
 
@@ -71,14 +80,14 @@ machine_queries = []
 for index, row in df.iterrows():
     machine_queries.append({
         'query': """
-            MATCH (f:Factory {factory_id: $factory, location: $city})
+            MATCH (f:Factory {factory_id: $factory, location: $location})
             MERGE (m:Machine {machine_id: $unique_machine_id, type: $machine_type})
             MERGE (m)-[:PART_OF]->(f)
         """,
         'parameters': {
             'unique_machine_id': row['unique_machine_id'],
-            'factory': row['Factory'],
-            'city': row['Location'],
+            'factory': row['unique_factory_id'],
+            'location': row['Location'],
             'machine_type': row['Machine Type']
         }
     })
