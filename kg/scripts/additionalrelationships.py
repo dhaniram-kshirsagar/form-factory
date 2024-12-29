@@ -281,6 +281,31 @@ for index, row in df.iterrows():
             'date': row['Date']
         }
     })
+df['unique_team_id'] = df['Location'] + '_' + df['Factory'] + '_' + df['Machine Type']
+
+df['unique_team_id'] = df['Location'] + '_' + df['Factory'] + '_' + df['Machine Type']
+
+# Create Team nodes and relationships
+
+# Create Team nodes and relationships
+team_queries = []
+
+for index, row in df.iterrows():
+    team_queries.append({
+        'query': """
+            MERGE (t:Team {team_id: $unique_team_id, factory: $factory, location: $location, machine_type: $machine_type})
+            MERGE (m:Machine {machine_id: $unique_machine_id})
+            MERGE (t)-[:OPERATES {date: date($date)}]->(m)
+        """,
+        'parameters': {
+            'unique_team_id': row['unique_team_id'],
+            'factory': row['Factory'],
+            'location': row['Location'],
+            'machine_type': row['Machine Type'],
+            'unique_machine_id': row['unique_machine_id'],
+            'date': row['Date'] # Assuming 'Production Volume (units)' is the column name
+        }
+    })
 
 # Function to execute batched queries
 def execute_batch_queries(batch_queries):
@@ -290,7 +315,7 @@ def execute_batch_queries(batch_queries):
                 tx.run(q['query'], q['parameters'])
 
 # Execute batched queries in transactions
-execute_batch_queries(date_queries)
+""" execute_batch_queries(date_queries)
 execute_batch_queries(operated_on_queries)
 execute_batch_queries(shift_queries)
 execute_batch_queries(used_on_operated_during_queries)
@@ -300,7 +325,11 @@ execute_batch_queries(supplier_queries)
 execute_batch_queries(defect_queries)
 execute_batch_queries(product_date_relationships)
 execute_batch_queries(product_supplier_relationships)
-execute_batch_queries(machine_defect_date_relationships)
+execute_batch_queries(machine_defect_date_relationships) """
+
+# Execute batched queries in transactions
+execute_batch_queries(team_queries)
+
 
 
 print("Shift nodes, USED_ON and OPERATED_DURING relationships created successfully!")
