@@ -7,9 +7,9 @@ nltk
 pypdf
 streamlit-extras
 streamlit-float
-langchain_openai
+langchain-openai
 langchain
-langchain_neo4j
+langchain-neo4j
 scikit-learn
 sqlite3
 numpy
