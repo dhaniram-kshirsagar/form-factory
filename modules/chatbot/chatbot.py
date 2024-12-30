@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import math
+import os
 from pathlib import Path
 
 
@@ -9,9 +9,11 @@ import openai
 from llama_index.llms.openai import OpenAI
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
+from modules.kg_rag import kg_rag
+
 @st.dialog("Foam Factory Robo Chat")
 def open_chatbot():
-    openai.api_key = ''
+    openai.api_key = os.environ["OPENAI_API_KEY"]
 
     if "messages" not in st.session_state.keys():  # Initialize the chat messages history
         st.session_state.messages = [
@@ -21,12 +23,12 @@ def open_chatbot():
             }
         ]
 
-    index = load_data()
+    #index = load_data()
 
-    if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
-        st.session_state.chat_engine = index.as_chat_engine(
-            chat_mode="condense_question", verbose=True, streaming=True
-        )
+    # if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
+    #     st.session_state.chat_engine = index.as_chat_engine(
+    #         chat_mode="condense_question", verbose=True, streaming=True
+    #     )
 
     if prompt := st.chat_input(
         "Ask a question"
@@ -40,9 +42,9 @@ def open_chatbot():
     # If last message is not from assistant, generate a new response
     if st.session_state.messages[-1]["role"] != "assistant":
         with st.chat_message("assistant"):
-            response_stream = st.session_state.chat_engine.stream_chat(prompt)
-            st.write_stream(response_stream.response_gen)
-            message = {"role": "assistant", "content": response_stream.response}
+            #response_stream = st.session_state.chat_engine.stream_chat(prompt)
+            #st.write_stream(response_stream.response_gen)
+            message = {"role": "assistant", "content": kg_rag.generate_answer(prompt)}#response_stream.response}
             # Add response to message history
             st.session_state.messages.append(message)
 
