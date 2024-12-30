@@ -8,6 +8,8 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
+from pathlib import Path
+
 
 import streamlit  as st
 
@@ -149,7 +151,7 @@ def interactive_prediction():
     """
     Allows the user to interactively predict targets and analyze parameters.
     """
-    db_path = r'C:\\compny project\\form-factory-main\\form-factory-main\\modules\\ml\\Factory_Data.db'
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
     table_name = "Sample_Data_5000_v1"
 
     output_df = pd.DataFrame()
@@ -197,7 +199,7 @@ def get_vol_prediction_for_6month(target):
     """
     Allows the user to interactively predict targets and analyze parameters.
     """
-    db_path = r'C:\\compny project\\form-factory-main\\form-factory-main\\modules\\ml\\Factory_Data.db'
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
     table_name = "Sample_Data_5000_v1"
 
     output_df = pd.DataFrame()
@@ -241,7 +243,7 @@ def get_rev_prediction_for_6month(target):
     """
     Allows the user to interactively predict targets and analyze parameters.
     """
-    db_path = r'C:\\compny project\\form-factory-main\\form-factory-main\\modules\\ml\\Factory_Data.db'
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
     table_name = "Sample_Data_5000_v1"
 
     output_df = pd.DataFrame()
@@ -285,7 +287,7 @@ def get_foam_prediction_for_6month(target):
     """
     Allows the user to interactively predict targets and analyze parameters.
     """
-    db_path = r'C:\\compny project\\form-factory-main\\form-factory-main\\modules\\ml\\Factory_Data.db'
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
     table_name = "Sample_Data_5000_v1"
 
     output_df = pd.DataFrame()
