@@ -7,3 +7,10 @@ nltk
 pypdf
 streamlit-extras
 streamlit-float
+langchain-openai
+langchain
+langchain-neo4j
+scikit-learn
+sqlite3
+numpy
+matplotlib

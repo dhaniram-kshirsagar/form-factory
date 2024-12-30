@@ -29,7 +29,7 @@ CREATE (m:Machine {
   utilization: 74.5858697466541,
   downtime: 6.237528002182154,
   age: 7,
-  cycleTime: 5.999749158180029,
+  cycleTime: 5.999749158180029,`
   energyConsumption: 283.6995567863469,
   energyEfficiencyRating: "A",
   co2Emissions: 140.16725176148134
