@@ -14,7 +14,7 @@ chain = GraphCypherQAChain.from_llm(
     graph=graph,
     verbose=True,
     validate_cypher=True,
-    return_direct=True,
+    #return_direct=True,
     use_function_response=True,
     function_response_system="""You are an expert of neo4j cypher queries as well as 
         the foam factories performance and maintenance data. 
@@ -26,6 +26,6 @@ chain = GraphCypherQAChain.from_llm(
 )
 
 def get_kg_answer(question):
-    return chain.invoke({"query": question})
+    yield chain.invoke({"query": question})
 
 #"which factory is highest profit margin?"

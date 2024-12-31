@@ -42,9 +42,9 @@ def open_chatbot():
     # If last message is not from assistant, generate a new response
     if st.session_state.messages[-1]["role"] != "assistant":
         with st.chat_message("assistant"):
-            #response_stream = st.session_state.chat_engine.stream_chat(prompt)
-            #st.write_stream(response_stream.response_gen)
-            message = {"role": "assistant", "content": kg_rag.generate_answer(prompt)}#response_stream.response}
+            response_stream = kg_rag.get_kg_answer(prompt)
+            st.write_stream(response_stream)
+            message = {"role": "assistant", "content": response_stream}
             # Add response to message history
             st.session_state.messages.append(message)
 
