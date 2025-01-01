@@ -57,8 +57,8 @@ def load_data():
     Settings.llm = OpenAI(
         model="gpt-3.5-turbo",
         temperature=0.2,
-        system_prompt="""You are an expert on 
-        the foam factories performance data and maintenance questions. 
+        system_prompt="""You are an expert in 
+        the foam factories performance and maintenance data. 
         Assume that all questions are related 
         to the foam factories performance and maintenance. Keep 
         your answers technical and based on 
