@@ -1,7 +1,7 @@
 from langchain_neo4j import GraphCypherQAChain, Neo4jGraph
 from langchain_openai import ChatOpenAI
 
-graph = Neo4jGraph(url="bolt://172.104.129.10:7687", username="neo4j", password="")
+graph = Neo4jGraph(url="bolt://172.104.129.10:7687", username="neo4j", password="", enhanced_schema=True)
 
 import getpass
 import os

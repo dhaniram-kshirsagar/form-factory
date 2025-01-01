@@ -96,6 +96,14 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
 
     # st.altair_chart(chart_df)
 
+    # fig = plt.figure(figsize=(12, 8))
+    # ax = sns.lineplot(x='Month', y='Predicted Foam Density', hue='Location', 
+    #          data=filtered_factory_df,
+    #          palette=['red', 'blue', 'purple', 'pink'])
+    # ax.set_ylim([1.241,1.250])
+
+    # st.pyplot(fig)
+
     ''
     ''
 
