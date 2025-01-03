@@ -195,38 +195,37 @@ CREATE (m)-[:EXPERIENCED_DEFECT]->(def)-[:ON]->(d)
 
 
 //Query 1: Find total production volume for a factory in a given month.
-MATCH (f:Factory {factory_id: "Factory 1"})-[:OPERATED_ON]->(d:Date)
+MATCH (f:Factory {factory_id: 1, location: "City A"})-[r:OPERATED_ON]->(d:Date)
 WHERE d.date >= date("2023-01-01") AND d.date < date("2023-02-01")
-RETURN sum(f-[r:OPERATED_ON]->d | r.production_volume) AS TotalProductionVolumeJan
+RETURN sum(r.production_volume) AS TotalProductionVolumeJan
 
 //Query 2: Find average machine utilization for a specific machine type.
-MATCH (m:Machine {machine_type: "Type A"})-[:USED_ON]->(d:Date)
-RETURN avg(m-[r:USED_ON]->d | r.machine_utilization) AS AverageUtilizationTypeA
+MATCH (m:Machine {machine_type: "Type A"})-[r:USED_ON]->(d:Date)
+RETURN avg(r.machine_utilization) AS AverageUtilizationTypeA
 
 //Query 3: Analyze the relationship between downtime and breakdowns (Correlation).
-MATCH (m:Machine)-[:USED_ON]->(d:Date)
-RETURN collect(m-[r:USED_ON]->d | r.machine_downtime) AS Downtimes,
-       collect(m-[r:USED_ON]->d | r.breakdowns) AS Breakdowns
+MATCH (m:Machine)-[r:USED_ON]->(d:Date)
+RETURN collect(r.machine_downtime) AS Downtimes, collect(r.breakdowns) AS Breakdowns
 
 //More advanced correlation (requires APOC library):
 //CALL apoc.coll.pearson(Downtimes, Breakdowns) YIELD value as correlation
 //RETURN correlation
 
 //Query 4: Identify trends in defect rates over time.
-MATCH (m:Machine)-[:USED_ON]->(d:Date)
-RETURN d.date AS Date, avg(m-[r:USED_ON]->d | r.defect_rate) AS AverageDefectRate
+MATCH (m:Machine)-[r:USED_ON]->(d:Date)
+RETURN d.date AS Date, avg(r.defect_rate) AS AverageDefectRate
 ORDER BY d.date
 
 //Query 5: Find the impact of supplier delays on production.
-MATCH (p:Product)-[:SUPPLIED_BY {supplier_delays: supplierDelay}]->(s:Supplier)
-MATCH (p)-[:PRODUCED_ON]->(d:Date)<-[:OPERATED_ON]-(f:Factory)
-RETURN supplierDelay, avg(f-[r:OPERATED_ON]->d | r.production_volume) AS AvgProductionVolume
+MATCH (p:Product)-[sup_rel:SUPPLIED_BY]->(s:Supplier)
+MATCH (p)-[:PRODUCED_ON]->(d:Date)<-[operated_rel:OPERATED_ON]-(f:Factory)
+RETURN sup_rel.supplier_delays AS supplierDelay, avg(operated_rel.production_volume) AS AvgProductionVolume
 ORDER BY supplierDelay
 
 // Example with a specific delay:
 MATCH (p:Product)-[:SUPPLIED_BY {supplier_delays: 1}]->(s:Supplier)
-MATCH (p)-[:PRODUCED_ON]->(d:Date)<-[:OPERATED_ON]-(f:Factory)
-RETURN avg(f-[r:OPERATED_ON]->d | r.production_volume) AS AvgProductionVolumeWith1DayDelay
+MATCH (p)-[:PRODUCED_ON]->(d:Date)<-[operated_rel:OPERATED_ON]-(f:Factory)
+RETURN avg(operated_rel.production_volume) AS AvgProductionVolumeWith1DayDelay
 
 
 // Creating all possible nodes and relationships (consolidated and improved)
