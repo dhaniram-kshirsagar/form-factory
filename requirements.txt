@@ -14,3 +14,6 @@ scikit_learn
 db-sqlite3
 numpy
 matplotlib
+plotly
+streamlit_feedback
+trubrics
