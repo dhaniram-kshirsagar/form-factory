@@ -20,11 +20,6 @@ st.set_page_config(
 )
 
 
-# page = 'Home'
-# # Sidebar for navigation 
-# st.sidebar.title('Navigation') 
-# page = st.sidebar.selectbox( 'Select a page:', ('Home', 'Performance Section', 'Metrics Section', 'Profile Section') )
-
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
 
@@ -46,14 +41,6 @@ factories_df['Month'] = pd.DatetimeIndex(factories_df['date']).month
 
 m.metricsPage(factories_df)
 
-# if page == 'Home':
-#     h.displayHome()
-# elif page == 'Performance Section': 
-#     st.title('Performance Dashboard')
-#     p.performancePage(gdp_df)
-# elif page == 'Metrics Section': 
-#     st.title('Metrics Section')
-#     m.metricsPage(factories_df)  
 
 def click_button():
     st.session_state.clicked = True

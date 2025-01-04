@@ -20,4 +20,7 @@ chain = GraphCypherQAChain.from_llm(
 )
 
 def get_kg_answer(question):
+    return chain.invoke({"query": question})
+
+def yeild_kg_answer(question):
     yield chain.invoke({"query": question})

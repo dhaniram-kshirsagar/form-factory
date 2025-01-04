@@ -3,12 +3,12 @@ from langchain.prompts.prompt import PromptTemplate
 CYPHER_RECOMMENDATION_TEMPLATE = """Task:Generate Cypher statement to query a graph database.
 Instructions:
 Use only the provided relationship types and properties in the schema.
-Do not use any other relationship types or properties that are not provided.
+Do not use any other relationship types or properties that are not provided or not related to that node 
 Schema:
 ////Create Nodes
 
 // Create Factory
-CREATE (:Factory {{factory_id: "1", location: "City D"}}) // This should create 50 factories (5 * 10)
+CREATE (:Factory {{factory_id: 1, location: "City D"}}) // This should create 50 factories (5 * 10)
 
 // Create Date
 CREATE (:Date {{date: date("2023-01-01")}}) 
@@ -41,13 +41,13 @@ CREATE (:Defect {{defect_root_cause: "Material Impurity"}})
 //// Create Relationships with properties
 
 //OPERATED_ON Relationship
-MATCH (f:Factory {{factory_id: " 1"}})
+MATCH (f:Factory {{factory_id: 1}})
 MATCH (d:Date {{date: date("2023-01-01")}})
 CREATE (f)-[:OPERATED_ON {{production_volume: 1199, revenue: 9368.437, profit_margin: 34.47, market_demand_index: 86.73, shift: "Day"}}]->(d)
 //Add shift to OPERATED_ON
 
 //HAS_MACHINE Relationship
-MATCH (f:Factory {{factory_id: "1"}})
+MATCH (f:Factory {{factory_id: 1}})
 MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
 CREATE (f)-[:HAS_MACHINE {{team_size: 10, absentialism: 6.1/}}]->(m)
 
@@ -168,6 +168,45 @@ WITH s, p
 MATCH (p)-[po:PRODUCED_ON]->(d:Date)
 RETURN s.supplier_name AS SupplierName, avg(po.batch_quality) AS AvgBatchQuality
 ORDER BY s.supplier_name
+
+Incorrectly generated Cypher Example:
+Question: What is the average batch quality for each product category?
+
+Incorrect cypher for above question:
+MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
+RETURN p.product_category AS ProductCategory, avg(d.batch_quality) AS AvgBatchQuality
+ORDER BY ProductCategory
+
+Correct cypher for above question:
+MATCH (p:Product)-[po:PRODUCED_ON]->(d:Date)
+RETURN p.product_category AS ProductCategory, avg(po.batch_quality) AS AvgBatchQuality
+ORDER BY ProductCategory
+
+Question: How does the profit margin change over time for Factory 1?
+
+Incorrect cypher for above question:
+MATCH (f:Factory {{factory_id: 1}})-[:OPERATED_ON]->(d:Date)
+RETURN d.date AS Date, avg(f.profit_margin) AS AvgProfitMargin
+ORDER BY d.date
+
+Correct cypher for above question:
+MATCH (f:Factory {{factory_id: 1}})-[op:OPERATED_ON]->(d:Date)
+RETURN d.date AS Date, avg(op.profit_margin) AS AvgProfitMargin
+ORDER BY d.date
+
+Question: How does the co2 emissions change over time for machine "City A-1-Type A" in 2023?
+
+Incorrect cypher for above question:
+MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:USED_ON]->(d:Date {{date: date("2023-01-01")}})
+RETURN d.date AS Date, avg(m.co2_emissions) AS AvgCO2Emissions
+ORDER BY d.date
+
+Correct cypher for above question:
+MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[uo:USED_ON]->(d:Date)
+WHERE d.date >= date("2023-01-01") AND d.date < date("2024-01-01")
+RETURN d.date AS Date, avg(uo.co2_emissions) AS AvgCO2Emissions
+ORDER BY d.date
+
 
 Note: Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
