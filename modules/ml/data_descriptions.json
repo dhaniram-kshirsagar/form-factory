@@ -1,0 +1,15 @@
+{
+    "production_data": {
+      "date": {"data_type": "date", "description": "Date of production"},
+      "factory_id": {"data_type": "integer", "description": "ID of the factory"},
+          "shift": {"data_type": "string", "description": "Shift of the day"}
+    },
+      "profit_data": {
+      "market_demand_index": {"data_type": "float", "description": "Market demand index"},
+      "production_volume": {"data_type": "integer", "description": "Production volume"}
+    },
+      "machine_data": {
+      "machine_id": {"data_type": "string", "description": "Id of the machine"},
+      "breakdowns": {"data_type": "integer", "description": "Number of breakdowns"}
+    }
+  }
