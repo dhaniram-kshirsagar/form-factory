@@ -1,20 +1,20 @@
 {
-    "production_model": {
-      "target_variable": "production_volume",
-      "input_features": ["date", "factory_id", "shift"],
+    "production_volume_model": {
+      "target_variable": "Production Volume (units)",
+      "input_features": ["Year","Month","Factory","Location"],
       "model_type": "RandomForestRegressor",
-      "description": "Predicts production volume based on date, factory, and shift."
+      "description": "Predicts production volume based on year, month, factory, location"
     },
-    "profit_model": {
-      "target_variable": "profit_margin",
-      "input_features": ["market_demand_index", "production_volume"],
-      "model_type": "LinearRegression",
-          "description": "Predicts profit margin based on market demand and production volume."
+    "revenue_model": {
+      "target_variable": "Revenue ($)",
+      "input_features": ["Year","Month","Factory","Location"],
+      "model_type": "RandomForestRegressor",
+          "description": "Predicts revenue based on year, month, factory, location"
     },
-      "breakdown_model": {
-      "target_variable": "breakdowns",
-      "input_features": ["date", "machine_id"],
-      "model_type": "LogisticRegression",
-      "description": "Predicts breakdowns based on date and machine id."
+      "foam_density_model": {
+      "target_variable": "Foam Density",
+      "input_features": ["Year","Month","Factory","Location"],
+      "model_type": "RandomForestRegressor",
+      "description": "Predicts foam density based on year, month, factory, location"
     }
   }

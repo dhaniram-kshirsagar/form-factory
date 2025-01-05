@@ -1,8 +1,6 @@
 import os
-from langchain.embeddings import SentenceTransformerEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain_community.vectorstores import FAISS
 import json
 
 print('Initializing vectory db for ML model RAG...')
@@ -15,7 +13,7 @@ EMBEDDINGS_MODEL = "all-mpnet-base-v2" # or any other Sentence Transformer model
 
 # 1. Load Data Descriptions
 try:
-    with open(DATA_DESCRIPTIONS_FILE, 'r') as f:
+    with open('/workspaces/form-factory/modules/ml/'+DATA_DESCRIPTIONS_FILE, 'r') as f:
         data_descriptions = json.load(f)
 except FileNotFoundError:
     print(f"Error: {DATA_DESCRIPTIONS_FILE} not found. Create this file.")
@@ -23,7 +21,7 @@ except FileNotFoundError:
 
 # 2. Load Model Descriptions
 try:
-    with open(MODEL_DESCRIPTIONS_FILE, 'r') as f:
+    with open('/workspaces/form-factory/modules/ml/'+MODEL_DESCRIPTIONS_FILE, 'r') as f:
         model_descriptions = json.load(f)
 except FileNotFoundError:
     print(f"Error: {MODEL_DESCRIPTIONS_FILE} not found. Create this file.")

@@ -9,6 +9,11 @@ from sklearn.impute import SimpleImputer
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 from pathlib import Path
+import pickle
+
+PRODUCTION_MODEL_FILE = "production_volume_model.pkl"
+REVENUE_MODEL_FILE = "revenue_model.pkl"
+FOAM_DENSITY_MODEL_FILE = "foam_density_model.pkl"
 
 
 import streamlit  as st
@@ -193,6 +198,41 @@ def interactive_prediction():
 
     return output_df
 
+def train_vol_prediction_for_6month(target):
+    """
+    Allows the user to interactively predict targets and analyze parameters.
+    """
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
+    table_name = "Sample_Data_5000_v1"
+
+    output_df = pd.DataFrame()
+    data = load_data(db_path, table_name)
+
+    if data.empty:
+        return pd.DataFrame({"Message": ["Error: Data could not be loaded or is empty."]})
+
+    if target not in data.columns:
+        output_df = pd.concat([output_df, pd.DataFrame({"Message": [f"Error: '{target}' column is missing from the data."]})])
+        return output_df
+
+    data, preprocess_output = preprocess_data(data)
+    #output_df = pd.concat([output_df, preprocess_output])
+
+    independent_variables = data.drop(columns=[target], errors='ignore').columns
+    X = data[independent_variables]
+    y = data[target]
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    model, method_output = choose_best_regression_method(X_scaled, y)
+    #output_df = pd.concat([output_df, method_output])
+
+    model = train_model(X_scaled, y, model)
+
+    with open(PRODUCTION_MODEL_FILE, 'wb') as file:
+        pickle.dump(model, file)
+
 #targets = ['Production Volume (units)', 'Revenue ($)', 'Foam Density']
 @st.cache_data
 def get_vol_prediction_for_6month(target):
@@ -238,6 +278,41 @@ def get_vol_prediction_for_6month(target):
 
     return output_df
 
+def train_rev_prediction_for_6month(target):
+    """
+    Allows the user to interactively predict targets and analyze parameters.
+    """
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
+    table_name = "Sample_Data_5000_v1"
+
+    output_df = pd.DataFrame()
+    data = load_data(db_path, table_name)
+
+    if data.empty:
+        return pd.DataFrame({"Message": ["Error: Data could not be loaded or is empty."]})
+
+    if target not in data.columns:
+        output_df = pd.concat([output_df, pd.DataFrame({"Message": [f"Error: '{target}' column is missing from the data."]})])
+        return output_df
+
+    data, preprocess_output = preprocess_data(data)
+    #output_df = pd.concat([output_df, preprocess_output])
+
+    independent_variables = data.drop(columns=[target], errors='ignore').columns
+    X = data[independent_variables]
+    y = data[target]
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    model, method_output = choose_best_regression_method(X_scaled, y)
+    #output_df = pd.concat([output_df, method_output])
+
+    model = train_model(X_scaled, y, model)
+    
+    with open(REVENUE_MODEL_FILE, 'wb') as file:
+        pickle.dump(model, file)
+
 @st.cache_data
 def get_rev_prediction_for_6month(target):
     """
@@ -281,6 +356,42 @@ def get_rev_prediction_for_6month(target):
     #output_df = pd.concat([output_df, relationships])
 
     return output_df
+
+def train_foam_prediction_for_6month(target):
+    """
+    Allows the user to interactively predict targets and analyze parameters.
+    """
+    db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
+    table_name = "Sample_Data_5000_v1"
+
+    output_df = pd.DataFrame()
+    data = load_data(db_path, table_name)
+
+    if data.empty:
+        return pd.DataFrame({"Message": ["Error: Data could not be loaded or is empty."]})
+
+    if target not in data.columns:
+        output_df = pd.concat([output_df, pd.DataFrame({"Message": [f"Error: '{target}' column is missing from the data."]})])
+        return output_df
+
+    data, preprocess_output = preprocess_data(data)
+    #output_df = pd.concat([output_df, preprocess_output])
+
+    independent_variables = data.drop(columns=[target], errors='ignore').columns
+    X = data[independent_variables]
+    y = data[target]
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    model, method_output = choose_best_regression_method(X_scaled, y)
+    #output_df = pd.concat([output_df, method_output])
+
+    model = train_model(X_scaled, y, model)
+
+   
+    with open(FOAM_DENSITY_MODEL_FILE, 'wb') as file:
+        pickle.dump(model, file)
 
 @st.cache_data
 def get_foam_prediction_for_6month(target):
@@ -328,10 +439,9 @@ def get_foam_prediction_for_6month(target):
 
 # Execute and save outputs to a DataFrame
 if __name__ == "__main__":
-    result_df = ('Revenue ($)')
-    result_vol_df = get_vol_prediction_for_6month('Production Volume (units)')
-    result_vol_df.to_csv("Prod_Vol_Prediction_Output.csv", index=False)
-    result_foam_df = get_foam_prediction_for_6month('Foam Density')
-    result_foam_df.to_csv("Foam_Density_Output.csv", index=False)
-    #result_df.to_csv("output_results.csv", index=False)
+    train_vol_prediction_for_6month('Production Volume (units)')
+    #result_vol_df.to_csv("Prod_Vol_Prediction_Output.csv", index=False)
+    train_foam_prediction_for_6month('Foam Density')
+    #result_foam_df.to_csv("Foam_Density_Output.csv", index=False)
+    train_rev_prediction_for_6month('Revenue ($)')
     print("All outputs have been redirected to 'output_results.csv'")
