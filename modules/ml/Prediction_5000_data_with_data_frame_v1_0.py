@@ -439,9 +439,9 @@ def get_foam_prediction_for_6month(target):
 
 # Execute and save outputs to a DataFrame
 if __name__ == "__main__":
-    train_vol_prediction_for_6month('Production Volume (units)')
-    #result_vol_df.to_csv("Prod_Vol_Prediction_Output.csv", index=False)
-    train_foam_prediction_for_6month('Foam Density')
+    df = get_vol_prediction_for_6month('Production Volume (units)')
+    df.to_csv("prod_pred_output.csv", index=False)
+    #train_foam_prediction_for_6month('Foam Density')
     #result_foam_df.to_csv("Foam_Density_Output.csv", index=False)
-    train_rev_prediction_for_6month('Revenue ($)')
+    #train_rev_prediction_for_6month('Revenue ($)')
     print("All outputs have been redirected to 'output_results.csv'")

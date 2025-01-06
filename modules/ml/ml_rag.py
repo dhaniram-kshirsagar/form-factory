@@ -10,13 +10,23 @@ from langchain.schema import HumanMessage
 
 import os
 
+
+
 if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = ""
+
+LLM_MODEL = "gpt-3.5-turbo"
+ # LLM Call
+llm = ChatOpenAI(temperature=0, model=LLM_MODEL)
+
+import agent
+
+agent.init(llm)
 
 # --- Configuration ---
 VECTOR_DB_PATH = "factory_vector_db"
 EMBEDDINGS_MODEL = "all-mpnet-base-v2"
-LLM_MODEL = "gpt-3.5-turbo"
+
 
 MODEL_SELECTION_PROMPT = """
 You are an expert system designed to select the best machine learning model and extract input parameters to answer user questions about foam factory data.
@@ -31,11 +41,42 @@ Instructions:
 2. Select the most appropriate ML model to answer the question. If no suitable model is found, respond with "No suitable model found."
 3. Extract the necessary input parameters/variables from the question and provided information. 
 4. Return the selected model name and the input parameters in JSON format. If no suitable model is found, return "No suitable model found."
+5. In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4 and locations should be 0-4
+6. if default values in case following are not mentioned: factories: [0], locations: [0], years:[2025], months:[1]
+6. Use this mapping:
+    Factories:
+        Factory 1 -> 0
+        Factory 2 -> 1
+        ...
+        Factory 10 -> 9
+    Location:
+        City A -> 0
+        City B -> 1
+        City C -> 2
+        ...
+        City E -> 4
+
+Examples:
+
+Question: Give production volume numbers for 2 months
+Output:
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2],"factories":[0],"locations":[0]}}}}
+
+Question: Give production volume  for march months
+Output:
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"month":[3],"factories":[0],"locations":[0]}}}}
+
+Question: Give production volume numbers for 7 months for factory 2
+Output:
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"month":[1, 2, 3, 4, 5, 6, 7],"factories":[1],"locations":[0]}}}}
+
+Question: Give production volume numbers for October for factory 4 City B
+Output:
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"month":[10],"factories":[3],"locations":[1]}}}}
 
 Output Format:
-```json
 
-{{"model_name": "model_name", "input_parameters": {{"years":year,"months":month,"factories":factory,"locations":location}}}}
+{{"model_name": "model_name", "input_parameters": {{"years":[year],"months":[month],"factories":[factory],"locations":[location]}}}}
 
 or
 
@@ -106,19 +147,18 @@ def get_model_and_params(question):
       )
     final_prompt = prompt.format(question=question, context=context)
 
-    # LLM Call
-    llm = ChatOpenAI(temperature=0, model=LLM_MODEL)
 
     try:
         messages = [HumanMessage(content=final_prompt)] # Create a list of messages
         llm_output = llm.invoke(messages).content
         response = json.loads(llm_output)
+        
         if "model_name" in response and "input_parameters" in response:
-            extracted_params = extract_params_from_question(question)
+            # extracted_params = extract_params_from_question(question)
             final_params = response["input_parameters"]
-            for key in extracted_params:
-                if extracted_params[key]:
-                    final_params[key] = extracted_params[key]
+            # for key in extracted_params:
+            #     if extracted_params[key]:
+            #         final_params[key] = extracted_params[key]
             return response["model_name"], final_params
         else:
             print("LLM output is not in the expected JSON format:")
@@ -134,10 +174,16 @@ def get_model_and_params(question):
             return None, None
         
 def main():
-    query = "What will be production volume over next 6 months?"
+    #query = "What will be production volume over next 6 months?"
+    query = "What will be foam density of factory 1 in city A?"
     model_name, model_params = get_model_and_params(query)
     print(model_name)
     print(model_params)
-    #agent.run_agent(model_name, model_params)
+    if model_name is not None:
+        data = agent.run_agent(model_name, model_params)
+    else:
+        data = 'Unable to map model for given query!!'
+    
+    print(data)
 
 main()
