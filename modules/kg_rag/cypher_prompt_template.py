@@ -56,11 +56,10 @@ MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
 MATCH (d:Date {{date: date("2023-01-01")}})
 CREATE (m)-[:USED_ON {{machine_utilization: 74.59, machine_downtime: 6.24, cycle_time: 6, energy_consumption: 283.7, co2_emissions: 140.17, emission_limit_compliance: "No", cost_of_downtime: 488.75, breakdowns: 1, safety_incidents: 0, defect_rate: 2, team_size: 10, absentialism: 6.1}}]->(d)
 
-// ON Relationship
+// OPERATED Relationship
 MATCH (o:Operator {{operator_id: "City A-1-Operator 1"}})
 MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (o)-[:OPERATED]->(m)-[:ON]->(d)
+CREATE (o)-[:OPERATED{{date: date("2023-01-01")}}]->(m)
 
 // PRODUCED_ON Relationship
 MATCH (p:Product {{product_category: "Foam Grade A"}})
@@ -82,8 +81,7 @@ CREATE (p)-[:PRODUCED_USING]->(r)-[:ON]->(d)
 // EXPERIENCED_DEFECT Relationship
 MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
 MATCH (def:Defect {{defect_root_cause: "Material Impurity"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (m)-[:EXPERIENCED_DEFECT]->(def)-[:ON]->(d)
+CREATE (m)-[:EXPERIENCED_DEFECT{{date: date("2023-01-01")}}]->(def)
 
 Cypher Examples:
 Question: Find factories with an average profit margin below a certain threshold:
@@ -111,7 +109,7 @@ Cypher
 
 Question: Identify recurring defects for a specific machine:
 
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:EXPERIENCED_DEFECT]->(def:Defect)-[:ON]->(d:Date)
+MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:EXPERIENCED_DEFECT]->(def:Defect)
 RETURN def.defect_root_cause AS DefectRootCause, count(*) AS DefectCount
 ORDER BY DefectCount DESC
 
@@ -158,7 +156,7 @@ Question: List factories and average low profit margins:
 MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
 WHERE o.profit_margin < 25
 WITH f, avg(o.profit_margin) AS AverageProfitMargin
-RETURN f.factory_id AS FactoryID, , f.location as City, AverageProfitMargin
+RETURN f.factory_id AS FactoryID, f.location as City, AverageProfitMargin
 '''
 
 Question: What is the average batch quality for products supplied by each supplier?
