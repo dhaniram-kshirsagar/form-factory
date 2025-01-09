@@ -17,3 +17,12 @@ matplotlib
 plotly
 streamlit_feedback
 trubrics
+langchain-community 
+langchain-huggingface
+langchain-text-splitters
+langgraph
+langgraph-checkpoint
+langgraph-sdk 
+langsmith  
+python-dotenv
+watchdog
