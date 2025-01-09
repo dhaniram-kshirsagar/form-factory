@@ -26,3 +26,4 @@ langgraph-sdk
 langsmith  
 python-dotenv
 watchdog
+faiss-cpu
