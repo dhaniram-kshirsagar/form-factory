@@ -1,12 +1,20 @@
 import streamlit as st
 import pandas as pd
-import math
-from pathlib import Path
 
+import os
+from dotenv import load_dotenv
 
-import openai
-from llama_index.llms.openai import OpenAI
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+# Load environment variables from .env file
+load_dotenv()
+
+# Get the OpenAI API key
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Check if the key is loaded
+if OPENAI_API_KEY is None:
+    raise ValueError("OPENAI_API_KEY environment variable not set. Please create a .env file with OPENAI_API_KEY=<your_key>.")
+else:
+    print("OpenAI API key loaded successfully.")
 
 from modules.data import data
 from modules.chatbot import chatbot

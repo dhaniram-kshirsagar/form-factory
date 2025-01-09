@@ -5,26 +5,34 @@ import json
 
 print('Initializing vectory db for ML model RAG...')
 
-# Configuration (adjust paths as needed)
-MODEL_DESCRIPTIONS_FILE = "model_descriptions.json"  # JSON file with model metadata
-DATA_DESCRIPTIONS_FILE = "data_descriptions.json" # JSON file with data descriptions
-VECTOR_DB_PATH = "factory_vector_db"
+from pathlib import Path
+
+#MODEL_DESCRTIPTIONS_FILE = '/workspaces/form-factory/modules/ml/'+"model_descriptions.json"
+MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/model_descriptions.json"
+
+#DATA_DESCRIPTION_FILE = '/workspaces/form-factory/modules/ml/'+"data_descriptions.json"
+DATA_DESCRIPTION_FILE = Path(__file__).parent.parent/"ml/data_descriptions.json"
+
+# --- Configuration ---
+#VECTOR_DB_PATH = '/workspaces/form-factory/modules/ml/'+"factory_vector_db"
+VECTOR_DB_PATH = Path(__file__).parent.parent/"ml/factory_vector_db"
+
 EMBEDDINGS_MODEL = "all-mpnet-base-v2" # or any other Sentence Transformer model
 
 # 1. Load Data Descriptions
 try:
-    with open('/workspaces/form-factory/modules/ml/'+DATA_DESCRIPTIONS_FILE, 'r') as f:
+    with open(DATA_DESCRIPTION_FILE, 'r') as f:
         data_descriptions = json.load(f)
 except FileNotFoundError:
-    print(f"Error: {DATA_DESCRIPTIONS_FILE} not found. Create this file.")
+    print(f"Error: {DATA_DESCRIPTION_FILE} not found. Create this file.")
     exit()
 
 # 2. Load Model Descriptions
 try:
-    with open('/workspaces/form-factory/modules/ml/'+MODEL_DESCRIPTIONS_FILE, 'r') as f:
+    with open(MODEL_DESCRTIPTIONS_FILE, 'r') as f:
         model_descriptions = json.load(f)
 except FileNotFoundError:
-    print(f"Error: {MODEL_DESCRIPTIONS_FILE} not found. Create this file.")
+    print(f"Error: {MODEL_DESCRTIPTIONS_FILE} not found. Create this file.")
     exit()
 
 # 3. Create Documents for Vector Database

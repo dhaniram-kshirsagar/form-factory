@@ -1,12 +1,15 @@
-import datetime
-import pandas as pd
-import joblib
-
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain_core.tools import StructuredTool
 import json
+import os
+
+import joblib
+from pathlib import Path
+import pandas as pd
+
+if "OPENAI_API_KEY" not in os.environ:
+    os.environ["OPENAI_API_KEY"] = ""
 
 
 FEATURE_COLUMN = ["Year", "Month", "Factory", "Location", "Machine Type", "Machine Utilization (%)", "Machine Downtime (hours)", "Maintenance History", "Machine Age (years)", "Batch Quality (Pass %)", "Cycle Time (minutes)", "Energy Consumption (kWh)", "Energy Efficiency Rating", "CO2 Emissions (kg)", "Emission Limit Compliance", "Waste Generated (kg)", "Water Usage (liters)", "Shift", "Operator Experience (years)", "Team Size", "Operator Training Level", "Absenteeism Rate (%)", "Product Category", "Supplier", "Supplier Delays (days)", "Raw Material Quality", "Market Demand Index", "Cost of Downtime ($)", "Profit Margin (%)", "Breakdowns (count)", "Safety Incidents (count)", "Defect Root Cause", "Production Volume (units)", "Defect Rate (%)", "Foam Density", "Sales Data", "Day"]
@@ -58,9 +61,17 @@ dict_row_1 = dict(zip(keys, values_row_1))
 #print(PRED_DATA)
 
 # Configuration (adjust paths as needed)
-PRODUCTION_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"production_volume_model.pkl"
-REVENUE_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"revenue_model.pkl"
-FOAM_DENSITY_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"foam_density_model.pkl"
+# PRODUCTION_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"production_volume_model.pkl"
+# REVENUE_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"revenue_model.pkl"
+# FOAM_DENSITY_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"foam_density_model.pkl"
+
+PRODUCTION_MODEL_FILE = Path(__file__).parent.parent/"ml/production_volume_model.pkl"
+REVENUE_MODEL_FILE = Path(__file__).parent.parent/"ml/revenue_model.pkl"
+FOAM_DENSITY_MODEL_FILE = Path(__file__).parent.parent/"ml/foam_density_model.pkl"
+
+#MODEL_DESCRTIPTIONS_FILE = '/workspaces/form-factory/modules/ml/'+"model_descriptions.json"
+MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/model_descriptions.json"
+
 LLM_MODEL = "gpt-4"
 ALL_MONTHS = list(range(1, 13))  # All 12 months
 ALL_LOCATIONS = [0,1,2,3] # All 4 locations
@@ -142,32 +153,32 @@ def predict(model_name, years, months, factories, locations):
 
 # Define Tools (dynamically)
 tools = []
-model_descriptions_file = '/workspaces/form-factory/modules/ml/'+"model_descriptions.json"
+
 try:
-    with open(model_descriptions_file, 'r') as f:
+    with open(MODEL_DESCRTIPTIONS_FILE, 'r') as f:
         model_descriptions = json.load(f)
 except FileNotFoundError:
-    print(f"Error: {model_descriptions_file} not found. Create this file.")
+    print(f"Error: {MODEL_DESCRTIPTIONS_FILE} not found. Create this file.")
     exit()
 
 for model_name, model_data in model_descriptions.items():
-    tool_name = model_name.replace("_", " ").title().replace("Model", "Predictor")
+    tool_name = model_name
     description = f"Useful for predicting {model_data['target_variable'].lower()}. Input should be "
-    description += ", ".join([f"{feature} ({'integer' if str(feature).lower() in ['year','month'] else 'string'})" for feature in model_data['input_features']]) + "."
+    description += ", ".join([f"{feature} ({'array of integer' if str(feature).lower() in ['year','month'] else 'array of integer'})" for feature in model_data['input_features']]) + "."
     input_params = model_data['input_features']
-    print(tool_name)
+    #print(description)
     tools.append(
         StructuredTool.from_function(
             name=tool_name,
             func=lambda year, month, factory, location, model_name=model_name: predict(model_name, year, month, factory, location),
-            description=description,
-            return_direct=True
+            description=description
         )
     )
 
 prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", "You are a ml model prediction assistant."),
+        ("system", "You are a ml model prediction assistant. Use input as it is. Don't break numbers in multiple prediction call. "),
+        ("placeholder", "{chat_history}"),
         # Then the new input
         ("human", "{input}"),
         # Finally the scratchpad
@@ -176,6 +187,9 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 agent_executor = None
+# LLM_MODEL = "gpt-3.5-turbo"
+#  # LLM Call
+# llm = ChatOpenAI(temperature=0, model=LLM_MODEL)
 
 def init(llm):
     global agent_executor
@@ -183,31 +197,43 @@ def init(llm):
     agent = create_tool_calling_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
+#init(llm)
+
+
 def run_agent(model_name, input_params):
     """Runs the agent with the specified model and parameters."""
-    try:
-        years = input_params.get("years", [])
-        months = input_params.get("months", [])
-        factories = input_params.get("factories", [])
-        locations = input_params.get("locations", [])
-        if not years:
-          years = [datetime.now().year]
-        if not months:
-          months = ALL_MONTHS
-        if not factories:
-          factories = [0] # default factory
-        if not locations:
-          locations = ALL_LOCATIONS
+    
+    #try:
+    #print('Starting agent run')
+    #input_params = json.loads(input_params)
+   
+    years = input_params['years']
+    months = input_params.get("months", [])
+    factories = input_params.get("factories", [])
+    locations = input_params.get("locations", [])
 
-        prompt_string = f"Predict {model_descriptions[model_name]['target_variable'].lower()} for "
-        prompt_string += ", ".join([f"{key} {value}" for key,value in input_params.items()]) + "."
+    if not years:
+        years = [datetime.now().year]
+    if not months:
+        months = ALL_MONTHS
+    if not factories:
+        factories = [0] # default factory
+    if not locations:
+        locations = ALL_LOCATIONS
+    
+    #print('Starting agent run3')
 
-        print(prompt_string)
-        return agent_executor.invoke({"input":prompt_string})
+    prompt_string = f"Predict {model_descriptions[model_name]['target_variable'].lower()} for "
+    prompt_string += ", ".join([f"{key} {value}" for key,value in input_params.items()]) + "."
 
-    except Exception as e:
-        return f"Error running agent: {e}"
+    print(prompt_string)
+    return agent_executor.invoke({"input":prompt_string})
 
+
+#data = run_agent('foam_density_model', '{"years": [2025], "months": [1, 4], "factories": [0], "locations": [0]}')
+# for d in data['output']:
+#     print(d)
+#print(data['output'])
 # Example Usage
 # questions = [
 #     "What will be the production volume in 2024 for all months for factory A in all locations?",

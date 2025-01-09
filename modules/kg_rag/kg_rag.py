@@ -4,13 +4,12 @@ from langchain_openai import ChatOpenAI
 from modules.kg_rag.cypher_prompt_template import CYPHER_RECOMMENDATION_PROMPT
 from modules.kg_rag.qa_prompt_template import QA_PROMPT
 
-graph = Neo4jGraph(url="bolt://172.104.129.10:7687", username="neo4j", password="", enhanced_schema=True)
-
-import getpass
 import os
 
-if "OPENAI_API_KEY" not in os.environ:
-    os.environ["OPENAI_API_KEY"] = ""
+# Get the OpenAI API key
+NEO4J_PASSWORD = os.getenv("NEO_4J_PASS")
+
+graph = Neo4jGraph(url="bolt://172.104.129.10:7687", username="neo4j", password=NEO4J_PASSWORD, enhanced_schema=True)
 
 chain = GraphCypherQAChain.from_llm(
     ChatOpenAI(temperature=0), graph=graph, verbose=True,

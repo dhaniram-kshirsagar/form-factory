@@ -4,7 +4,7 @@ import streamlit as st
 from streamlit_feedback import streamlit_feedback
 import trubrics
 
-from modules.kg_rag import kg_rag
+from modules.ml import ml_rag
 
 
 # with st.sidebar:
@@ -13,22 +13,19 @@ from modules.kg_rag import kg_rag
 #     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/pages/5_Chat_with_user_feedback.py)"
 #     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
 
-st.title("📝 Chat with Furture Astro")
+st.title("📝 Predict Factory Performance with Factory Astro")
 #st.set_page_config(layout="wide")
 
 markdown = """
 You can start with following examples:
 
-    - What is the average batch quality for each product category?
-    - How does the profit margin change over time for Factory 1?
-    - For each factory, what is the total production volume and the average profit margin on days when the production volume was above the average production volume for that factory?
-    - Which machines experienced defects caused by 'Material Impurity' and what was their utilization on the day of the defect?
-    - Which operators have experience greater than 7 years and operated machines that experienced defects?
-    - What is the average batch quality for products supplied by each supplier?
-    - What is the average downtime for each machine type?
-    - Which factory had the highest total revenue in 2023?
-    - How does the co2 emissions change over time for machine "City A-1-Type A" in year 2023?
-    - What is the total energy consumption for each factory in 2023?
+    - What will revenue for factor 3 next year?
+    - What will be form density like in July for factor 2?
+    - What will be production volume over next 2 months?
+    - What will be foam density of factory 1 in city A?
+    - What will be revenue over next 2 months for factory 3 in city c?
+    - Get me production volume for factor 4 city c in month of July
+
 """
 
 st.markdown(markdown)
@@ -44,14 +41,15 @@ messages = st.session_state.messages
 for msg in messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-if prompt := st.chat_input(placeholder="e.g. List factories which are having low production vlume."):
+if prompt := st.chat_input(placeholder="e.g. Get me production volume for factor 4 city c in month of July."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
-    st.session_state["response"] = kg_rag.get_kg_answer(prompt)
+    st.session_state["response"] = ml_rag.get_ml_answer(prompt)
     with st.chat_message("assistant"):
         st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
         st.write(st.session_state["response"])
 
+st.markdown('NOTE Its work in progress... In the generated output: Add +1 to Factory name. Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.')
 # if st.session_state["response"]:
 #     feedback = streamlit_feedback(
 #         feedback_type="thumbs",
