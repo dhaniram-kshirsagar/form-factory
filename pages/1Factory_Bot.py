@@ -1,3 +1,4 @@
+import time
 from openai import OpenAI
 import streamlit as st
 from streamlit_feedback import streamlit_feedback
@@ -11,7 +12,7 @@ from modules.kg_rag import kg_rag
 #     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/pages/5_Chat_with_user_feedback.py)"
 #     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
 
-st.title("📝 Chat with Foam Factories")
+st.title(":robot_face: Chat with Foam Factories")
 #st.set_page_config(layout="wide")
 
 markdown = """
@@ -35,20 +36,34 @@ if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "assistant", "content": "How can I help you? Leave feedback to help me improve!"}
     ]
+
 if "response" not in st.session_state:
     st.session_state["response"] = None
+
+if "waiting_for_response" not in st.session_state:
+    st.session_state.waiting_for_response = False
 
 messages = st.session_state.messages
 for msg in messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-if prompt := st.chat_input(placeholder="e.g. List factories which are having low production vlume."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
-    st.session_state["response"] = kg_rag.get_kg_answer(prompt)
-    with st.chat_message("assistant"):
-        st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
-        st.write(st.session_state["response"])
+if prompt := st.chat_input(placeholder="e.g. List factories which are having low production vlume.", disabled=st.session_state.waiting_for_response) or st.session_state.waiting_for_response:
+    if not st.session_state.waiting_for_response:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.last_user_message = prompt
+        st.chat_message("user").write(prompt)
+        st.session_state.waiting_for_response = True
+        st.rerun()
+    else:
+        with st.spinner("Assistant is typing..."):
+            time.sleep(1)
+            print(prompt)
+            st.session_state["response"] = kg_rag.get_kg_answer(st.session_state.last_user_message)
+            with st.chat_message("assistant"):
+                st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
+                st.write(st.session_state["response"])
+            st.session_state.waiting_for_response = False
+            st.rerun()
 
 # if st.session_state["response"]:
 #     feedback = streamlit_feedback(

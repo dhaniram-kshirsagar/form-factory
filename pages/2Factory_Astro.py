@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 from openai import OpenAI
 import streamlit as st
@@ -7,14 +8,7 @@ import trubrics
 from modules.ml import ml_rag
 
 
-# with st.sidebar:
-#     openai_api_key = st.text_input("OpenAI API Key", key="feedback_api_key", type="password")
-#     "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-#     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/pages/5_Chat_with_user_feedback.py)"
-#     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
-
 st.title("📝 Predict Factory Performance with Factory Astro")
-#st.set_page_config(layout="wide")
 
 markdown = """
 You can start with following examples:
@@ -34,20 +28,33 @@ if "astro_messages" not in st.session_state:
     st.session_state.astro_messages = [
         {"role": "assistant", "content": "How can I help you? Leave feedback to help me improve!"}
     ]
-if "response" not in st.session_state:
+if "astro_response" not in st.session_state:
     st.session_state["astro_response"] = None
+
+if "astro_waiting_for_response" not in st.session_state:
+    st.session_state.astro_waiting_for_response = False
 
 messages = st.session_state.astro_messages
 for msg in messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-if prompt := st.chat_input(placeholder="e.g. Get me production volume for factor 4 city c in month of July."):
-    st.session_state.astro_messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
-    st.session_state["astro_response"] = ml_rag.get_ml_answer(prompt)
-    with st.chat_message("assistant"):
-        st.session_state.astro_messages.append({"role": "assistant", "content": st.session_state["astro_response"]})
-        st.write(st.session_state["astro_response"])
+if prompt := st.chat_input(placeholder="e.g. Get me production volume for factor 4 city c in month of July.", disabled=st.session_state.astro_waiting_for_response) or st.session_state.astro_waiting_for_response:
+    if not st.session_state.astro_waiting_for_response:
+        st.session_state.astro_messages.append({"role": "user", "content": prompt})
+        st.session_state.astro_last_user_message = prompt
+        st.chat_message("user").write(prompt)
+        st.session_state.astro_waiting_for_response = True
+        st.rerun()
+    else:
+        with st.spinner("Assistant is typing..."):
+            time.sleep(1)
+            print(prompt)
+            st.session_state["astro_response"] = ml_rag.get_ml_answer(st.session_state.astro_last_user_message)
+            with st.chat_message("assistant"):
+                st.session_state.astro_messages.append({"role": "assistant", "content": st.session_state["astro_response"]})
+                st.write(st.session_state["astro_response"])
+            st.session_state.astro_waiting_for_response = False
+            st.rerun()
 
 st.markdown('NOTE Its work in progress... In the generated output: Add +1 to Factory name. Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.')
 # if st.session_state["response"]:
