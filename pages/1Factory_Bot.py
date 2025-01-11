@@ -6,6 +6,8 @@ import trubrics
 
 from modules.kg_rag import kg_rag
 
+kg_rag.init_graph()
+
 # with st.sidebar:
 #     openai_api_key = st.text_input("OpenAI API Key", key="feedback_api_key", type="password")
 #     "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"

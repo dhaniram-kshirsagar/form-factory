@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 from pathlib import Path
+from modules.data.data_curater import load_data
 
 def yearFilter(factory_profit_df): 
 
@@ -26,7 +27,7 @@ def selectedFactories(factory_profit_df):
     
     return selected_factories
 
-def lineGraph(factory_profit_df, selected_factories, from_year, to_year):
+def defect_rate(factory_profit_df, selected_factories, from_year, to_year):
         
     # Filter the data
     filtered_factory_df = factory_profit_df[
@@ -34,114 +35,112 @@ def lineGraph(factory_profit_df, selected_factories, from_year, to_year):
         & (factory_profit_df['Year'] <= to_year)
         & (from_year <= factory_profit_df['Year'])
     ]
+    
+    st.header('Defect Rate', divider='gray')
 
-    # filtered_factory_df['time'] = pd.to_datetime(filtered_factory_df['date'])
-    # monthly_avg_df = (filtered_factory_df.groupby(['factory', 'time', filtered_factory_df['time'].dt.to_period('m')])['defect_rate_pcnt']
-    #       .sum()
-    #       .groupby(level=0)
-    #       .mean()
-    #       .reset_index(name='avg_defect_rate'))
+    ''
 
-    filtered_factory_df['time'] = pd.to_datetime(filtered_factory_df['date'])
-    filtered_factory_df['MonthYear'] = filtered_factory_df['time'].apply("{:%Y-%m}".format)
-    monthly_avg_df = filtered_factory_df.groupby([filtered_factory_df['MonthYear'], filtered_factory_df['factory']])['defect_rate_pcnt'].mean().reset_index()
+    st.line_chart(
+        filtered_factory_df,
+        x='MonthYear',
+        y='defect_rate_pcnt',
+        color='factory',
+    )
+
+    ''
+    ''
+
+def lineGraph2(factory_profit_df, selected_factories, from_year, to_year):
+
+    
+    filtered_factory_df = factory_profit_df[
+        (factory_profit_df['factory'].isin(selected_factories))
+        & (factory_profit_df['Year'] <= to_year)
+        & (from_year <= factory_profit_df['Year'])
+    ]
+    
+    st.header('Production Volume', divider='gray')
+
+    ''
+
+    st.line_chart(
+        filtered_factory_df,
+        x='MonthYear',
+        y='production_volume_units',
+        color='factory',
+    )
+
+    ''
+    ''
+
+def lineGraph3( factory_profit_df,selected_factories, from_year, to_year):
+
+    filtered_factory_df = factory_profit_df[
+        (factory_profit_df['factory'].isin(selected_factories))
+        & (factory_profit_df['Year'] <= to_year)
+        & (from_year <= factory_profit_df['Year'])
+    ]
+    
+    st.header('Energy Consumption', divider='gray')
+
+    ''
+
+    st.line_chart(
+        filtered_factory_df,
+        x='MonthYear',
+        y='energy_consumption_kwh',
+        color='factory',
+    )
+
+    ''
+    ''
+
+
+def lineGraph4(factory_profit_df, selected_factories, from_year, to_year):
+    filtered_factory_df = factory_profit_df[
+        (factory_profit_df['factory'].isin(selected_factories))
+        & (factory_profit_df['Year'] <= to_year)
+        & (from_year <= factory_profit_df['Year'])
+    ]
+    
+    st.header('Factory Uptime', divider='gray')
+
+    ''
+
+    st.line_chart(
+        filtered_factory_df,
+        x='MonthYear',
+        y='machine_downtime_hours',
+        color='factory',
+    )
+
+
+def metricsPage():
+    avg_defect_rate_df=load_data('avg_defect_rate_table')
+    from_year, to_year = yearFilter(avg_defect_rate_df)
+    selected_factories = selectedFactories(avg_defect_rate_df)
 
     colgraph = st.columns(2)
 
     with colgraph[0]:
-        st.header('Defect Rate', divider='gray')
-
-        ''
-
-        st.line_chart(
-            monthly_avg_df,
-            x='MonthYear',
-            y='defect_rate_pcnt',
-            color='factory',
-        )
-
-        ''
-        ''
-
-    avg_month_prod = filtered_factory_df.groupby([filtered_factory_df['MonthYear'], filtered_factory_df['factory']])['production_volume_units'].mean().reset_index()
+        
+        defect_rate(avg_defect_rate_df, selected_factories, from_year, to_year)
     with colgraph[1]:
-        st.header('Production Volume', divider='gray')
+        production_volume_units = load_data('production_volume_units')
 
-        ''
-
-        st.line_chart(
-            avg_month_prod,
-            x='MonthYear',
-            y='production_volume_units',
-            color='factory',
-        )
-    
-    ''
-    ''
+        lineGraph2( production_volume_units,selected_factories, from_year, to_year)
 
     colgraph2 = st.columns(2)
-
-    avg_month_energy = filtered_factory_df.groupby([filtered_factory_df['MonthYear'], filtered_factory_df['factory']])['energy_consumption_kwh'].mean().reset_index()
-    avg_month_dntime = filtered_factory_df.groupby([filtered_factory_df['MonthYear'], filtered_factory_df['factory']])['machine_downtime_hours'].mean().reset_index()
-
+    
     with colgraph2[0]:
-        st.header('Energy Consumption', divider='gray')
-
-        ''
-
-        st.line_chart(
-            avg_month_energy,
-            x='MonthYear',
-            y='energy_consumption_kwh',
-            color='factory',
-        )
-
-        ''
-        ''
-
+        energy_consumption_kwh = load_data('energy_consumption_kwh')
+        lineGraph3(energy_consumption_kwh,selected_factories, from_year, to_year)
     with colgraph2[1]:
-        st.header('Factory Uptime', divider='gray')
-
-        ''
-
-        st.line_chart(
-            avg_month_dntime,
-            x='MonthYear',
-            y='machine_downtime_hours',
-            color='factory',
-        )
-
-
-def metricsPage(factory_profit_df):
-    from_year, to_year = yearFilter(factory_profit_df)
-    selected_factories = selectedFactories(factory_profit_df)
-    lineGraph(factory_profit_df, selected_factories, from_year, to_year)
+        machine_downtime_hours = load_data('machine_downtime_hours')
+        lineGraph4( machine_downtime_hours,selected_factories, from_year, to_year)
 
     ''
     ''
 
-""" 
-    cols = st.columns(4)
-
-    for i, country in enumerate(selected_countries):
-        col = cols[i % len(cols)]
-
-        with col:
-            first_gdp = first_year[first_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
-            last_gdp = last_year[last_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
-
-            if math.isnan(first_gdp):
-                growth = 'n/a'
-                delta_color = 'off'
-            else:
-                growth = f'{last_gdp / first_gdp:,.2f}x'
-                delta_color = 'normal'
-
-            st.metric(
-                label=f'{country} GDP',
-                value=f'{last_gdp:,.0f}B',
-                delta=growth,
-                delta_color=delta_color
-            ) """
 
  

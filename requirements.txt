@@ -27,3 +27,4 @@ langsmith
 python-dotenv
 watchdog
 faiss-cpu
+futures
