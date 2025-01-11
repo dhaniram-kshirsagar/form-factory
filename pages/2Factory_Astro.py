@@ -30,24 +30,24 @@ You can start with following examples:
 
 st.markdown(markdown)
 
-if "messages" not in st.session_state:
-    st.session_state.messages = [
+if "astro_messages" not in st.session_state:
+    st.session_state.astro_messages = [
         {"role": "assistant", "content": "How can I help you? Leave feedback to help me improve!"}
     ]
 if "response" not in st.session_state:
-    st.session_state["response"] = None
+    st.session_state["astro_response"] = None
 
-messages = st.session_state.messages
+messages = st.session_state.astro_messages
 for msg in messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
 if prompt := st.chat_input(placeholder="e.g. Get me production volume for factor 4 city c in month of July."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.session_state.astro_messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
-    st.session_state["response"] = ml_rag.get_ml_answer(prompt)
+    st.session_state["astro_response"] = ml_rag.get_ml_answer(prompt)
     with st.chat_message("assistant"):
-        st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
-        st.write(st.session_state["response"])
+        st.session_state.astro_messages.append({"role": "assistant", "content": st.session_state["astro_response"]})
+        st.write(st.session_state["astro_response"])
 
 st.markdown('NOTE Its work in progress... In the generated output: Add +1 to Factory name. Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.')
 # if st.session_state["response"]:

@@ -4,9 +4,10 @@ from langchain_core.tools import StructuredTool
 import json
 import os
 
-import joblib
 from pathlib import Path
 import pandas as pd
+
+from modules.ml import predictor
 
 if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = ""
@@ -60,15 +61,6 @@ dict_row_1 = dict(zip(keys, values_row_1))
 
 #print(PRED_DATA)
 
-# Configuration (adjust paths as needed)
-# PRODUCTION_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"production_volume_model.pkl"
-# REVENUE_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"revenue_model.pkl"
-# FOAM_DENSITY_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"foam_density_model.pkl"
-
-PRODUCTION_MODEL_FILE = Path(__file__).parent.parent/"ml/production_volume_model.pkl"
-REVENUE_MODEL_FILE = Path(__file__).parent.parent/"ml/revenue_model.pkl"
-FOAM_DENSITY_MODEL_FILE = Path(__file__).parent.parent/"ml/foam_density_model.pkl"
-
 #MODEL_DESCRTIPTIONS_FILE = '/workspaces/form-factory/modules/ml/'+"model_descriptions.json"
 MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/model_descriptions.json"
 
@@ -76,45 +68,12 @@ LLM_MODEL = "gpt-4"
 ALL_MONTHS = list(range(1, 13))  # All 12 months
 ALL_LOCATIONS = [0,1,2,3] # All 4 locations
 
-# Load ML Models (with error handling)
-models = {}
-model_files = {
-    "production_volume_model": PRODUCTION_MODEL_FILE,
-    "revenue_model": REVENUE_MODEL_FILE,
-    "foam_density_model": FOAM_DENSITY_MODEL_FILE
-}
-for model_name, file_path in model_files.items():
-    try:
-        models[model_name] = joblib.load(file_path)
-    except FileNotFoundError as e:
-        print(f"Error loading model {model_name}: {e}")
-        exit()
+
 
 # Generate Sample Data (Multiple Months/Locations)
 def generate_sample_data(model_name, years, months, factories, locations):
     """Generates sample data for multiple months and locations."""
 
-    # data = []
-    # for year in years:
-    #   for month in months:
-    #     for factory in factories:
-    #       for location in locations:
-    #         if model_name == "production_volume_model":
-    #             data.append({'Year': year, 'Month': month, 'Factory': factory, 'Location': location})
-    #         elif model_name == "revenue_model":
-    #             data.append({'Year': year, 'Month': month, 'Factory': factory, 'Location': location})
-    #         elif model_name == "foam_density_model":
-    #             data.append({'Year': year, 'Month': month, 'Factory': factory, 'Location': location})
-
-    # if not data:
-    #     return None  # Unknown model or empty data
-
-    # return pd.DataFrame(data)
-
-    #months_data = [m+1 for m in range(months)]
-    #years_data = [years[i]+i for i in range(len(years))]
-   
-    #print(years_data)
     future_data = pd.DataFrame()
     for year in years:
         for month in months:
@@ -132,20 +91,18 @@ def generate_sample_data(model_name, years, months, factories, locations):
 
                     future_data = pd.concat([future_data, temp_data], ignore_index=True)
 
-    #predictions = model.predict(future_data[feature_columns])
-    #future_data[f'Predicted {target}'] = predictions
     return future_data
 
 # Define Prediction Functions (generalized)
 def predict(model_name, years, months, factories, locations):
     """Generalized prediction function for multiple inputs."""
     try:
-        model = models[model_name]
+        
         input_data = generate_sample_data(model_name, years, months, factories, locations)
         if input_data is None:
             return "Unknown model name or no data generated."
-
-        predictions = model.predict(input_data)
+        
+        predictions = predictor.getPrediction(model_name, input_data)
         input_data['prediction'] = predictions
         return input_data.to_json(orient='records') #Return the result as json string
     except (KeyError, IndexError, ValueError, TypeError) as e:
@@ -187,25 +144,15 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 agent_executor = None
-# LLM_MODEL = "gpt-3.5-turbo"
-#  # LLM Call
-# llm = ChatOpenAI(temperature=0, model=LLM_MODEL)
 
 def init(llm):
     global agent_executor
-# Initialize Agent
     agent = create_tool_calling_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-
-#init(llm)
 
 
 def run_agent(model_name, input_params):
     """Runs the agent with the specified model and parameters."""
-    
-    #try:
-    #print('Starting agent run')
-    #input_params = json.loads(input_params)
    
     years = input_params['years']
     months = input_params.get("months", [])
