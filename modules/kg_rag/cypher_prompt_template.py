@@ -205,6 +205,21 @@ WHERE d.date >= date("2023-01-01") AND d.date < date("2024-01-01")
 RETURN d.date AS Date, avg(uo.co2_emissions) AS AvgCO2Emissions
 ORDER BY d.date
 
+Question: what day was the best for overall production?
+
+Incorrect cypher for above question:
+MATCH (d:Date)
+RETURN d.date AS Date, sum(d.production_volume) AS TotalProduction
+ORDER BY TotalProduction DESC
+LIMIT 1
+
+Correct cypher for above question:
+MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
+WITH f, d, o.production_volume AS ProductionVolume
+ORDER BY ProductionVolume DESC
+RETURN f.factory_id AS FactoryID, ProductionVolume, d as BestProdDay
+LIMIT 1
+
 
 Note: Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
