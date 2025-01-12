@@ -28,3 +28,4 @@ python-dotenv
 watchdog
 faiss-cpu
 futures
+streamlit_navigation_bar
