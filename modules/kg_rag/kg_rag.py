@@ -5,9 +5,11 @@ from modules.kg_rag.cypher_prompt_template import CYPHER_RECOMMENDATION_PROMPT
 from modules.kg_rag.qa_prompt_template import QA_PROMPT
 
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Get the OpenAI API key
-NEO4J_PASSWORD = os.getenv("NEO_4J_PASS")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 
 graph = None
 chain = None
