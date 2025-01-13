@@ -12,7 +12,9 @@ def show_image():
         image = Image.open('home.jpg')
 
         # Display the image with no size restrictions
-        st.image(image, use_column_width=True) # Use full width
+        st.image(image, use_column_width=True) # Use full width of the app
+
+        
 
     except FileNotFoundError:
         st.error(f"Error: Image not found at {'home.jpg'}")

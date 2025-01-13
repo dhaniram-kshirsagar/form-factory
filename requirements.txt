@@ -29,3 +29,5 @@ watchdog
 faiss-cpu
 futures
 streamlit_navigation_bar
+asyncio
+threading
