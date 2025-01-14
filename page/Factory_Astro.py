@@ -1,29 +1,26 @@
 import time
 import streamlit as st
-from openai import OpenAI
-import streamlit as st
-from streamlit_feedback import streamlit_feedback
-import trubrics
-
+import pandas as pd
+import json
 from modules.ml import ml_rag
+import plotly.express as px
 
 def Show_Factoryastro():
     st.subheader("📝 Predict Factory Performance with Factory Astro")
 
     markdown = """
-    You can start with following examples:
+    You can start with the following examples:
 
-        - What will revenue for factor 3 next year?
-        - What will be form density like in July for factor 2?
-        - What will be production volume over next 2 months?
+        - What will revenue for factory 3 next year?
+        - What will be form density like in July for factory 2?
+        - What will be production volume over the next 2 months?
         - What will be foam density of factory 1 in city A?
-        - What will be revenue over next 2 months for factory 3 in city c?
-        - Get me production volume for factor 4 city c in month of July
-
+        - What will be revenue over the next 2 months for factory 3 in city C?
+        - Get me production volume for factory 4 in city C in the month of July.
     """
-
     st.markdown(markdown)
 
+    # Initialize Session State
     if "astro_messages" not in st.session_state:
         st.session_state.astro_messages = [
             {"role": "assistant", "content": "How can I help you? Leave feedback to help me improve!"}
@@ -38,44 +35,93 @@ def Show_Factoryastro():
     for msg in messages:
         st.chat_message(msg["role"]).write(msg["content"])
 
-    if prompt := st.chat_input(placeholder="e.g. Get me production volume for factor 4 city c in month of July.", disabled=st.session_state.astro_waiting_for_response) or st.session_state.astro_waiting_for_response:
+    if prompt := st.chat_input(placeholder="e.g. Get me production volume for factor 4 city c in month of July.", disabled=st.session_state.astro_waiting_for_response) :
         if not st.session_state.astro_waiting_for_response:
             st.session_state.astro_messages.append({"role": "user", "content": prompt})
             st.session_state.astro_last_user_message = prompt
             st.chat_message("user").write(prompt)
+          
             st.session_state.astro_waiting_for_response = True
-            st.rerun()
-        else:
-            with st.spinner("Assistant is typing..."):
-                time.sleep(1)
-                print(prompt)
-                st.session_state["astro_response"] = ml_rag.get_ml_answer(st.session_state.astro_last_user_message)
-                with st.chat_message("assistant"):
-                    st.session_state.astro_messages.append({"role": "assistant", "content": st.session_state["astro_response"]})
-                    st.write(st.session_state["astro_response"])
-                st.session_state.astro_waiting_for_response = False
-                st.rerun()
+        #st.rerun()
+    # Handle assistant's response after user submits input
+    if st.session_state.astro_waiting_for_response:
+        with st.spinner("Assistant is typing..."):
+            try:
+                llm_response = ml_rag.get_ml_answer(st.session_state.astro_last_user_message)
+                try:
+                    parsed_response = json.loads(llm_response)
+                    st.session_state["astro_response"] = parsed_response["llm_output_text_summmary"]
+                    st.chat_message("assistant").write(st.session_state["astro_response"])
+                    st.write('''NOTE Its work in progress... In the generated output: Add +1 to Factory name. 
+                Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.''')
 
-    st.markdown('NOTE Its work in progress... In the generated output: Add +1 to Factory name. Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.')
-# if st.session_state["response"]:
-#     feedback = streamlit_feedback(
-#         feedback_type="thumbs",
-#         optional_text_label="[Optional] Please provide an explanation",
-#         key=f"feedback_{len(messages)}",
-#     )
-#     # This app is logging feedback to Trubrics backend, but you can send it anywhere.
-#     # The return value of streamlit_feedback() is just a dict.
-#     # Configure your own account at https://trubrics.streamlit.app/
-#     if feedback and "TRUBRICS_EMAIL" in st.secrets:
-#         config = trubrics.init(
-#             email=st.secrets.TRUBRICS_EMAIL,
-#             password=st.secrets.TRUBRICS_PASSWORD,
-#         )
-#         collection = trubrics.collect(
-#             component_name="default",
-#             model="gpt",
-#             response=feedback,
-#             metadata={"chat": messages},
-#         )
-#         trubrics.save(config, collection)
-#         st.toast("Feedback recorded!", icon="📝")
+                    if 'Predicted_data' in parsed_response:
+                        data = pd.DataFrame(parsed_response['Predicted_data'])
+                    
+                        
+                        # Dynamically determine x and y columns
+                        if len(data) >= 3:
+                            x_col = None
+                            y_col = None
+                            for col in data.columns:
+                                if "month" in col.lower():
+                                    x_col = col
+                                if "prediction" in col.lower():
+                                    y_col = col
+
+                            if x_col and y_col:
+                                # Check if it is a density prediction
+                                is_density_prediction = "density" in str(st.session_state["astro_response"]).lower()
+                                is_vol_prediction = "volume"  in str(st.session_state["astro_response"]).lower()
+                                is_rev_prediction = "revenue"  in str(st.session_state["astro_response"]).lower()
+
+                                title = ''
+                                if is_density_prediction:
+                                    title = 'Foam Density'
+                                if is_rev_prediction:
+                                    title = 'Revenue'
+                                if is_vol_prediction:
+                                    title = 'Volume'
+
+                                # Apply the transformation if it's density and multiply prediction by 100000
+                                if is_density_prediction:
+                                    data[y_col] = data[y_col] * 100000
+                                    st.markdown("Note: Predicted density values multiplied by 100,000.")
+
+                                # Check if there are at least 3 rows in the DataFrame
+                                
+                                #st.header("Predicted "+title, divider="gray")
+                                fig = px.line(
+                                    data, 
+                                    x=x_col, 
+                                    y=y_col, 
+                                    color='Location' if 'Location' in data.columns else None,
+                                    height=400,  # Reduced height
+                                    width=700,
+                                    title= "Predicted "+title  # Reduced width
+                                )
+                                left, middle, right = st.columns((2, 5, 2))
+                                with middle:
+                                    st.plotly_chart(fig)
+                
+                                
+                        else:
+                                st.warning("No Graph Genrated!!!  Data has less than 3 Predictions.", icon="⚠️")
+                                
+                    else:
+                        st.error("No Predicted_data key found in the JSON response.")
+
+                except json.JSONDecodeError as e:
+                    st.error(f"Error decoding JSON response: {e}")
+                except Exception as e:
+                    st.error(f"An unexpected error occurred: {e}")
+
+                st.session_state.astro_messages.append(
+                {"role": "assistant", "content": st.session_state["astro_response"]}
+            )
+               
+               
+            finally:
+                st.session_state.astro_waiting_for_response = False
+                
+    

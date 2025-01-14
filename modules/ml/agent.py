@@ -97,14 +97,21 @@ def generate_sample_data(model_name, years, months, factories, locations):
 def predict(model_name, years, months, factories, locations):
     """Generalized prediction function for multiple inputs."""
     try:
-        
+        # Step 1: Generate the sample data
         input_data = generate_sample_data(model_name, years, months, factories, locations)
         if input_data is None:
             return "Unknown model name or no data generated."
         
+        # Step 2: Generate predictions
         predictions = predictor.getPrediction(model_name, input_data)
         input_data['prediction'] = predictions
-        return input_data.to_json(orient='records') #Return the result as json string
+        
+        # Step 3: Filter columns to include only relevant data
+        filtered_data = input_data[['Year', 'Month', 'Factory', 'Location', 'prediction']]
+        
+        # Step 4: Return the filtered result as a JSON string
+        return filtered_data.to_json(orient='records')  # Return only the filtered data as JSON string
+    
     except (KeyError, IndexError, ValueError, TypeError) as e:
         return f"Error during prediction for {model_name}: {e}"
 
@@ -132,13 +139,44 @@ for model_name, model_data in model_descriptions.items():
         )
     )
 
+# prompt = ChatPromptTemplate.from_messages(
+#     [
+#         ("system", "You are a ml model prediction assistant. Use input as it is. Don't break numbers in multiple prediction call. "),
+#         ("placeholder", "{chat_history}"),
+#         # Then the new input
+#         ("human", "{input}"),
+#         # Finally the scratchpad
+#         ("placeholder", "{agent_scratchpad}"),
+#     ]
+# )
+
 prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", "You are a ml model prediction assistant. Use input as it is. Don't break numbers in multiple prediction call. "),
+        ("system", 
+         """
+         You are an advanced ML model assistant. Your job is to predict values based on the given data
+         and always provide the output in the requested format.
+
+        1. Example of incorrect intermidiate input for given question-
+        Question:
+        Predict production volume (units) for years [2025], months [1, 2, 3, 4, 5], factories [2], locations [0]
+        
+        Incorrect intermidiate output:
+        `production_volume_model` with `{{'year': [2025, 2025, 2025, 2025, 2025], 'month': [1, 2, 3, 4, 5], 'factory': [2, 2, 2, 2, 2], 'location': [0, 0, 0, 0, 0]}}`
+
+        Correct intermidiate output:
+        `production_volume_model` with `{{'year': [2025], 'month': [1, 2, 3, 4, 5], 'factory': [2], 'location': [0]}}`
+
+         Make sure the output strictly adheres to the specified format. If the user provides custom output requirements,
+         adjust your response accordingly.
+
+         Output Format:  {{"Predicted_data":ml_model_output_dataframe, "llm_output_text_summmary":Text Summary}}
+
+         NOTE - Strictly avoid including input in the output.
+         
+         """),
         ("placeholder", "{chat_history}"),
-        # Then the new input
         ("human", "{input}"),
-        # Finally the scratchpad
         ("placeholder", "{agent_scratchpad}"),
     ]
 )
