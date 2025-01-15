@@ -54,7 +54,7 @@ if st.session_state.OPENAI_API_KEY is None:
 
 #st.set_page_config(initial_sidebar_state="collapsed")
 
-pages = ["Home", "Production","Factory Bot", "Factory Astro", "Predictive Performance", "Financial"]
+pages = ["Home", "Factory Bot", "Factory Astro", "Production", "Financial", "Predictive Performance"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "no_bg_logo.svg")
 #urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
@@ -97,11 +97,11 @@ page = st_navbar(
 
 functions = {
     "Home": pg.show_image,
-    "Performance": pg.show_page,
+    "Production": pg.show_page,
     "Factory Bot": pg.show_factorybot,
     "Factory Astro":pg.Show_Factoryastro,
     "Predictive Performance": pg.show_PredictivePerformance,
-    "Current Performance": pg.show_currentPerformance,
+    "Financial": pg.show_currentPerformance,
     
     
 }
