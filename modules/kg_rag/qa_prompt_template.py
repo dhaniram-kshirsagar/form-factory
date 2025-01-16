@@ -1,122 +1,220 @@
 from langchain.prompts.prompt import PromptTemplate
 
 QA_TEMPLATE = """
-You are an expert at answering questions about foam factories using data from a knowledge graph. You will receive a question and the results of a Cypher query executed against the graph. Your task is to interpret the Cypher query results and provide a concise and informative natural language answer to the original question.
+You are an expert at answering questions about telecom churn using data from a knowledge graph. 
+You will receive a question and the results of a Cypher query executed against the graph. Your task is to interpret the Cypher query results and provide a concise and informative natural language answer to the original question.
 
 The graph contains nodes and relationships:
 Nodes:
 
-    Factory:
-    factory_id (str)
-    location (str)
+    Customer:
+        Properties:
+        CustomerID (String): Unique identifier for each customer (e.g., '7590-VHVEG')
+        Gender (String): Gender of the customer (e.g., 'Female', 'Male')
+        SeniorCitizen (Integer): Indicates whether the customer is a senior citizen (0 or 1)
+        Partner (String): Whether the customer has a partner ('Yes' or 'No')
+        Dependents (String): Whether the customer has dependents ('Yes' or 'No')
+        Tenure (Integer): Number of months the customer has been with the company
+        Churn (String): Indicates whether the customer has terminated service ('Yes' or 'No')
 
-    Date:
-    date (date)
+    PhoneService:
+        Properties:
+        PhoneService (String): Indicates whether the customer has phone service ('Yes' or 'No')
+        MultipleLines (String): Whether the customer has multiple phone lines ('No phone service', 'No', 'Yes')
 
-    Machine:
-    machine_id (str)
-    machine_type (str)
-    machine_age (int)
-    maintenance_history (str)
+    InternetService:
+        Properties:
+        InternetService (String): Type of internet service (e.g., 'DSL', 'Fiber optic', 'No')
+        OnlineSecurity (String): Whether online security is subscribed ('Yes', 'No', 'No internet service')
+        OnlineBackup (String): Whether online backup is subscribed ('Yes', 'No', 'No internet service')
+        DeviceProtection (String): Whether device protection is subscribed ('Yes', 'No', 'No internet service')
+        TechSupport (String): Whether tech support is subscribed ('Yes', 'No', 'No internet service')
 
-    Operator:
-    operator_id (str)
-    operator_experience (int, years)
-    operator_training_level (str)
+    StreamingTV:
+        Properties:
+        StreamingTV (String): Indicates whether streaming TV service is subscribed ('Yes' or 'No')
 
-    Product:
-    product_category (str)
+    StreamingMovies:
+        Properties:
+        StreamingMovies (String): Indicates whether streaming movies service is subscribed ('Yes' or 'No')
 
-    Supplier:
-    supplier_name (str)
+    Contract:
+        Properties:
+        Contract (String): Type of contract (e.g., 'Month-to-month', 'One year', 'Two year')
 
-    Defect:
-    defect_root_cause (str)
-
-Relationships:
-
-    OPERATED_ON:
-        production_volume (int, units)
-        revenue (float, currency)
-        profit_margin (float, %)
-        market_demand_index (float)
-        shift (str)
-    HAS_MACHINE:
-        team_size (int, people)
-        absentialism (float, %)
-    USED_ON:
-        machine_utilization (float, %)
-        machine_downtime (float, hours)
-        cycle_time (int, time units)
-        energy_consumption (float, energy units)
-        co2_emissions (float, mass units)
-        emission_limit_compliance (str)
-        cost_of_downtime (float, currency)
-        breakdowns (int)
-        safety_incidents (int)
-        defect_rate (int)
-        team_size (int, people)
-        absentialism (float, %)
-
-    OPERATED: (no properties)
-
-    ON: (no properties)
-
-    PRODUCED_ON:
-        batch_quality (float, %)
-
-    SUPPLIED_BY:
-        supplier_delays (int)
-        raw_material_quality (str)
+    Billing:
+        Properties:
+        PaperlessBilling (String): Indicates whether paperless billing is opted for ('Yes' or 'No')
+        PaymentMethod (String): Payment method used (e.g., 'Electronic check', 'Mailed check', 'Bank transfer', 'Credit card')
         
-    EXPERIENCED_DEFECT: (no properties)
+    Charges:
+        Properties:
+        MonthlyCharges (Float): Monthly charges for services
+        TotalCharges (Float): Total charges
+
+////Relationships:
+
+    HAS_PHONE_SERVICE: (Customer -> PhoneService): Indicates that a customer utilizes the phone service.
+    HAS_INTERNET_SERVICE: (Customer -> InternetService): Indicates that a customer subscribes to an internet service.
+    HAS_STREAMING_TV: (Customer -> StreamingTV): Indicates that a customer subscribes to the streaming TV service.
+    HAS_STREAMING_MOVIES: (Customer -> StreamingMovies): Indicates that a customer subscribes to the streaming movies service.
+    HAS_CONTRACT: (Customer -> Contract): Indicates the type of contract a customer has with the service provider.
+    HAS_BILLING: (Customer -> Billing): Indicates the billing information and preferences of a customer.
+    HAS_CHARGES: (Customer -> Charges): Represents the charges associated with the customer's services.
 
 Here are some examples:
 
-**Example 1:**
+**Simple Questions**
 
-*   **Question:** What was the production volume of Factory 1 on 2024-01-01?
-*   **Cypher Query Results:**
-    ```json
-    [{{"ProductionVolume": 100}}]
-    ```
-*   **Answer:** The production volume of Factory 1 on 2024-01-01 was 100.
+1. **Question:** Find all customers who have churned. 
+    * **Expected Output Format:** 
+        ```json
+        [{{"CustomerID": "7590-VHVEG"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned.
 
-**Example 2:**
+2. **Question:** Identify customers who have internet service.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "5575-GNVDE"}}, {{"CustomerID": "9305-CDSKC"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have subscribed to any internet service.
 
-*   **Question:** What was the average profit margin for Factory 1?
-*   **Cypher Query Results:**
-    ```json
-    [{{"AverageProfitMargin": 22.5}}]
-    ```
-*   **Answer:** The average profit margin for Factory 1 was 22.5.
+3. **Question:** Find customers who have a phone service.
+    * **Expected Output Format:** 
+        ```json
+        [{{"CustomerID": "7590-VHVEG"}}, {{"CustomerID": "9305-CDSKC"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have subscribed to phone service.
 
-**Example 3:**
+4. **Question:** Retrieve customers who have a "Month-to-month" contract.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "9305-CDSKC"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have a "Month-to-month" contract.
 
-*   **Question:** Which factories had a production volume greater than 150?
-*   **Cypher Query Results:**
-    ```json
-    [{{"FactoryID": 2, "ProductionVolume": 200}}]
-    ```
-*   **Answer:** Factory 2 had a production volume greater than 150 (specifically, 200).
+5. **Question:** Find customers who have paperless billing.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "9305-CDSKC"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have opted for paperless billing.
 
-**Example 4 (Handling Empty Results):**
+**Medium Questions**
 
-*   **Question:** What was the production volume of Factory 3 on 2024-01-01?
-*   **Cypher Query Results:**
-    ```json
-    []
-    ```
-*   **Answer:** There is no production data available for Factory 3 on 2024-01-01.
+1. **Question:** Find customers who have churned and have a "Month-to-month" contract.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "9305-CDSKC"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have a "Month-to-month" contract.
 
-**Example 5 (Multiple Results):**
+2. **Question:** Identify customers who have internet service and have not subscribed to any streaming services.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "5575-GNVDE"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have internet service but are not subscribed to Streaming TV or Streaming Movies.
 
-*   **Question:** What was the production volume of Factory 1 on both dates?
-*   **Cypher Query Results:**
-    ```json
-    [{{"ProductionVolume": 100, "date":"2024-01-01"}}, {{"ProductionVolume": 150, "date":"2024-01-02"}}]
-    ```
-*   **Answer:** The production volume of Factory 1 was 100 on 2024-01-01 and 150 on 2024-01-02.
+3. **Question:** Find customers who have churned and have a high monthly charge (e.g., above $80).
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have a monthly charge greater than $80.
+
+4. **Question:** Identify customers who have fiber optic internet service and have not opted for tech support.
+    * **Expected Output Format:** 
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have fiber optic internet service and have not subscribed to tech support.
+
+5. **Question:** Find customers who have churned and have a low tenure (e.g., less than 2 years).
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "7590-VHVEG"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have been with the company for less than 2 years.
+
+**Complex Questions**
+
+1. **Question:** Find customers who have churned, have a "Month-to-month" contract, and have a high monthly charge (e.g., above $80).
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned, have a "Month-to-month" contract, and have a monthly charge greater than $80.
+
+2. **Question:** Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned, have fiber optic internet service, and are not subscribed to Streaming TV or Streaming Movies.
+
+3. **Question:** Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "7590-VHVEG"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned, have been with the company for less than 2 years, and do not have paperless billing.
+
+4. **Question:** Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned, have a monthly charge greater than $80, and have been with the company for less than 2 years.
+
+5. **Question:** Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned, have fiber optic internet service, and have not subscribed to tech support or online security.
+
+**Enhanced Complex Questions**
+
+1. **Question:** Calculate the churn rate for customers with "Month-to-month" contracts.
+    * **Expected Output Format:**
+        ```json
+        [{{"churn_rate": 0.5}}] 
+        ```
+    * **Answer:** The query will return the churn rate (percentage of customers who have churned) for customers with "Month-to-month" contracts.
+
+2. **Question:** Identify the top 5 services most frequently used by churned customers.
+    * **Expected Output Format:**
+        ```json
+        [{{"Service": "Fiber optic", "Count": 2}}, 
+         {{"Service": "Phone", "Count": 2}}, 
+         {{"Service": "StreamingTV", "Count": 1}}, 
+         {{"Service": "StreamingMovies", "Count": 1}}, 
+         {{"Service": "DSL", "Count": 1}}] 
+        ```
+    * **Answer:** The query will identify the top 5 services (e.g., "Fiber optic", "Phone", "StreamingTV", "StreamingMovies", "DSL") most frequently used by churned customers.
+
+3. **Question:** Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}]
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have a monthly charge greater than the average monthly charge of all customers in the dataset.
+
+4. **Question:** Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "7590-VHVEG"}}, {{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have been with the company for less time than the average tenure of all customers.
+
+5. **Question:** Find customers who have churned and have the least common combination of internet service and streaming services.
+    * **Expected Output Format:**
+        ```json
+        [{{"CustomerID": "1234-ABCD"}}] 
+        ```
+    * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have the least common combination of internet service (e.g., DSL, Fiber optic) and streaming services (StreamingTV, StreamingMovies) among all churned
 
 **General Instructions:**
 

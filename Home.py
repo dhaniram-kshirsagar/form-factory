@@ -1,7 +1,6 @@
 
 
 import streamlit as st
-# import pandas as pd
 import threading
 import asyncio
 from modules.kg_rag import kg_rag
@@ -12,18 +11,6 @@ from dotenv import load_dotenv
 from streamlit_navigation_bar import st_navbar
 import page as pg
 import time
-
-# Get the OpenAI API key
-# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-# # Check if the key is loaded
-# if OPENAI_API_KEY is None:
-#     raise ValueError("OPENAI_API_KEY environment variable not set. Please create a .env file with OPENAI_API_KEY=<your_key>.")
-# else:
-#     print("OpenAI API key loaded successfully.")
-
-# from modules.data import data
-#from modules.chatbot import chatbot
 
 print(f"Starting Home.py execution #### Time  {time.time()}")
 # Set the title and favicon that appear in the Browser's tab bar.
@@ -37,7 +24,8 @@ print(f"Done page setting config #### Time  {time.time()}")
 
 def initialize_graph():
     print(f"Starting kg_rag initialization in separate thread #### Time  {time.time()}")
-    asyncio.run(kg_rag.init_graph())
+    #asyncio.run(kg_rag.init_graph())
+    kg_rag.init_graph()
 
 # Initialize the graph in a separate thread
 thread = threading.Thread(target=initialize_graph)
@@ -54,7 +42,7 @@ if st.session_state.OPENAI_API_KEY is None:
 
 #st.set_page_config(initial_sidebar_state="collapsed")
 
-pages = ["Home", "Performance","Factory Bot", "Factory Astro", "Predictive Performance", "Current Performance"]
+pages = ["Home", "Performance","Churn Bot", "Churn Astro", "Predictive Performance", "Current Performance"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "no_bg_logo.svg")
 #urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
@@ -98,8 +86,8 @@ page = st_navbar(
 functions = {
     "Home": pg.show_image,
     "Performance": pg.show_page,
-    "Factory Bot": pg.show_factorybot,
-    "Factory Astro":pg.Show_Factoryastro,
+    "Churn Bot": pg.show_factorybot,
+    "Churn Astro":pg.Show_Factoryastro,
     "Predictive Performance": pg.show_PredictivePerformance,
     "Current Performance": pg.show_currentPerformance,
     

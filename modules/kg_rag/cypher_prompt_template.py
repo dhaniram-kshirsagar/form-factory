@@ -7,218 +7,191 @@ Do not use any other relationship types or properties that are not provided or n
 Schema:
 ////Create Nodes
 
-// Create Factory
-CREATE (:Factory {{factory_id: 1, location: "City D"}}) // This should create 50 factories (5 * 10)
+// Create Customer Nodes
+CREATE (c:Customer {{CustomerID: '7590-VHVEG', Gender: 'Female', SeniorCitizen: 0, Partner: 'Yes', Dependents: 'No', Tenure: 1, Churn: 'No'}})
 
-// Create Date
-CREATE (:Date {{date: date("2023-01-01")}}) 
+// Create PhoneService Nodes
+CREATE (p:PhoneService {{PhoneService: 'No', MultipleLines: 'No phone service'}})
+CREATE (p:PhoneService {{PhoneService: 'Yes', MultipleLines: 'No'}})
 
-// Create Machine
-CREATE (:Machine {{machine_id: "City A-1-Type A", machine_type: "Type A", machine_age: 7, maintenance_history: "Regular"}})
-// We have 3 types in machines, so 3 machines in factories (3 * 50) 150 total machines
+// Create InternetService Nodes
+CREATE (i:InternetService {{InternetService: 'DSL', OnlineSecurity: 'No', OnlineBackup: 'Yes', DeviceProtection: 'No', TechSupport: 'No'}})
 
-//Create Operator
-CREATE (:Operator {{operator_id: "City A-1-Operator 1", operator_experience: 8, operator_training_level: "Advanced"}})
-// City + Factory + Operator Ids should be unique assuming operators can operate between machines
-// operator_experience - Integer
-// TEAM Size should be on OPERATED_ON along with absentialism
-// training level - beginer - experiece - 3
-// training level - intermediate - experiece - 5
-// training level - advanced - experiece - 8
+// Create StreamingTV Nodes
+CREATE (st:StreamingTV {{StreamingTV: 'No'}})
+CREATE (st:StreamingTV {{StreamingTV: 'Yes'}})
 
-//Create Product
-CREATE (:Product {{product_category: "Foam Grade A"}})
+// Create StreamingMovies Nodes
+CREATE (sm:StreamingMovies {{StreamingMovies: 'No'}})
+CREATE (sm:StreamingMovies {{StreamingMovies: 'Yes'}})
 
-//Create Supplier
-CREATE (:Supplier {{supplier_name: "Supplier A"}})
+// Create Contract Nodes
+CREATE (ct:Contract {{Contract: 'Month-to-month'}})
+CREATE (ct:Contract {{Contract: 'One year'}})
 
-//RawMaterial
-CREATE(:RawMaterial {{raw_material_quality: "Medium"}})
+// Create Billing Nodes
+CREATE (b:Billing {{PaperlessBilling: 'Yes', PaymentMethod: 'Electronic check'}})
+CREATE (b:Billing {{PaperlessBilling: 'No', PaymentMethod: 'Mailed check'}})
 
-//Create Defect
-CREATE (:Defect {{defect_root_cause: "Material Impurity"}})
+// Create Charges Nodes
+CREATE (ch:Charges {{MonthlyCharges: 29.85, TotalCharges: 29.85}})
 
-//// Create Relationships with properties
+// Create HAS_PHONE_SERVICE Relationships
+MATCH (c:Customer {{CustomerID: '7590-VHVEG'}}), (p:PhoneService {{PhoneService: 'No'}}) 
+CREATE (c)-[:HAS_PHONE_SERVICE]->(p)
 
-//OPERATED_ON Relationship
-MATCH (f:Factory {{factory_id: 1}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (f)-[:OPERATED_ON {{production_volume: 1199, revenue: 9368.437, profit_margin: 34.47, market_demand_index: 86.73, shift: "Day"}}]->(d)
-//Add shift to OPERATED_ON
+// Create HAS_INTERNET_SERVICE Relationships
+MATCH (c:Customer {{CustomerID: '5575-GNVDE'}}), (i:InternetService {{InternetService: 'DSL'}}) 
+CREATE (c)-[:HAS_INTERNET_SERVICE]->(i)
 
-//HAS_MACHINE Relationship
-MATCH (f:Factory {{factory_id: 1}})
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-CREATE (f)-[:HAS_MACHINE {{team_size: 10, absentialism: 6.1/}}]->(m)
+// Create HAS_STREAMING_TV Relationships
+MATCH (c:Customer {{CustomerID: '9305-CDSKC'}}), (st:StreamingTV {{StreamingTV: 'Yes'}}) 
+CREATE (c)-[:HAS_STREAMING_TV]->(st)
 
-// USED_ON Relationship
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (m)-[:USED_ON {{machine_utilization: 74.59, machine_downtime: 6.24, cycle_time: 6, energy_consumption: 283.7, co2_emissions: 140.17, emission_limit_compliance: "No", cost_of_downtime: 488.75, breakdowns: 1, safety_incidents: 0, defect_rate: 2, team_size: 10, absentialism: 6.1}}]->(d)
+// Create HAS_STREAMING_MOVIES Relationships
+MATCH (c:Customer {{CustomerID: '9305-CDSKC'}}), (sm:StreamingMovies {{StreamingMovies: 'Yes'}}) 
+CREATE (c)-[:HAS_STREAMING_MOVIES]->(sm)
 
-// OPERATED Relationship
-MATCH (o:Operator {{operator_id: "City A-1-Operator 1"}})
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-CREATE (o)-[:OPERATED{{date: date("2023-01-01")}}]->(m)
+// Create HAS_CONTRACT Relationships
+MATCH (c:Customer {{CustomerID: '9305-CDSKC'}}), (ct:Contract {{Contract: 'Month-to-month'}}) 
+CREATE (c)-[:HAS_CONTRACT]->(ct)
 
-// PRODUCED_ON Relationship
-MATCH (p:Product {{product_category: "Foam Grade A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (p)-[:PRODUCED_ON {{batch_quality: 88.47}}]->(d)
+// Create HAS_BILLING Relationships
+MATCH (c:Customer {{CustomerID: '9305-CDSKC'}}), (b:Billing {{PaperlessBilling: 'Yes', PaymentMethod: 'Electronic check'}}) 
+CREATE (c)-[:HAS_BILLING]->(b)
 
-// SUPPLIED_BY Relationship
-MATCH (r:RawMaterial {{raw_material_quality: "Medium"}})
-MATCH (sup:Supplier {{supplier_name: "Supplier A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (r)-[:SUPPLIED_BY {{supplier_delays: 1}}]->(sup)-[:ON]->(d)
+// Create HAS_CHARGES Relationships
+MATCH (c:Customer {{CustomerID: '7590-VHVEG'}}), (ch:Charges {{MonthlyCharges: 29.85, TotalCharges: 29.85}}) 
+CREATE (c)-[:HAS_CHARGES]->(ch)
 
-// PRODUCED_USING Relationship
-MATCH (p:Product {{product_category: "Foam Grade A"}})
-MATCH (r:RawMaterial {{raw_material_quality: "Medium"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (p)-[:PRODUCED_USING]->(r)-[:ON]->(d)
 
-// EXPERIENCED_DEFECT Relationship
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-MATCH (def:Defect {{defect_root_cause: "Material Impurity"}})
-CREATE (m)-[:EXPERIENCED_DEFECT{{date: date("2023-01-01")}}]->(def)
+////Cypher Examples:
 
-Cypher Examples:
-Question: Find factories with an average profit margin below a certain threshold:
- 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WITH f, avg(o.profit_margin) AS AverageProfitMargin
-WHERE AverageProfitMargin < 30 // Example threshold
-RETURN f.factory_id AS FactoryID, AverageProfitMargin
+// **Simple Questions**
 
-Question: Compare revenue and profit margin between two factories on a specific date:
+// 1. Find all customers who have churned.
+MATCH (c:Customer {{Churn: 'Yes'}})
+RETURN c.CustomerID
 
-MATCH (f1:Factory {{factory_id: 1}})-[o1:OPERATED_ON]->(d:Date {{date: date("2023-01-01")}})
-MATCH (f2:Factory {{factory_id: 2}})-[o2:OPERATED_ON]->(d)
-RETURN f1.factory_id AS Factory1, o1.revenue AS Revenue1, o1.profit_margin AS ProfitMargin1,
-       f2.factory_id AS Factory2, o2.revenue AS Revenue2, o2.profit_margin AS ProfitMargin2
-Complex Queries (Revenue & Profit Margin):
+// 2. Identify customers who have internet service.
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+RETURN c.CustomerID
 
-Question: Analyze the correlation between production volume and revenue:
+// 3. Find customers who have a phone service.
+MATCH (c:Customer)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
+RETURN c.CustomerID
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-RETURN avg(o.production_volume) AS AvgProductionVolume, avg(o.revenue) AS AvgRevenue
-ORDER BY AvgProductionVolume DESC
-Analyze the impact of market demand index on revenue and profit margin:
-Cypher
+// 4. Retrieve customers who have a "Month-to-month" contract.
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
+RETURN c.CustomerID
 
-Question: Identify recurring defects for a specific machine:
+// 5. Find customers who have paperless billing.
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {{PaperlessBilling: 'Yes'}})
+RETURN c.CustomerID
 
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:EXPERIENCED_DEFECT]->(def:Defect)
-RETURN def.defect_root_cause AS DefectRootCause, count(*) AS DefectCount
-ORDER BY DefectCount DESC
+// **Medium Questions**
 
-Question: Analyze the relationship between supplier raw material quality and batch quality:
+// 1. Find customers who have churned and have a "Month-to-month" contract.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
+RETURN c.CustomerID
 
-MATCH (p:Product)-[:SUPPLIED_BY]->(s:Supplier)
-MATCH (p)-[po:PRODUCED_ON]->(d:Date)
-RETURN s.raw_material_quality AS RawMaterialQuality, avg(po.batch_quality) AS AvgBatchQuality
-ORDER BY RawMaterialQuality
+// 2. Identify customers who have internet service and have not subscribed to any streaming services.
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->()) AND NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
+RETURN c.CustomerID
 
-Question: Analyze the combined impact of machine downtime and defect rate on production volume:
+// 3. Find customers who have churned and have a high monthly charge (e.g., above $80).
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > 80
+RETURN c.CustomerID
 
-MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
-MATCH (f)-[o:OPERATED_ON]->(d)
-RETURN avg(u.machine_downtime) AS AvgDowntime, avg(u.defect_rate) as AvgDefectRate, sum(o.production_volume) AS TotalProductionVolume
-ORDER BY AvgDowntime DESC, AvgDefectRate DESC
+// 4. Identify customers who have fiber optic internet service and have not opted for tech support.
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {{InternetService: 'Fiber optic'}})
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {{TechSupport: 'Yes'}}))
+RETURN c.CustomerID
 
-Question: Analyze the impact of machine downtime on revenue (requires linking downtime to revenue loss):
-This query assumes you can calculate the cost of downtime per day. If not you need to create such a property
+// 5. Find customers who have churned and have a low tenure (e.g., less than 2 years).
+MATCH (c:Customer {{Churn: 'Yes'}})
+WHERE c.Tenure < 24 
+RETURN c.CustomerID
 
-MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
-MATCH (f)-[o:OPERATED_ON]->(d)
-RETURN avg(u.machine_downtime) AS AvgDowntime, sum(o.revenue - u.cost_of_downtime) AS AdjustedRevenue
-ORDER BY AvgDowntime DESC
+// **Complex Questions**
 
-Question: Analyze profit margin trends over time (requires more date data and potentially APOC for time series functions):
-This simplified version shows profit margin over time. For more advanced analysis, consider the APOC library:
+// 1. Find customers who have churned, have a "Month-to-month" contract, and have a high monthly charge (e.g., above $80).
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > 80
+RETURN c.CustomerID
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-RETURN d.date AS Date, avg(o.profit_margin) AS AvgProfitMargin
-ORDER BY d.date
+// 2. Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService {{InternetService: 'Fiber optic'}})
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->()) AND NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
+RETURN c.CustomerID
 
-Question: Identify factors contributing to low profit margins (combining multiple relationships and properties):
+// 3. Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_BILLING]->(b:Billing)
+WHERE c.Tenure < 24 AND b.PaperlessBilling = 'No'
+RETURN c.CustomerID
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WHERE o.profit_margin < 25 // Example threshold for low profit margin
-MATCH (f)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d)
-MATCH (p:Product)-[:PRODUCED_ON]->(d)
-RETURN f.factory_id AS Factory, d.date as Date, o.profit_margin as ProfitMargin, avg(u.machine_downtime) as Downtime, p.product_category as ProductCategory, o.market_demand_index as MarketDemand
-ORDER BY ProfitMargin
+// 4. Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > 80 AND c.Tenure < 24
+RETURN c.CustomerID
 
-Question: List factories and average low profit margins:
+// 5. Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService {{InternetService: 'Fiber optic'}})
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {{TechSupport: 'Yes'}})) AND NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {{OnlineSecurity: 'Yes'}}))
+RETURN c.CustomerID
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WHERE o.profit_margin < 25
-WITH f, avg(o.profit_margin) AS AverageProfitMargin
-RETURN f.factory_id AS FactoryID, f.location as City, AverageProfitMargin
-'''
+// **Enhanced Complex Questions**
 
-Question: What is the average batch quality for products supplied by each supplier?
+// 1. Calculate the churn rate for customers with "Month-to-month" contracts.
+MATCH (c:Customer)
+WITH COUNT(c) AS total_customers
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
+RETURN COUNT(c) / total_customers AS churn_rate
 
-MATCH (s:Supplier)<-[:SUPPLIED_BY]-(r:RawMaterial)<-[:PRODUCED_USING]-(p:Product)
-WITH s, p
-MATCH (p)-[po:PRODUCED_ON]->(d:Date)
-RETURN s.supplier_name AS SupplierName, avg(po.batch_quality) AS AvgBatchQuality
-ORDER BY s.supplier_name
+// 2. Identify the top 5 services most frequently used by churned customers.
+MATCH (c:Customer {{Churn: 'Yes'}})
+OPTIONAL MATCH (c)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+RETURN 
+  i.InternetService, 
+  p.PhoneService, 
+  st.StreamingTV, 
+  sm.StreamingMovies, 
+  count(*) AS count
+ORDER BY count DESC 
+LIMIT 5
 
-Incorrectly generated Cypher Example:
-Question: What is the average batch quality for each product category?
+// 3. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WITH c, ch, avg(ch.MonthlyCharges) OVER () AS avg_monthly_charge
+WHERE ch.MonthlyCharges > avg_monthly_charge
+RETURN c.CustomerID
 
-Incorrect cypher for above question:
-MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
-RETURN p.product_category AS ProductCategory, avg(d.batch_quality) AS AvgBatchQuality
-ORDER BY ProductCategory
+// 4. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+MATCH (c:Customer {{Churn: 'Yes'}})
+WITH c, avg(c.Tenure) OVER () AS avg_tenure
+WHERE c.Tenure < avg_tenure
+RETURN c.CustomerID
 
-Correct cypher for above question:
-MATCH (p:Product)-[po:PRODUCED_ON]->(d:Date)
-RETURN p.product_category AS ProductCategory, avg(po.batch_quality) AS AvgBatchQuality
-ORDER BY ProductCategory
-
-Question: How does the profit margin change over time for Factory 1?
-
-Incorrect cypher for above question:
-MATCH (f:Factory {{factory_id: 1}})-[:OPERATED_ON]->(d:Date)
-RETURN d.date AS Date, avg(f.profit_margin) AS AvgProfitMargin
-ORDER BY d.date
-
-Correct cypher for above question:
-MATCH (f:Factory {{factory_id: 1}})-[op:OPERATED_ON]->(d:Date)
-RETURN d.date AS Date, avg(op.profit_margin) AS AvgProfitMargin
-ORDER BY d.date
-
-Question: How does the co2 emissions change over time for machine "City A-1-Type A" in 2023?
-
-Incorrect cypher for above question:
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:USED_ON]->(d:Date {{date: date("2023-01-01")}})
-RETURN d.date AS Date, avg(m.co2_emissions) AS AvgCO2Emissions
-ORDER BY d.date
-
-Correct cypher for above question:
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[uo:USED_ON]->(d:Date)
-WHERE d.date >= date("2023-01-01") AND d.date < date("2024-01-01")
-RETURN d.date AS Date, avg(uo.co2_emissions) AS AvgCO2Emissions
-ORDER BY d.date
-
-Question: what day was the best for overall production?
-
-Incorrect cypher for above question:
-MATCH (d:Date)
-RETURN d.date AS Date, sum(d.production_volume) AS TotalProduction
-ORDER BY TotalProduction DESC
+// 5. Find customers who have churned and have the least common combination of internet service and streaming services.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+WITH i.InternetService, st.StreamingTV, sm.StreamingMovies, count(*) AS combination_count 
+ORDER BY combination_count ASC
 LIMIT 1
-
-Correct cypher for above question:
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WITH f, d, o.production_volume AS ProductionVolume
-ORDER BY ProductionVolume DESC
-RETURN f.factory_id AS FactoryID, ProductionVolume, d as BestProdDay
-LIMIT 1
+WITH i.InternetService AS least_common_internet, st.StreamingTV AS least_common_streaming_tv, sm.StreamingMovies AS least_common_streaming_movies 
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+WHERE i.InternetService = least_common_internet 
+  AND st.StreamingTV = least_common_streaming_tv 
+  AND sm.StreamingMovies = least_common_streaming_movies 
+RETURN c.CustomerID
 
 
 Note: Do not include any explanations or apologies in your responses.
