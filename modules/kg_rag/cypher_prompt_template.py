@@ -204,7 +204,9 @@ WITH c, avg(c.Tenure) OVER () AS avg_tenure
 WHERE c.Tenure < avg_tenure
 RETURN c.CustomerID
 
-// This is also an incorrect example of query to solve above problem.
+// This is also an incorrect example of query to solve above problem. In this query average tenure is calculated for churned customers only, whereas we need to calculate average for all customers.
+// and then find churned customers who have lower tenure than average tenure of all customers.
+
 MATCH (c:Customer {{Churn: 'Yes'}})
 WITH c, avg(c.Tenure) AS avg_tenure
 WHERE c.Tenure < avg_tenure
