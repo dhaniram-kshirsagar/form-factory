@@ -29,12 +29,13 @@ def show_factorybot():
         8. Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
         9. Identify the top 5 services most frequently used by churned customers.
         10. Retrieve customers who have a "Month-to-month" contract.
+        11. Calculate the churn rate for customers with "Month-to-month" contracts.
+        12. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
+        13. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+        14. Find customers who have churned and have the least common combination of internet service and streaming services.
+
     """
 
-    #9. Calculate the churn rate for customers with "Month-to-month" contracts.
-    #10. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
-    #10. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
-    #11. Find customers who have churned and have the least common combination of internet service and streaming services.
 
 
     st.markdown(markdown)

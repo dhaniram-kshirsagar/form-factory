@@ -145,10 +145,16 @@ RETURN c.CustomerID
 // **Enhanced Complex Questions**
 
 // 1. Calculate the churn rate for customers with "Month-to-month" contracts.
-MATCH (c:Customer)
+// First match and count total customers with "Month-to-month" contracts
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
 WITH COUNT(c) AS total_customers
+
+// Then match customers who have churned and have a month-to-month contract
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
-RETURN COUNT(c) / total_customers AS churn_rate
+WITH COUNT(c) AS churned_customers, total_customers
+
+// Calculate the churn rate for month-to-month contracts
+RETURN churned_customers * 1.0 / total_customers AS churn_rate
 
 // 2. Identify the top 5 services most frequently used by churned customers.
 MATCH (c:Customer {{Churn: 'Yes'}})
@@ -166,25 +172,52 @@ ORDER BY count DESC
 LIMIT 5
 
 // 3. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
+
+// THis is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WITH c, ch, avg(ch.MonthlyCharges) OVER () AS avg_monthly_charge
 WHERE ch.MonthlyCharges > avg_monthly_charge
 RETURN c.CustomerID
 
+// This is correct sample of the query to solve above problem.
+
+// Calculate the average monthly charge for all customers
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.MonthlyCharges) AS avg_monthly_charge
+
+// Find customers who have churned and have a higher monthly charge than the average
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > avg_monthly_charge
+RETURN c.CustomerID
+
 // 4. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+
+This is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
+
 MATCH (c:Customer {{Churn: 'Yes'}})
 WITH c, avg(c.Tenure) OVER () AS avg_tenure
 WHERE c.Tenure < avg_tenure
 RETURN c.CustomerID
 
+This is correct query.
+// Calculate the average tenure for all customers
+MATCH (c:Customer)
+WITH avg(c.Tenure) AS avg_tenure
+// Find customers who have churned and have a lower tenure than the average
+MATCH (c:Customer {{Churn: 'Yes'}})
+WHERE c.Tenure < avg_tenure
+RETURN c.CustomerID
+
+
+
 // 5. Find customers who have churned and have the least common combination of internet service and streaming services.
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
 OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
 OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
-WITH i.InternetService, st.StreamingTV, sm.StreamingMovies, count(*) AS combination_count 
+WITH i.InternetService AS internet_service, st.StreamingTV AS streaming_tv, sm.StreamingMovies AS streaming_movies, count(*) AS combination_count 
 ORDER BY combination_count ASC
 LIMIT 1
-WITH i.InternetService AS least_common_internet, st.StreamingTV AS least_common_streaming_tv, sm.StreamingMovies AS least_common_streaming_movies 
+WITH internet_service AS least_common_internet, streaming_tv AS least_common_streaming_tv, streaming_movies AS least_common_streaming_movies 
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
 OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
 OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
@@ -208,6 +241,7 @@ RETURN c.CustomerID, i.OnlineBackup, ch.MonthlyCharges, ch.TotalCharges
 Note: Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
 Do not include any text except the generated Cypher statement.
+Do not include OVER clause in your Cypher statement.
 
 The question is:
 {question}"""
