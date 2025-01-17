@@ -16,7 +16,7 @@ NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 graph = None
 chain = None
 
-def init_graph( ):
+async def init_graph( ):
     global graph, chain
 
     if graph is None:

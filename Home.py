@@ -1,8 +1,6 @@
-
-
 import streamlit as st
-import threading
 import asyncio
+import threading
 from modules.kg_rag import kg_rag
 
 import os
@@ -12,26 +10,24 @@ from streamlit_navigation_bar import st_navbar
 import page as pg
 import time
 
-print(f"Starting Home.py execution #### Time  {time.time()}")
+async def initialize_graph():
+    await kg_rag.init_graph()
+
+def run_initialize_graph():
+    asyncio.run(initialize_graph())
+
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
-    #page_title='Foam Factories',
-    #page_icon=':factory:', # This is an emoji shortcode. Could be a URL too.
+    page_title='Foam Factories',
+    page_icon=':factory:', # This is an emoji shortcode. Could be a URL too.
     layout='wide',
     initial_sidebar_state="collapsed"
 )
-print(f"Done page setting config #### Time  {time.time()}")
-
-def initialize_graph():
-    print(f"Starting kg_rag initialization in separate thread #### Time  {time.time()}")
-    #asyncio.run(kg_rag.init_graph())
-    kg_rag.init_graph()
 
 # Initialize the graph in a separate thread
-thread = threading.Thread(target=initialize_graph)
+thread = threading.Thread(target=run_initialize_graph)
 thread.start()
 
-print(f"Begin home page execution after dispatching thread #### Time  {time.time()}")
 # Load environment variables from .env file
 st.session_state.OPENAI_API_KEY = None
 
@@ -97,8 +93,6 @@ functions = {
 go_to = functions.get(page)
 if go_to:
     go_to()
-
-print(f"Done home page execution after dispatching thread #### Time  {time.time()}")
 
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
