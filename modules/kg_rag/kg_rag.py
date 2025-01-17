@@ -7,6 +7,9 @@ from modules.kg_rag.qa_prompt_template import QA_PROMPT
 import os
 from dotenv import load_dotenv
 import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
@@ -30,7 +33,10 @@ async def init_graph( ):
         )
 
 def get_kg_answer(question):
-    return chain.invoke({"query": question})
+    logging.info(f"User question: {question}")
+    generated_query = chain.invoke({"query": question})
+    logging.info(f"Generated Cypher query: {generated_query}")
+    return generated_query
 
 def yeild_kg_answer(question):
     yield chain.invoke({"query": question})

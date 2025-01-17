@@ -69,82 +69,96 @@ CREATE (c)-[:HAS_CHARGES]->(ch)
 
 // **Simple Questions**
 
-// 1. Find all customers who have churned.
+Find all customers who have churned.
+
 MATCH (c:Customer {{Churn: 'Yes'}})
 RETURN c.CustomerID
 
-// 2. Identify customers who have internet service.
+Identify customers who have internet service.
+
 MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
 RETURN c.CustomerID
 
-// 3. Find customers who have a phone service.
+Find customers who have a phone service.
+
 MATCH (c:Customer)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
 RETURN c.CustomerID
 
-// 4. Retrieve customers who have a "Month-to-month" contract.
+Retrieve customers who have a "Month-to-month" contract.
+
 MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
 RETURN c.CustomerID
 
-// 5. Find customers who have paperless billing.
+Find customers who have paperless billing.
+
 MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {{PaperlessBilling: 'Yes'}})
 RETURN c.CustomerID
 
 // **Medium Questions**
 
-// 1. Find customers who have churned and have a "Month-to-month" contract.
+. Find customers who have churned and have a "Month-to-month" contract.
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
 RETURN c.CustomerID
 
-// 2. Identify customers who have internet service and have not subscribed to any streaming services.
+Identify customers who have internet service and have not subscribed to any streaming services.
+
 MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
 WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->()) AND NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
 RETURN c.CustomerID
 
-// 3. Find customers who have churned and have a high monthly charge (e.g., above $80).
+Find customers who have churned and have a high monthly charge (e.g., above $80).
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WHERE ch.MonthlyCharges > 80
 RETURN c.CustomerID
 
-// 4. Identify customers who have fiber optic internet service and have not opted for tech support.
+Identify customers who have fiber optic internet service and have not opted for tech support.
+
 MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {{InternetService: 'Fiber optic'}})
 WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {{TechSupport: 'Yes'}}))
 RETURN c.CustomerID
 
-// 5. Find customers who have churned and have a low tenure (e.g., less than 2 years).
+Find customers who have churned and have a low tenure (e.g., less than 2 years).
 MATCH (c:Customer {{Churn: 'Yes'}})
 WHERE c.Tenure < 24 
 RETURN c.CustomerID
 
 // **Complex Questions**
 
-// 1. Find customers who have churned, have a "Month-to-month" contract, and have a high monthly charge (e.g., above $80).
+Find customers who have churned, have a "Month-to-month" contract, and have a high monthly charge (e.g., above $80).
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})-[:HAS_CHARGES]->(ch:Charges)
 WHERE ch.MonthlyCharges > 80
 RETURN c.CustomerID
 
-// 2. Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.
+Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService {{InternetService: 'Fiber optic'}})
 WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->()) AND NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
 RETURN c.CustomerID
 
-// 3. Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.
+Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_BILLING]->(b:Billing)
 WHERE c.Tenure < 24 AND b.PaperlessBilling = 'No'
 RETURN c.CustomerID
 
-// 4. Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
+Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WHERE ch.MonthlyCharges > 80 AND c.Tenure < 24
 RETURN c.CustomerID
 
-// 5. Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
+Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
+
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService {{InternetService: 'Fiber optic'}})
 WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {{TechSupport: 'Yes'}})) AND NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {{OnlineSecurity: 'Yes'}}))
 RETURN c.CustomerID
 
 // **Enhanced Complex Questions**
 
-// 1. Calculate the churn rate for customers with "Month-to-month" contracts.
+Calculate the churn rate for customers with "Month-to-month" contracts.
 // First match and count total customers with "Month-to-month" contracts
 MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {{Contract: 'Month-to-month'}})
 WITH COUNT(c) AS total_customers
@@ -156,7 +170,8 @@ WITH COUNT(c) AS churned_customers, total_customers
 // Calculate the churn rate for month-to-month contracts
 RETURN churned_customers * 1.0 / total_customers AS churn_rate
 
-// 2. Identify the top 5 services most frequently used by churned customers.
+Identify the top 5 services most frequently used by churned customers.
+
 MATCH (c:Customer {{Churn: 'Yes'}})
 OPTIONAL MATCH (c)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
 OPTIONAL MATCH (c)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
@@ -171,21 +186,7 @@ RETURN
 ORDER BY count DESC 
 LIMIT 5
 
-// 3. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
-
-// THis is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
-MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
-WITH c, ch, avg(ch.MonthlyCharges) OVER () AS avg_monthly_charge
-WHERE ch.MonthlyCharges > avg_monthly_charge
-RETURN c.CustomerID
-// This is also an incorrect example of query to solve above problem.
-MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
-WITH c, ch, avg(ch.MonthlyCharges) AS avg_monthly_charge
-WHERE ch.MonthlyCharges > avg_monthly_charge
-RETURN c.CustomerID
-
-// This is correct sample of the query to solve above problem.
-
+Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
 // Calculate the average monthly charge for all customers
 MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
 WITH avg(ch.MonthlyCharges) AS avg_monthly_charge
@@ -195,25 +196,9 @@ MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WHERE ch.MonthlyCharges > avg_monthly_charge
 RETURN c.CustomerID
 
-// 4. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+Identify customers who have churned and have a lower tenure than the average tenure of all customers.
 // In this query first calculate the average tenure of all customers and then find churned customers who have lower tenure than average tenure of all customers.
-// This is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
 
-MATCH (c:Customer {{Churn: 'Yes'}})
-WITH c, avg(c.Tenure) OVER () AS avg_tenure
-WHERE c.Tenure < avg_tenure
-RETURN c.CustomerID
-
-// This is also an incorrect example of query to solve above problem. In this query average tenure is calculated for churned customers only, whereas we need to calculate average for all customers.
-// and then find churned customers who have lower tenure than average tenure of all customers.
-
-MATCH (c:Customer {{Churn: 'Yes'}})
-WITH c, avg(c.Tenure) AS avg_tenure
-WHERE c.Tenure < avg_tenure
-RETURN c.CustomerID
-
-// This is correct query.
-// Calculate the average tenure for all customers
 MATCH (c:Customer)
 WITH avg(c.Tenure) AS avg_tenure
 // Find customers who have churned and have a lower tenure than the average
@@ -221,9 +206,8 @@ MATCH (c:Customer {{Churn: 'Yes'}})
 WHERE c.Tenure < avg_tenure
 RETURN c.CustomerID
 
+Find customers who have churned and have the least common combination of internet service and streaming services.
 
-
-// 5. Find customers who have churned and have the least common combination of internet service and streaming services.
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
 OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
 OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
@@ -239,22 +223,75 @@ WHERE i.InternetService = least_common_internet
   AND sm.StreamingMovies = least_common_streaming_movies 
 RETURN c.CustomerID
 
-// 6. Retrieve the CustomerID and MonthlyCharges for customers who have opted for paperless billing. 
+Retrieve the CustomerID and MonthlyCharges for customers who have opted for paperless billing. 
+
 MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {{PaperlessBilling: 'Yes'}})
 WITH c, b
 MATCH (c)-[:HAS_CHARGES]->(ch:Charges)
 RETURN c.CustomerID, b.PaperlessBilling, ch.MonthlyCharges, ch.TotalCharges
 
-// 7. Retrieve the CustomerID and TotalCharges for customers who have not opted for online backup service. 
+Retrieve the CustomerID and TotalCharges for customers who have not opted for online backup service. 
+
 MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {{OnlineBackup: 'No'}})
 WITH c, i
 MATCH (c)-[:HAS_CHARGES]->(ch:Charges)
 RETURN c.CustomerID, i.OnlineBackup, ch.MonthlyCharges, ch.TotalCharges
 
+Identify customers who have churned and have a lower billing than the average billing of all customers.
+
+// Calculate the average total charges for all customers
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.TotalCharges) AS avg_total_charges
+
+// Find customers who have churned and have a lower total charges than the average
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges < avg_total_charges
+RETURN c.CustomerID
+
+Incorrectly generated Cypher Examples:
+
+Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
+
+Incorrect cypher for above question:
+
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WITH c, ch, avg(ch.MonthlyCharges) AS avg_monthly_charge
+WHERE ch.MonthlyCharges > avg_monthly_charge
+RETURN c.CustomerID
+
+Correct cypher for above question:
+
+// Calculate the average monthly charge for all customers
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.MonthlyCharges) AS avg_monthly_charge
+
+// Find customers who have churned and have a higher monthly charge than the average
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > avg_monthly_charge
+RETURN c.CustomerID
+
+Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+
+Incorrect Cypher Query:
+
+MATCH (c:Customer {{Churn: 'Yes'}})
+WITH c, avg(c.Tenure) AS avg_tenure
+WHERE c.Tenure < avg_tenure
+RETURN c.CustomerID
+
+Correct Cypher Query:
+
+MATCH (c:Customer)
+WITH avg(c.Tenure) AS avg_tenure
+MATCH (c:Customer {{Churn: 'Yes'}})
+WHERE c.Tenure < avg_tenure
+RETURN c.CustomerID
+
 Note: Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
 Do not include any text except the generated Cypher statement.
 Do not include OVER clause in your Cypher statement.
+Do consider Incorrect Cypher Query examples to avoid mistakes.
 
 The question is:
 {question}"""
