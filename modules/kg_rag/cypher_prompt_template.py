@@ -178,6 +178,11 @@ MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WITH c, ch, avg(ch.MonthlyCharges) OVER () AS avg_monthly_charge
 WHERE ch.MonthlyCharges > avg_monthly_charge
 RETURN c.CustomerID
+// This is also an incorrect example of query to solve above problem.
+MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
+WITH c, ch, avg(ch.MonthlyCharges) AS avg_monthly_charge
+WHERE ch.MonthlyCharges > avg_monthly_charge
+RETURN c.CustomerID
 
 // This is correct sample of the query to solve above problem.
 
@@ -192,14 +197,20 @@ RETURN c.CustomerID
 
 // 4. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
 
-This is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
+// This is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
 
 MATCH (c:Customer {{Churn: 'Yes'}})
 WITH c, avg(c.Tenure) OVER () AS avg_tenure
 WHERE c.Tenure < avg_tenure
 RETURN c.CustomerID
 
-This is correct query.
+// This is also an incorrect example of query to solve above problem.
+MATCH (c:Customer {{Churn: 'Yes'}})
+WITH c, avg(c.Tenure) AS avg_tenure
+WHERE c.Tenure < avg_tenure
+RETURN c.CustomerID
+
+// This is correct query.
 // Calculate the average tenure for all customers
 MATCH (c:Customer)
 WITH avg(c.Tenure) AS avg_tenure
