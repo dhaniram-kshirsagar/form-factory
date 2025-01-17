@@ -30,6 +30,7 @@ def show_factorybot():
         7. Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
         8. Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
         9. Identify the top 5 services most frequently used by churned customers.
+        10. Retrieve customers who have a "Month-to-month" contract.
     """
 
     #9. Calculate the churn rate for customers with "Month-to-month" contracts.
