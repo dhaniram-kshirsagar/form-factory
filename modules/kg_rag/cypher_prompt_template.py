@@ -196,7 +196,7 @@ WHERE ch.MonthlyCharges > avg_monthly_charge
 RETURN c.CustomerID
 
 // 4. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
-
+// In this query first calculate the average tenure of all customers and then find churned customers who have lower tenure than average tenure of all customers.
 // This is incorrect sample of the query to solve above problem. Over clause is not supported in Cypher.
 
 MATCH (c:Customer {{Churn: 'Yes'}})
