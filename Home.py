@@ -85,11 +85,11 @@ page = st_navbar(
 
 functions = {
     "Home": pg.show_image,
-    "Performance": pg.show_page,
+    #"Performance": pg.show_page,
     "Churn Bot": pg.show_factorybot,
-    "Churn Astro":pg.Show_Factoryastro,
-    "Predictive Performance": pg.show_PredictivePerformance,
-    "Current Performance": pg.show_currentPerformance,
+    #"Churn Astro":pg.Show_Factoryastro,
+    #"Predictive Performance": pg.show_PredictivePerformance,
+    #"Current Performance": pg.show_currentPerformance,
     
     
 }

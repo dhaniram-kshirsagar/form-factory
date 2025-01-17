@@ -8,7 +8,7 @@ import trubrics
 from modules.ml import ml_rag
 
 def Show_Factoryastro():
-    st.subheader("📝 Predict Factory Performance with Factory Astro")
+    st.subheader("📝 Predict Churn based on factor SUCH AS????")
 
     markdown = """
     You can start with following examples:

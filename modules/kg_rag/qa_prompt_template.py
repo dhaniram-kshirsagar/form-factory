@@ -216,6 +216,36 @@ Here are some examples:
         ```
     * **Answer:** The query will return a list of CustomerIDs for all customers who have churned and have the least common combination of internet service (e.g., DSL, Fiber optic) and streaming services (StreamingTV, StreamingMovies) among all churned
 
+6. **Question:** Retrieve the CustomerID and TotalCharges for customers who have not opted for online backup service
+    * **Expected Output Format:**
+    ```json
+    [{{"CustomerID": "7590-VHVEG", "MonthlyCharges": 29.85, "TotalCharges": 29.85}}, 
+        {{"CustomerID": "1234-ABCD", "MonthlyCharges": 59.90, "TotalCharges": 59.90}}]
+    ```
+    * **Answer:**  The query will return a list of JSON objects, where each object contains the CustomerID, MonthlyCharges, and TotalCharges for customers who have opted for paperless billing.
+
+7. Identify the top 3 customer segments with the highest churn rates based on demographics (gender, SeniorCitizen, Partner, Dependents).
+    * **Expected Output Format:**
+        ```json
+        [{{"Segment": "Female, SeniorCitizen, No Partner, No Dependents", "ChurnRate": 0.55}}, 
+        {{"Segment": "Male, SeniorCitizen, No Partner, No Dependents", "ChurnRate": 0.48}}, 
+        {{"Segment": "Female, Not SeniorCitizen, No Partner, No Dependents", "ChurnRate": 0.45}}] 
+        ```
+    * **Answer:** The top 3 customer segments with the highest churn rates are: 
+        * Female, SeniorCitizen, No Partner, No Dependents
+        * Male, SeniorCitizen, No Partner, No Dependents 
+        * Female, Not SeniorCitizen, No Partner, No Dependents
+
+8. Identify potential early warning signs of churn by analyzing customer behavior patterns (e.g., increased customer support calls, service downgrades, changes in payment method) in the months leading up to churn.
+
+    * **Expected Output Format:**
+        ```json
+        [{{"EarlyWarningSign": "Increased support calls in the last 3 months", "ChurnRate": 0.35}}, 
+        {{"EarlyWarningSign": "Downgraded service within the last 6 months", "ChurnRate": 0.28}}, 
+        {{"EarlyWarningSign": "Change in payment method within the last 2 months", "ChurnRate": 0.22}}] 
+        ```
+    * **Answer:** The analysis will identify specific customer behaviors (e.g., increase
+    
 **General Instructions:**
 
 *   Focus on providing a clear and concise answer in natural language.

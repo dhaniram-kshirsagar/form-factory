@@ -15,24 +15,28 @@ kg_rag.init_graph()
 #     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
 
 def show_factorybot():
-    st.subheader(":robot_face: Chat with Foam Factories")
-    
-    #st.set_page_config(layout="wide")
+    st.subheader(":robot_face: Get insights from your churn data")
 
+    
     markdown = """
     You can start with following examples:
 
-        - What is the average batch quality for each product category?
-        - How does the profit margin change over time for Factory 1?
-        - For each factory, what is the total production volume and the average profit margin on days when the production volume was above the average production volume for that factory?
-        - Which machines experienced defects caused by 'Material Impurity' and what was their utilization on the day of the defect?
-        - Which operators have experience greater than 7 years and operated machines that experienced defects?
-        - What is the average batch quality for products supplied by each supplier?
-        - What is the average downtime for each machine type?
-        - Which factory had the highest total revenue in 2023?
-        - How does the co2 emissions change over time for machine "City A-1-Type A" in year 2023?
-        - What is the total energy consumption for each factory in 2023?
+        1. Identify customers who have internet service and have not subscribed to any streaming services. -
+        2. Find customers who have churned and have a high monthly charge (e.g., above $80).
+        3. Identify customers who have fiber optic internet service and have not opted for tech support.
+        4. Find customers who have churned and have a low tenure (e.g., less than 2 years).
+        5. Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.
+        6. Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.
+        7. Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
+        8. Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.
+        9. Identify the top 5 services most frequently used by churned customers.
     """
+
+    #9. Calculate the churn rate for customers with "Month-to-month" contracts.
+    #10. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
+    #10. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+    #11. Find customers who have churned and have the least common combination of internet service and streaming services.
+
 
     st.markdown(markdown)
 

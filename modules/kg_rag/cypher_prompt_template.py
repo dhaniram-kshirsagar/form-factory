@@ -193,6 +193,17 @@ WHERE i.InternetService = least_common_internet
   AND sm.StreamingMovies = least_common_streaming_movies 
 RETURN c.CustomerID
 
+// 6. Retrieve the CustomerID and MonthlyCharges for customers who have opted for paperless billing. 
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {{PaperlessBilling: 'Yes'}})
+WITH c, b
+MATCH (c)-[:HAS_CHARGES]->(ch:Charges)
+RETURN c.CustomerID, b.PaperlessBilling, ch.MonthlyCharges, ch.TotalCharges
+
+// 7. Retrieve the CustomerID and TotalCharges for customers who have not opted for online backup service. 
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {{OnlineBackup: 'No'}})
+WITH c, i
+MATCH (c)-[:HAS_CHARGES]->(ch:Charges)
+RETURN c.CustomerID, i.OnlineBackup, ch.MonthlyCharges, ch.TotalCharges
 
 Note: Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
