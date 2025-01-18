@@ -19,10 +19,10 @@ def show_factorybot():
     markdown = """
     You can start with following examples:
 
-        1. Identify customers who have internet service and have not subscribed to any streaming services. -
-        2. Find customers who have churned and have a high monthly charge (e.g., above $80).
-        3. Identify customers who have fiber optic internet service and have not opted for tech support.
-        4. Find customers who have churned and have a low tenure (e.g., less than 2 years).
+        1. How does the tenure of customers correlate with their service usage?-
+        2. Is there a significant difference in churn rates based on payment methods?
+        3. How does the presence of online security, backup, and tech support services affect customer satisfaction and churn?
+        4. What payment methods are most commonly used by customers?
         5. Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.
         6. Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.
         7. Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).
@@ -33,6 +33,7 @@ def show_factorybot():
         12. Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
         13. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
         14. Find customers who have churned and have the least common combination of internet service and streaming services.
+        15. Which factors are most strongly associated with customer churn (e.g., monthly charges, tenure, contract type)?
 
     """
 
