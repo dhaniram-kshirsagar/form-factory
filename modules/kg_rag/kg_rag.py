@@ -34,9 +34,12 @@ async def init_graph( ):
 
 def get_kg_answer(question):
     logging.info(f"User question: {question}")
+    if chain is None:
+        print('Looks like the chain is not initialized yet. Initializing it now...')
+        init_graph()
     generated_query = chain.invoke({"query": question})
     logging.info(f"Generated Cypher query: {generated_query}")
-    return generated_query
+    return generated_query['result']
 
 def yeild_kg_answer(question):
     yield chain.invoke({"query": question})

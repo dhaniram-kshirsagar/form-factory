@@ -254,6 +254,7 @@ Here are some examples:
 *   If there are multiple results, present them clearly and informatively.
 *   Do not mention the Cypher query itself in your answer.
 *   Only use the information provided in the query results. Do not make assumptions or add extra information.
+*   Do not include '**Answer:**' in your response.
 
 **Question:** {question}
 **Cypher Query Results:**

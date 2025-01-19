@@ -19,7 +19,7 @@ def show_factorybot():
     markdown = """
     You can start with following examples:
 
-        1. How does the tenure of customers correlate with their service usage?-
+        1. How does the tenure of customers correlate with their service usage?
         2. Is there a significant difference in churn rates based on payment methods?
         3. How does the presence of online security, backup, and tech support services affect customer satisfaction and churn?
         4. What payment methods are most commonly used by customers?
