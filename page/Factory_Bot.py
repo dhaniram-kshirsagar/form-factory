@@ -110,7 +110,9 @@ def show_factorybot():
         else:
             with st.spinner("Assistant is typing..."):
                 time.sleep(1)
-                st.session_state["response"] = kg_rag.get_kg_answer(st.session_state.last_user_message)['result']
+                llmresp = kg_rag.get_kg_answer(st.session_state.last_user_message)
+                print(llmresp)
+                st.session_state["response"] = llmresp['result']
                 with st.chat_message("assistant"):
                     st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
                     st.write(st.session_state["response"])

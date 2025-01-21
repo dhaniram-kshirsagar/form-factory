@@ -23,14 +23,29 @@ async def init_graph( ):
         graph = Neo4jGraph(url="bolt://172.104.129.10:7787", username="neo4j", password=NEO4J_PASSWORD, enhanced_schema=True)
 
         chain = GraphCypherQAChain.from_llm(
-            ChatOpenAI(temperature=0), graph=graph, verbose=True,
+            ChatOpenAI(temperature=0), graph=graph, verbose=True, return_intermediate_steps=True,
             cypher_prompt=CYPHER_RECOMMENDATION_PROMPT,
             qa_prompt=QA_PROMPT,
             allow_dangerous_requests=True 
         )
 
+import json
+from neo4j.exceptions import CypherSyntaxError
 def get_kg_answer(question):
-    return chain.invoke({"query": question})
+    
+    result = {}
+    if chain is None:
+        init_graph()
+        if chain is None:
+            result['result'] = 'I am still initializing. Please try again later'
+            return result
+
+    try:
+        result = chain.invoke({"query": question})
+    except CypherSyntaxError as e:
+        result['result'] = 'I do not understand this type of queries'
+    finally:
+        return result
 
 def yeild_kg_answer(question):
     yield chain.invoke({"query": question})

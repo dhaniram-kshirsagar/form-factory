@@ -59,13 +59,12 @@ def Show_Factoryastro():
                     parsed_response = json.loads(llm_response)
                     st.session_state["astro_response"] = parsed_response["llm_output_text_summmary"]
                     st.chat_message("assistant").write(st.session_state["astro_response"])
-                #     st.write('''NOTE Its work in progress... In the generated output: Add +1 to Factory name. 
-                # Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.''')
+                    st.write('''NOTE Its work in progress... In the generated output: Add +1 to Factory name. 
+                 Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.''')
 
                     if 'Predicted_data' in parsed_response:
                         data = pd.DataFrame(parsed_response['Predicted_data'])
                     
-                        
                         # Dynamically determine x and y columns
                         if len(data) >= 3:
                             x_col = None
@@ -94,8 +93,6 @@ def Show_Factoryastro():
                                 if is_density_prediction:
                                     data[y_col] = data[y_col] * 100000
                                     st.markdown("Note: Predicted density values multiplied by 100,000.")
-
-                                # Check if there are at least 3 rows in the DataFrame
                                 
                                 #st.header("Predicted "+title, divider="gray")
                                 fig = px.line(
@@ -110,18 +107,14 @@ def Show_Factoryastro():
                                 left, middle, right = st.columns((2, 5, 2))
                                 with middle:
                                     st.plotly_chart(fig)
-                
-                                
                         else:
-                                st.warning("No Graph Genrated!!!  Data has less than 3 Predictions.", icon="⚠️")
-                                
+                                st.warning("No Graph Genrated!!!  Data has less than 3 Predictions.", icon="⚠️")  
                     else:
-                        st.error("No Predicted_data key found in the JSON response.")
-
+                        st.error("No Predicted Data Found!!!")
                 except json.JSONDecodeError as e:
-                    st.error(f"Error decoding JSON response: {e}")
-                except Exception as e:
-                    st.error(f"An unexpected error occurred: {e}")
+                    st.error(f"Oops! looks like my engine is having trouble understanding your request. Please try again.")
+            except Exception as e:
+                st.error(f"Oops! looks like my engine is having trouble understanding your request. Please try again.")
 
                 st.session_state.astro_messages.append(
                 {"role": "assistant", "content": st.session_state["astro_response"]}

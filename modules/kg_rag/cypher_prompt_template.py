@@ -157,7 +157,6 @@ MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
 WHERE o.profit_margin < 25
 WITH f, avg(o.profit_margin) AS AverageProfitMargin
 RETURN f.factory_id AS FactoryID, f.location as City, AverageProfitMargin
-'''
 
 Question: What is the average batch quality for products supplied by each supplier?
 
@@ -221,9 +220,13 @@ RETURN f.factory_id AS FactoryID, ProductionVolume, d as BestProdDay
 LIMIT 1
 
 
-Note: Do not include any explanations or apologies in your responses.
+Note: 
+Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
 Do not include any text except the generated Cypher statement.
+Handle errors or exception while generating cypher query gracefully
+If unable to build cypher query then return that i don't understand this type of questions
+If question includes any text which doesn't match with any of given knowledge graph node information then return a dummy query which results in no data
 
 The question is:
 {question}"""

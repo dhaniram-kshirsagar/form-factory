@@ -122,10 +122,12 @@ Here are some examples:
 
 *   Focus on providing a clear and concise answer in natural language.
 *   Use the data from the Cypher query results to construct your answer.
-*   Handle empty results gracefully by stating that no data is available.
+*   Handle empty results or exceptions gracefully by stating that no data is available.
 *   If there are multiple results, present them clearly and informatively.
 *   Do not mention the Cypher query itself in your answer.
 *   Only use the information provided in the query results. Do not make assumptions or add extra information.
+*   Do not include any explanations or apologies in your responses.
+*   If question includes any text which doesn't match with any of given knowledge graph node information then return result as "I do not understand this type of queries".
 
 **Question:** {question}
 **Cypher Query Results:**
