@@ -15,63 +15,31 @@ from modules.kg_rag import kg_rag
 def show_factorybot():
     st.subheader(":robot_face: Chat with Foam Factories")
     
-    #st.set_page_config(layout="wide")
-
-
     # Define the content for each column
     column_1_content = """
-        ### Examples of Analysis
-
+        ### Examples of questions you can ask:
     ##### 1. **Quality Analysis**
-    
      - **Average Quality:**
         - What is the average batch quality for each product category?
         - What is the average batch quality for products supplied by each supplier?
-
-
     ##### 2. **Profitability & Revenue**
-    
      - **Profit Margin**:
         - How does the profit margin change over time for Factory 1?
-
      - **Revenue Comparison**:
         - Which factory had the highest total revenue in 2023?
-    
-
-    ##### 3. **Production Insights**
-    
-     - **Production Volume**:
-         - What is the total production volume for each factory?
-         
-     - **Profit Margin Analysis**:
-         - What is the average profit margin on days when the production volume was above the average production volume for that factory?
    """
 
     column_2_content = """
-    ##
-    ##### 4. **Defects & Operators**
-    
+    #####
+    ##### 3. **Defects & Operators**
     - **Defect Analysis:**
         - Which machines experienced defects caused by 'Material Impurity', and what was their utilization on the day of the defect?
-
      - **Operator Experience:**
         - Which operators have experience greater than 7 years?
         - Which operators operated machines that experienced defects?
-   
-
-    ##### 5. **Efficiency & Downtime**
-    
+    ##### 4. **Efficiency & Downtime**
     -  **Downtime Analysis**:
-         - What is the average downtime for each machine type?
-
-
-    ##### 6. **Sustainability**
-    
-     - **CO2 Emission Trend**:
-        - How do CO₂ emissions change over time for the machine "City A-1-Type A" in the year 2023?
-      
-     - **Energy Consumption**:
-        - What is the total energy consumption for each factory in 2023?"""
+         - What is the average downtime for each machine type?"""
 
     # Create two columns
     col1, col2 = st.columns(2)

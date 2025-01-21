@@ -9,16 +9,13 @@ def Show_Factoryastro():
     st.subheader("📝 Predict Factory Performance with Factory Astro")
 
     markdown = """
-        ### You can start with the following examples:
-
+        ### Examples of questions you can ask:
      - **Revenue Predictions**:
         - What will the revenue for factory 3 be next year?
         - What will the revenue over the next 2 months for factory 3 in city C be?
-
      - **Foam Density**:
         - What will the foam density be in July for factory 2?
         - What will the foam density of factory 1 in city A be?
-
      - **Production Volume**:
         - What will the production volume be over the next 2 months?
         - Get me the production volume for factory 4 in city C in the month of July.
