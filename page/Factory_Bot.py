@@ -17,22 +17,73 @@ def show_factorybot():
     
     #st.set_page_config(layout="wide")
 
-    markdown = """
-    You can start with following examples:
 
+    # Define the content for each column
+    column_1_content = """
+        ### Examples of Analysis
+
+    ##### 1. **Quality Analysis**
+    
+     - **Average Quality:**
         - What is the average batch quality for each product category?
-        - How does the profit margin change over time for Factory 1?
-        - For each factory, what is the total production volume and the average profit margin on days when the production volume was above the average production volume for that factory?
-        - Which machines experienced defects caused by 'Material Impurity' and what was their utilization on the day of the defect?
-        - Which operators have experience greater than 7 years and operated machines that experienced defects?
         - What is the average batch quality for products supplied by each supplier?
-        - What is the average downtime for each machine type?
-        - Which factory had the highest total revenue in 2023?
-        - How does the co2 emissions change over time for machine "City A-1-Type A" in year 2023?
-        - What is the total energy consumption for each factory in 2023?
-    """
 
-    st.markdown(markdown)
+
+    ##### 2. **Profitability & Revenue**
+    
+     - **Profit Margin**:
+        - How does the profit margin change over time for Factory 1?
+
+     - **Revenue Comparison**:
+        - Which factory had the highest total revenue in 2023?
+    
+
+    ##### 3. **Production Insights**
+    
+     - **Production Volume**:
+         - What is the total production volume for each factory?
+         
+     - **Profit Margin Analysis**:
+         - What is the average profit margin on days when the production volume was above the average production volume for that factory?
+   """
+
+    column_2_content = """
+    ##
+    ##### 4. **Defects & Operators**
+    
+    - **Defect Analysis:**
+        - Which machines experienced defects caused by 'Material Impurity', and what was their utilization on the day of the defect?
+
+     - **Operator Experience:**
+        - Which operators have experience greater than 7 years?
+        - Which operators operated machines that experienced defects?
+   
+
+    ##### 5. **Efficiency & Downtime**
+    
+    -  **Downtime Analysis**:
+         - What is the average downtime for each machine type?
+
+
+    ##### 6. **Sustainability**
+    
+     - **CO2 Emission Trend**:
+        - How do CO₂ emissions change over time for the machine "City A-1-Type A" in the year 2023?
+      
+     - **Energy Consumption**:
+        - What is the total energy consumption for each factory in 2023?"""
+
+    # Create two columns
+    col1, col2 = st.columns(2)
+
+    # Render the content in the respective columns
+    with col1:
+        st.markdown(column_1_content)
+
+    with col2:
+        st.markdown(column_2_content)
+
+
 
     if "messages" not in st.session_state:
         st.session_state.messages = [

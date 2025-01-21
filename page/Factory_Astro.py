@@ -9,16 +9,23 @@ def Show_Factoryastro():
     st.subheader("📝 Predict Factory Performance with Factory Astro")
 
     markdown = """
-    You can start with the following examples:
+        ### You can start with the following examples:
 
-        - What will revenue for factory 3 next year?
-        - What will be form density like in July for factory 2?
-        - What will be production volume over the next 2 months?
-        - What will be foam density of factory 1 in city A?
-        - What will be revenue over the next 2 months for factory 3 in city C?
-        - Get me production volume for factory 4 in city C in the month of July.
+     - **Revenue Predictions**:
+        - What will the revenue for factory 3 be next year?
+        - What will the revenue over the next 2 months for factory 3 in city C be?
+
+     - **Foam Density**:
+        - What will the foam density be in July for factory 2?
+        - What will the foam density of factory 1 in city A be?
+
+     - **Production Volume**:
+        - What will the production volume be over the next 2 months?
+        - Get me the production volume for factory 4 in city C in the month of July.
     """
+
     st.markdown(markdown)
+
 
     # Initialize Session State
     if "astro_messages" not in st.session_state:
@@ -52,8 +59,8 @@ def Show_Factoryastro():
                     parsed_response = json.loads(llm_response)
                     st.session_state["astro_response"] = parsed_response["llm_output_text_summmary"]
                     st.chat_message("assistant").write(st.session_state["astro_response"])
-                    st.write('''NOTE Its work in progress... In the generated output: Add +1 to Factory name. 
-                Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.''')
+                #     st.write('''NOTE Its work in progress... In the generated output: Add +1 to Factory name. 
+                # Assume City A if "location 0", City B if "location 1" and so on.. We are working to map factory and location names.''')
 
                     if 'Predicted_data' in parsed_response:
                         data = pd.DataFrame(parsed_response['Predicted_data'])

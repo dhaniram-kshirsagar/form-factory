@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
-import math
-from pathlib import Path
 import plotly.express as px
+import numpy as np
+import math
+
+
 
 def yearFilter(factory_profit_df): 
-
     min_value = factory_profit_df['Month'].min()
     max_value = factory_profit_df['Month'].max()
 
@@ -13,7 +14,8 @@ def yearFilter(factory_profit_df):
         'Which months are you interested in?',
         min_value=min_value,
         max_value=max_value,
-        value=[min_value, max_value])
+        value=[min_value, max_value]
+    )
 
     return from_year, to_year
 
@@ -23,64 +25,74 @@ def selectedFactories(factory_profit_df):
     selected_factories = st.multiselect(
         'Which factories would you like to view?',
         factories,
-        [0])  # add sample factory
+        [factories[0]] if len(factories) > 0 else []
+    )
 
     return selected_factories
 
-
 def selectedLocations(factory_profit_df):
     locations = factory_profit_df['Location'].unique()
+
     selected_locations = st.multiselect(
         'Which location would you like to view?',
         locations,
         locations[:4] if len(locations) >= 4 else locations
     )
+
     return selected_locations
 
-def lineGraph_rev(factory_profit_df, selected_factories, selected_locations, from_month, to_month):
+# Line graph for revenue
+def lineGraph_rev(factory_profit_df, selected_factories, selected_locations, from_month, to_month, log_scale=False):
     # Filter the data
     filtered_factory_df = factory_profit_df[
-        factory_profit_df['Factory'].isin(selected_factories)
-        & factory_profit_df['Location'].isin(selected_locations)
-        & (factory_profit_df['Month'] <= to_month)
-        & (from_month <= factory_profit_df['Month'])
-    ].copy()
+        (factory_profit_df['Factory'].isin(selected_factories)) &
+        (factory_profit_df['Location'].isin(selected_locations)) &
+        (factory_profit_df['Month'] <= to_month) &
+        (factory_profit_df['Month'] >= from_month)
+    ]
 
-    if not filtered_factory_df.empty:
-        def adjust_revenue(row):
-            location = row['Location']
-            revenue = row['Predicted Revenue ($)']
-            if location in selected_locations:
-                bonus_index = sorted(selected_locations).index(location) #index of the sorted locations
-                return revenue + (bonus_index + 1) * 100000
-            return revenue
+    if filtered_factory_df.empty:
+        st.warning("No data available for the selected filters (Factories, Locations, Months).")
+        return
+    
+    # Check if the required column exists
+    if 'Predicted Revenue ($)' not in filtered_factory_df.columns:
+        st.error("The column 'Predicted Revenue ($)' is not present in the dataframe.")
+        return
 
-        filtered_factory_df['Adjusted Revenue'] = filtered_factory_df.apply(adjust_revenue, axis=1)
+    # Apply transformations for hover data
+    filtered_factory_df['Transformed Revenue'] = filtered_factory_df['Predicted Revenue ($)']
+    filtered_factory_df['Transformed Revenue'] += np.random.uniform(-1000, 1000, size=len(filtered_factory_df))
 
-        st.header('Predicted Revenue ($) for Six Months', divider='gray')
+    # Create a copy of the dataframe for hover data
+    hover_df = filtered_factory_df[['Month', 'Location', 'Transformed Revenue']].copy()
 
-        fig = px.line(
-            filtered_factory_df, 
-            x='Month', 
-            y='Adjusted Revenue', 
-            color='Location', 
-          #  title='Predicted Revenue ($) for Six Months'
-        )
-        # fig.add_annotation(
-        #     text="This is a custom footer for Revenue Graph.", 
-        #     xref="paper", yref="paper", 
-        #     x=1, y=0, 
-        #     showarrow=False, 
-        #     font=dict(size=10)
-        # )
-        fig.update_layout(
-            yaxis_title="Adjusted Revenue ($)<br><sup>(Divide the given value by 100000 to see the exact prediction)</sup>" 
-        )
+    # Plot the graph
+    st.header('Predicted Revenue ($)', divider='gray')
 
-        st.plotly_chart(fig)
+    fig = px.line(
+        filtered_factory_df,
+        x='Month',
+        y='Predicted Revenue ($)',  # Use original values for the y-axis
+        color='Location',
+        hover_data=hover_df  # Use hover_df to avoid conflicts
+    )
 
-       # st.markdown(f"<p style='text-align: center;'>'helllo'</p>", unsafe_allow_html=True)
+   
+    st.plotly_chart(fig)
 
+    # Add table with preview (5 rows) and expand for full table
+    st.subheader("Predicted Data for Revenue")
+    st.write("Preview of Predicted data (first 5 rows):")
+    try:
+        st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Revenue ($)']].head(5))
+        with st.expander("Show Full Table"):
+             st.write("Full Predicted data:")
+             st.dataframe(filtered_factory_df)
+    except KeyError as e:
+        st.error(f"KeyError: {e}. Please ensure the required columns exist in the dataframe.")
+
+# Line graph for foam density
 def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, from_month, to_month):
     filtered_factory_df = factory_profit_df[
         factory_profit_df['Factory'].isin(selected_factories)
@@ -114,44 +126,75 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
         )
     st.plotly_chart(fig)
 
-def lineGraph_vol(factory_profit_df, selected_factories, selected_locations, from_month, to_month):
+   
 
+    # Add table with preview (5 rows) and expand for full table
+    st.subheader("Predicted Data for Foam Density")
+    st.write("Preview of Predicted data (first 5 rows):")
+    st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Foam Density']].head(5))
+
+    with st.expander("Show Full Table"):
+        st.write("Full Predicted data:")
+        st.dataframe(filtered_factory_df)
+
+
+# Line graph for production volume
+def lineGraph_vol(factory_profit_df, selected_factories, selected_locations, from_month, to_month, log_scale=False):
     # Filter the data
     filtered_factory_df = factory_profit_df[
-        factory_profit_df['Factory'].isin(selected_factories)
-        & factory_profit_df['Location'].isin(selected_locations)
-        & (factory_profit_df['Month'] <= to_month)
-        & (from_month <= factory_profit_df['Month'])
-    ]
-    if not filtered_factory_df.empty:
-        def adjust_volume(row):
-            location = row['Location']
-            volume = row['Predicted Production Volume (units)']
-            if location in selected_locations:
-                bonus_index = sorted(selected_locations).index(location)
-                return volume + (bonus_index + 1) * 100000
-            return volume
+        (factory_profit_df['Factory'].isin(selected_factories)) &
+        (factory_profit_df['Location'].isin(selected_locations)) &
+        (factory_profit_df['Month'] <= to_month) &
+        (factory_profit_df['Month'] >= from_month)
+    ].copy()
 
-        filtered_factory_df['Predicted Production Volume (units)'] = filtered_factory_df.apply(adjust_volume, axis=1)
+    if filtered_factory_df.empty:
+        st.warning("No data available for the selected filters (Factories, Locations, Months).")
+        return
 
-    st.header('Predicted Production Volume (units) for Six Months', divider='gray')
+    y_axis_title = "Predicted Production Volume (units)"
 
+    # Apply transformations for hover data
+    filtered_factory_df['Transformed Volume'] = filtered_factory_df['Predicted Production Volume (units)']
+    filtered_factory_df['Transformed Volume'] += np.random.uniform(-10, 10, size=len(filtered_factory_df))
+
+
+    st.header('Predicted Production Volume', divider='gray')
+
+    # Plot the graph
     fig = px.line(
-        filtered_factory_df, 
-        x='Month', 
-        y='Predicted Production Volume (units)', 
-        color='Location', 
-        title='Predicted Production Volume (units) for Six Months'
+        filtered_factory_df,
+        x='Month',
+        y='Predicted Production Volume (units)',
+        color='Location',
+        hover_data={
+            'Log/Transformed Volume': filtered_factory_df['Transformed Volume']  # Avoid conflict
+        }
     )
-    fig.update_layout(
-            yaxis_title="Predicted Production Volume (units) <br><sup>(Reduce the given value by 100000 to see the exact prediction)</sup>" 
-        )
+
+    
     st.plotly_chart(fig)
 
-def predictionPage(result_vol_df,result_rev_df,result_foam_df):
+
+    # Add table with preview (5 rows) and expand for full table
+    st.subheader("Predicted Data for Production Volume")
+    st.write("Preview of Predicted data (first 5 rows):")
+    st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Production Volume (units)']].head(5))
+
+    with st.expander("Show Full Table"):
+        st.write("Full Predicted data:")
+        st.dataframe(filtered_factory_df)
+
+
+# Prediction page combining all graphs
+def predictionPage(result_vol_df, result_rev_df, result_foam_df):
     from_year, to_year = yearFilter(result_vol_df)
     selected_factories = selectedFactories(result_vol_df)
     selected_locations = selectedLocations(result_vol_df)
+
+    #log_scale = st.checkbox("Use Logarithmic Scale for Y-Axis", value=False)
+
     lineGraph_vol(result_vol_df, selected_factories, selected_locations, from_year, to_year)
     lineGraph_rev(result_rev_df, selected_factories, selected_locations, from_year, to_year)
     lineGraph_foam(result_foam_df, selected_factories, selected_locations, from_year, to_year)
+
