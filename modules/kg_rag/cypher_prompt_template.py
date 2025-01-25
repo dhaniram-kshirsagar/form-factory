@@ -5,218 +5,318 @@ Instructions:
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided or not related to that node 
 Schema:
+
 ////Create Nodes
 
-// Create Factory
-CREATE (:Factory {{factory_id: 1, location: "City D"}}) // This should create 50 factories (5 * 10)
+// Create Teams
+Match (t:Team {{id: 'Location A_Factory 1_Member_0', factory: 'Factory 1', location: 'Location A'}})
 
-// Create Date
-CREATE (:Date {{date: date("2023-01-01")}}) 
+// Create Members
+MERGE (m:Member {{
+    name: 'Member_0_0', 
+    experience: 10.0, 
+    trainingLevel: '3.6', 
+    absenteeismRate: 0.45, 
+    factory: 'Factory 1', 
+    location: 'Location A'
+}})
 
-// Create Machine
-CREATE (:Machine {{machine_id: "City A-1-Type A", machine_type: "Type A", machine_age: 7, maintenance_history: "Regular"}})
-// We have 3 types in machines, so 3 machines in factories (3 * 50) 150 total machines
+// Create Dates
+MERGE (d1:Date {{date: date('2020-01-01')}})
+MERGE (d2:Date {{date: date('2020-01-02')}})
 
-//Create Operator
-CREATE (:Operator {{operator_id: "City A-1-Operator 1", operator_experience: 8, operator_training_level: "Advanced"}})
-// City + Factory + Operator Ids should be unique assuming operators can operate between machines
-// operator_experience - Integer
-// TEAM Size should be on OPERATED_ON along with absentialism
-// training level - beginer - experiece - 3
-// training level - intermediate - experiece - 5
-// training level - advanced - experiece - 8
+// Create Factories
+MERGE (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
 
-//Create Product
-CREATE (:Product {{product_category: "Foam Grade A"}})
+// Create Machines
+MERGE (m:Machine {{machine_id: 'Location A-Factory 1-Type 2', machine_type: 'Type 2', machine_age: 8.89}})
 
-//Create Supplier
-CREATE (:Supplier {{supplier_name: "Supplier A"}})
+// Create Products
+MERGE (p:Product {{product_category: 'Category A'}})
 
-//RawMaterial
-CREATE(:RawMaterial {{raw_material_quality: "Medium"}})
+// Create Suppliers
+MERGE (s:Supplier {{supplier_name: 'Supplier X'}})
 
-//Create Defect
-CREATE (:Defect {{defect_root_cause: "Material Impurity"}})
+// Create Raw Materials
+MERGE (r:RawMaterial {{raw_material_quality: 1}})
 
 //// Create Relationships with properties
 
-//OPERATED_ON Relationship
-MATCH (f:Factory {{factory_id: 1}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (f)-[:OPERATED_ON {{production_volume: 1199, revenue: 9368.437, profit_margin: 34.47, market_demand_index: 86.73, shift: "Day"}}]->(d)
-//Add shift to OPERATED_ON
+// HAS_MEMBER relationship
 
-//HAS_MACHINE Relationship
-MATCH (f:Factory {{factory_id: 1}})
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-CREATE (f)-[:HAS_MACHINE {{team_size: 10, absentialism: 6.1/}}]->(m)
+MATCH (t:Team {{id: 'Location A_Factory 1_Member_0'}})
+MATCH (m:Member {{name: 'John Doe', experience: 5, trainingLevel: 'Level 3', absenteeismRate: 0.03, factory: 'Factory A', location: 'Location X'}})
+MERGE (t)-[:HAS_MEMBER]->(m)
 
-// USED_ON Relationship
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (m)-[:USED_ON {{machine_utilization: 74.59, machine_downtime: 6.24, cycle_time: 6, energy_consumption: 283.7, co2_emissions: 140.17, emission_limit_compliance: "No", cost_of_downtime: 488.75, breakdowns: 1, safety_incidents: 0, defect_rate: 2, team_size: 10, absentialism: 6.1}}]->(d)
+// HAS_MACHINE  relationship
 
-// OPERATED Relationship
-MATCH (o:Operator {{operator_id: "City A-1-Operator 1"}})
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-CREATE (o)-[:OPERATED{{date: date("2023-01-01")}}]->(m)
+MATCH (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
+MERGE (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
+MERGE (f)-[:HAS_MACHINE]->(m)
 
-// PRODUCED_ON Relationship
-MATCH (p:Product {{product_category: "Foam Grade A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (p)-[:PRODUCED_ON {{batch_quality: 88.47}}]->(d)
+// OPERATED_ON relationship      
 
-// SUPPLIED_BY Relationship
-MATCH (r:RawMaterial {{raw_material_quality: "Medium"}})
-MATCH (sup:Supplier {{supplier_name: "Supplier A"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (r)-[:SUPPLIED_BY {{supplier_delays: 1}}]->(sup)-[:ON]->(d)
+MATCH (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
+MATCH (d:Date {{date: date('2020-01-01')}})
+MERGE (f)-[:OPERATED_ON {{shift: 'Day'}}]->(d)
 
-// PRODUCED_USING Relationship
-MATCH (p:Product {{product_category: "Foam Grade A"}})
-MATCH (r:RawMaterial {{raw_material_quality: "Medium"}})
-MATCH (d:Date {{date: date("2023-01-01")}})
-CREATE (p)-[:PRODUCED_USING]->(r)-[:ON]->(d)
+// USED_ON  relationship
 
-// EXPERIENCED_DEFECT Relationship
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})
-MATCH (def:Defect {{defect_root_cause: "Material Impurity"}})
-CREATE (m)-[:EXPERIENCED_DEFECT{{date: date("2023-01-01")}}]->(def)
+MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
+MATCH (d:Date {{date: date('2025-01-01')}})
+MERGE  (m)-[:USED_ON {{
+    shift: 'Shift 1', 
+    machine_utilization: 0.8, 
+    cycle_time: 120, 
+    energy_consumption: 150, 
+    co2_emissions: 20, 
+    emission_limit_compliance: 'Yes', 
+    cost_of_downtime: 100,
+    breakdowns: 2, 
+    safety_incidents: 0, 
+    defect_rate: 0.01, 
+    energy_efficiency_rating: 1.5, 
+    waste_generated: 10, 
+    water_usage: 300, 
+    temperature: 70, 
+    pressure: 200, 
+    chemical_ratio: 4.0, 
+    mixing_speed: 200, 
+    production_volume: 500, 
+    revenue: 10000, 
+    profit_margin: 0.15, 
+    market_demand_index: 5
+}}]->(d)
+
+// USED_BY_TEAM relationship
+
+
+MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
+MATCH (t:Team {{id: 'Location A_Factory 1_Member_0'}})
+MERGE (m)-[:USED_BY_TEAM {{
+    shift: 'Day', 
+    date: date('2020-01-01'), 
+    average_operator_training_level: 3.6, 
+    average_absentism: 0.05, 
+    average_operator_experience: 5
+}}]->(t)
+
+// PRODUCED_ON relationship
+
+MATCH (p:Product {{product_category: 'Category A'}})
+MATCH (d:Date {{date: date('2020-01-01')}})
+MERGE (p)-[:PRODUCED_ON {{batch: 'Batch 1', batch_quality: 'High'}}]->(d)
+
+// SUPPLIED_BY relationship
+
+MATCH (r:RawMaterial {{raw_material_quality: 1}})
+MATCH (s:Supplier {{supplier_name: 'Supplier X'}})
+MERGE (r)-[:SUPPLIED_BY {{date: date('2020-01-01'), shift: 'Day', supplier_delays: 0}}]->(s)
+
+// PRODUCED_USING relationship
+
+MATCH (p:Product {{product_category: 'Category A'}})
+MATCH (r:RawMaterial {{raw_material_quality: 1}})
+MERGE (p)-[:PRODUCED_USING {{date: date('2020-01-01'), shift: 'Day', batch: 'Batch 1', batch_quality: 'High'}}]->(r)
 
 Cypher Examples:
+
+Question: Get details about team Location A_Factory 1_Member_0 and its members: 
+
+MATCH (t:Team {{id: 'Location A_Factory 1_Member_0'}})-[:HAS_MEMBER]->(m)
+return t, m
+
 Question: Find factories with an average profit margin below a certain threshold:
- 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WITH f, avg(o.profit_margin) AS AverageProfitMargin
-WHERE AverageProfitMargin < 30 // Example threshold
-RETURN f.factory_id AS FactoryID, AverageProfitMargin
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH f, avg(u.profit_margin) AS averageProfitMargin
+WHERE averageProfitMargin < 30
+RETURN f.factory_id AS FactoryID, averageProfitMargin
 
 Question: Compare revenue and profit margin between two factories on a specific date:
 
-MATCH (f1:Factory {{factory_id: 1}})-[o1:OPERATED_ON]->(d:Date {{date: date("2023-01-01")}})
-MATCH (f2:Factory {{factory_id: 2}})-[o2:OPERATED_ON]->(d)
-RETURN f1.factory_id AS Factory1, o1.revenue AS Revenue1, o1.profit_margin AS ProfitMargin1,
-       f2.factory_id AS Factory2, o2.revenue AS Revenue2, o2.profit_margin AS ProfitMargin2
-Complex Queries (Revenue & Profit Margin):
+
+MATCH (f1:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m1:Machine)-[u1:USED_ON]->(d:Date {{date: date('2020-01-01')}}),
+      (f2:Factory {{factory_id: 'Factory 2'}})-[:HAS_MACHINE]->(m2:Machine)-[u2:USED_ON]->(d)
+RETURN f1.factory_id AS Factory1, avg(u1.revenue) AS Factory1Revenue, avg(u1.profit_margin) AS Factory1ProfitMargin,
+       f2.factory_id AS Factory2, avg(u2.revenue) AS Factory2Revenue, avg(u2.profit_margin) AS Factory2ProfitMargin
 
 Question: Analyze the correlation between production volume and revenue:
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+RETURN f.factory_id AS FactoryID, u.production_volume AS ProductionVolume, u.revenue AS Revenue
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-RETURN avg(o.production_volume) AS AvgProductionVolume, avg(o.revenue) AS AvgRevenue
-ORDER BY AvgProductionVolume DESC
+Question: Identify defect rates for a specific machine:
 
-Question: Identify recurring defects for a specific machine:
+MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})-[u:USED_ON]->(d:Date)
+RETURN m.machine_id AS MachineID, u.defect_rate AS DefectRate, d.date AS Date
+ORDER BY d.date
 
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:EXPERIENCED_DEFECT]->(def:Defect)
-RETURN def.defect_root_cause AS DefectRootCause, count(*) AS DefectCount
-ORDER BY DefectCount DESC
+Question: Analyze the relationship between supplier raw material quality and batch quality
 
-Question: Analyze the relationship between supplier raw material quality and batch quality:
-
-MATCH (p:Product)-[:SUPPLIED_BY]->(s:Supplier)
-MATCH (p)-[po:PRODUCED_ON]->(d:Date)
-RETURN s.raw_material_quality AS RawMaterialQuality, avg(po.batch_quality) AS AvgBatchQuality
+MATCH (p:Product)-[pu:PRODUCED_USING]->(rm:RawMaterial)
+RETURN rm.raw_material_quality AS RawMaterialQuality, avg(pu.batch_quality) AS AvgBatchQuality
 ORDER BY RawMaterialQuality
 
 Question: Analyze the combined impact of machine downtime and defect rate on production volume:
 
-MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
-MATCH (f)-[o:OPERATED_ON]->(d)
-RETURN avg(u.machine_downtime) AS AvgDowntime, avg(u.defect_rate) as AvgDefectRate, sum(o.production_volume) AS TotalProductionVolume
-ORDER BY AvgDowntime DESC, AvgDefectRate DESC
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WITH m, avg(u.cost_of_downtime) AS AvgDowntime, avg(u.defect_rate) AS AvgDefectRate, avg(u.production_volume) AS AvgProductionVolume
+RETURN m.machine_id AS MachineID, AvgDowntime, AvgDefectRate, AvgProductionVolume
+ORDER BY AvgProductionVolume DESC
 
 Question: Analyze the impact of machine downtime on revenue (requires linking downtime to revenue loss):
-This query assumes you can calculate the cost of downtime per day. If not you need to create such a property
 
-MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
-MATCH (f)-[o:OPERATED_ON]->(d)
-RETURN avg(u.machine_downtime) AS AvgDowntime, sum(o.revenue - u.cost_of_downtime) AS AdjustedRevenue
-ORDER BY AvgDowntime DESC
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WITH m, avg(u.cost_of_downtime) AS AvgDowntimeCost, avg(u.revenue) AS AvgRevenue
+RETURN m.machine_id AS MachineID, AvgDowntimeCost, AvgRevenue, (AvgRevenue - AvgDowntimeCost) AS RevenueAfterDowntime
+ORDER BY RevenueAfterDowntime DESC
 
 Question: Analyze profit margin trends over time (requires more date data and potentially APOC for time series functions):
 This simplified version shows profit margin over time. For more advanced analysis, consider the APOC library:
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-RETURN d.date AS Date, avg(o.profit_margin) AS AvgProfitMargin
-ORDER BY d.date
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN d.date AS Date, avg(u.profit_margin) AS AvgProfitMargin
+ORDER BY Date
 
 Question: Identify factors contributing to low profit margins (combining multiple relationships and properties):
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WHERE o.profit_margin < 25 // Example threshold for low profit margin
-MATCH (f)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d)
-MATCH (p:Product)-[:PRODUCED_ON]->(d)
-RETURN f.factory_id AS Factory, d.date as Date, o.profit_margin as ProfitMargin, avg(u.machine_downtime) as Downtime, p.product_category as ProductCategory, o.market_demand_index as MarketDemand
-ORDER BY ProfitMargin
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH f, avg(u.profit_margin) AS AvgProfitMargin, avg(u.machine_utilization) AS AvgUtilization, avg(u.defect_rate) AS AvgDefectRate, avg(u.energy_consumption) AS AvgEnergyConsumption, avg(u.co2_emissions) AS AvgCO2Emissions, avg(u.cost_of_downtime) AS AvgDowntimeCost, avg(u.breakdowns) AS AvgBreakdowns, avg(u.safety_incidents) AS AvgSafetyIncidents
+WHERE AvgProfitMargin < 25 // Adjust threshold as needed
+RETURN f.factory_id AS FactoryID, AvgProfitMargin, AvgUtilization, AvgDefectRate, AvgEnergyConsumption, AvgCO2Emissions, AvgDowntimeCost, AvgBreakdowns, AvgSafetyIncidents
+ORDER BY AvgProfitMargin ASC
 
 Question: List factories and average low profit margins:
 
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WHERE o.profit_margin < 25
-WITH f, avg(o.profit_margin) AS AverageProfitMargin
-RETURN f.factory_id AS FactoryID, f.location as City, AverageProfitMargin
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH f, avg(u.profit_margin) AS AvgProfitMargin
+WHERE AvgProfitMargin < 20 // Adjust threshold as needed
+RETURN f.factory_id AS FactoryID, AvgProfitMargin
+ORDER BY AvgProfitMargin ASC
 
 Question: What is the average batch quality for products supplied by each supplier?
 
-MATCH (s:Supplier)<-[:SUPPLIED_BY]-(r:RawMaterial)<-[:PRODUCED_USING]-(p:Product)
-WITH s, p
-MATCH (p)-[po:PRODUCED_ON]->(d:Date)
-RETURN s.supplier_name AS SupplierName, avg(po.batch_quality) AS AvgBatchQuality
-ORDER BY s.supplier_name
-
-Incorrectly generated Cypher Example:
-Question: What is the average batch quality for each product category?
-
-Incorrect cypher for above question:
-MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
-RETURN p.product_category AS ProductCategory, avg(d.batch_quality) AS AvgBatchQuality
-ORDER BY ProductCategory
-
-Correct cypher for above question:
-MATCH (p:Product)-[po:PRODUCED_ON]->(d:Date)
-RETURN p.product_category AS ProductCategory, avg(po.batch_quality) AS AvgBatchQuality
-ORDER BY ProductCategory
+MATCH (r:RawMaterial)-[sb:SUPPLIED_BY]->(s:Supplier)
+MATCH (p:Product)-[pu:PRODUCED_USING]->(rm:RawMaterial)
+WHERE sb.date = pu.date
+WITH s, pu.batch_quality AS BatchQuality
+RETURN s.supplier_name AS Supplier, avg(BatchQuality) AS AvgBatchQuality
 
 Question: How does the profit margin change over time for Factory 1?
 
-Incorrect cypher for above question:
-MATCH (f:Factory {{factory_id: 1}})-[:OPERATED_ON]->(d:Date)
-RETURN d.date AS Date, avg(f.profit_margin) AS AvgProfitMargin
-ORDER BY d.date
+// Use this query to return result date wise: 
 
-Correct cypher for above question:
-MATCH (f:Factory {{factory_id: 1}})-[op:OPERATED_ON]->(d:Date)
-RETURN d.date AS Date, avg(op.profit_margin) AS AvgProfitMargin
-ORDER BY d.date
+MATCH (f:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH d.date AS Date, avg(u.profit_margin) AS AvgProfitMargin
+RETURN Date, AvgProfitMargin
+ORDER BY Date
 
-Question: How does the co2 emissions change over time for machine "City A-1-Type A" in 2023?
+// Use this query to return result Monthly: 
+MATCH (f:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH d, u,
+     toString(d.date) AS DateString,
+     substring(toString(d.date), 0, 7) AS YearMonth
+WITH YearMonth, avg(u.profit_margin) AS AvgProfitMargin
+RETURN YearMonth, AvgProfitMargin
+ORDER BY YearMonth
 
-Incorrect cypher for above question:
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[:USED_ON]->(d:Date {{date: date("2023-01-01")}})
-RETURN d.date AS Date, avg(m.co2_emissions) AS AvgCO2Emissions
-ORDER BY d.date
+// Use this query to return result Quarterwise: 
 
-Correct cypher for above question:
-MATCH (m:Machine {{machine_id: "City A-1-Type A"}})-[uo:USED_ON]->(d:Date)
-WHERE d.date >= date("2023-01-01") AND d.date < date("2024-01-01")
-RETURN d.date AS Date, avg(uo.co2_emissions) AS AvgCO2Emissions
-ORDER BY d.date
+MATCH (f:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH d, u, 
+     toString(d.date) AS DateString,
+     substring(toString(d.date), 0, 4) AS Year,
+     toInteger(substring(toString(d.date), 5, 2)) AS Month
+WITH Year, ((Month - 1) / 3) + 1 AS Quarter, avg(u.profit_margin) AS AvgProfitMargin
+RETURN Year + '-Q' + Quarter AS YearQuarter, AvgProfitMargin
+ORDER BY YearQuarter
+
+Question: How does the co2 emissions change over time for machine "Location A-Factory 1-Type 2" in 2023?
+
+MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})-[u:USED_ON]->(d:Date)
+WHERE d.date >= date('2023-01-01') AND d.date <= date('2023-12-31')
+WITH d, u,
+     toString(d.date) AS DateString,
+     substring(toString(d.date), 0, 7) AS YearMonth
+WITH YearMonth, avg(u.co2_emissions) AS AvgCO2Emissions
+RETURN YearMonth, AvgCO2Emissions
+ORDER BY YearMonth
 
 Question: what day was the best for overall production?
 
-Incorrect cypher for above question:
-MATCH (d:Date)
-RETURN d.date AS Date, sum(d.production_volume) AS TotalProduction
-ORDER BY TotalProduction DESC
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WITH d.date AS Date, sum(u.production_volume) AS TotalProductionVolume
+RETURN Date, TotalProductionVolume
+ORDER BY TotalProductionVolume DESC
 LIMIT 1
+
+Question: Which teams operated machines that experienced defects?
+
+MATCH(m:Machine)-[u:USED_ON]->(d:Date)
+with m,u,d
+MATCH (m)-[ut:USED_BY_TEAM]->(t:Team)
+WHERE u.defect_rate > 0 and d.date = ut.date
+RETURN distinct(t.id) as TeamID, m.machine_id as MachineID
+
+Question: How many locations are there?
+
+MATCH (f:Factory)
+return DISTINCT(f.location)
+
+Question: What is the average absenteeism rate?
+
+MATCH ()-[u:USED_BY_TEAM]->(t:Team)
+return avg(u.average_absentialism)
+
+Question: What is average absenteeism rate for each team?
+
+MATCH (m)-[u:USED_BY_TEAM]->(t:Team)
+RETURN t.id AS Team, avg(u.average_absentialism) AS AverageAbsenteeism
+
+Question: What is the average absenteeism rate for location?
+
+MATCH (m)-[u:USED_BY_TEAM]->(t:Team)
+RETURN t.location AS Location, avg(u.average_absentialism) AS AverageAbsenteeism
+
+Question: Which year was the most profitable
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH substring(toString(d.date), 0, 4) AS Year, sum(u.revenue) AS TotalRevenue
+RETURN Year
+ORDER BY TotalRevenue DESC
+LIMIT 1
+
+Incorrectly generated Cypher query examples:
+
+Question: List teams that operated on a 23-Jan-2023 and their average operator experience?
+
+Incorrect cypher for above question:
+
+MATCH (t:Team)-[:USED_BY_TEAM]->(m:Machine)-[u:USED_ON]->(d:Date {{date: date('2023-01-23')}})
+RETURN t.id AS Team, avg(u.average_operator_experience) AS AverageOperatorExperience
 
 Correct cypher for above question:
-MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
-WITH f, d, o.production_volume AS ProductionVolume
-ORDER BY ProductionVolume DESC
-RETURN f.factory_id AS FactoryID, ProductionVolume, d as BestProdDay
-LIMIT 1
 
+MATCH(m:Machine)-[u:USED_ON]->(d:Date{{date: date('2023-01-23')}})
+WITH m, u, d
+MATCH(m)-[ut:USED_BY_TEAM]->(t:Team)
+WHERE d.date = ut.date
+Return t.id, avg(ut.average_operator_experience) as AverageOperatorExperience
+
+Question: Analyze each team's contribution to production volume on a 23-Jan-2023
+
+Incorrect cypher for above question:
+
+MATCH (t:Team)-[:USED_BY_TEAM]->(m:Machine)-[u:USED_ON]->(d:Date {{date: date('2023-01-23')}})
+RETURN t.id AS Team, sum(u.production_volume) AS TotalProductionVolume
+
+Correct cypher for above question:
+
+MATCH(m:Machine)-[u:USED_ON]->(d:Date{{date: date('2023-01-23')}})
+WITH m, u, d
+MATCH(m)-[ut:USED_BY_TEAM]->(t:Team)
+WHERE d.date = ut.date
+Return t.id, u.production_volume as ProductionVolume
 
 Note: 
 Do not include any explanations or apologies in your responses.
