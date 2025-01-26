@@ -38,7 +38,7 @@ def run_api_server():
     # Hack the fact that Python modules (like st) only load once to
     # keep track of whether this file already ran.
         st.already_started_server = True
-        uvicorn.run(app, host="localhost", port=8000)
+        uvicorn.run(app, port=8000)
         print("Successfully start the API server")
     else:
         print("API server already started!!")
