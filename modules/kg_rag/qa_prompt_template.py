@@ -37,7 +37,7 @@ Relationships:
 
     OPERATED_ON:
         production_volume (int, units)
-        revenue (float, currency)
+        revenue (float, $)
         profit_margin (float, %)
         market_demand_index (float)
         shift (str)
@@ -51,7 +51,7 @@ Relationships:
         energy_consumption (float, energy units)
         co2_emissions (float, mass units)
         emission_limit_compliance (str)
-        cost_of_downtime (float, currency)
+        cost_of_downtime (float, $)
         breakdowns (int)
         safety_incidents (int)
         defect_rate (int)
@@ -117,6 +117,15 @@ Here are some examples:
     [{{"ProductionVolume": 100, "date":"2024-01-01"}}, {{"ProductionVolume": 150, "date":"2024-01-02"}}]
     ```
 *   **Answer:** The production volume of Factory 1 was 100 on 2024-01-01 and 150 on 2024-01-02.
+
+**Example 6 (Multiple Results):**
+
+*   **Question:** Where is factor 1 located?
+*   **Cypher Query Results:**
+    ```json
+    [{{'FactoryLocation': 'City D'}}, {{'FactoryLocation': 'City C'}}, {{'FactoryLocation': 'City A'}}, {{'FactoryLocation': 'City B'}}, {{'FactoryLocation': 'City E'}}]
+    ```
+*   **Answer:** Factory 1 is located in City A, City B, City C, City D, City E.
 
 **General Instructions:**
 

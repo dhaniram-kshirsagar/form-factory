@@ -13,6 +13,8 @@ from streamlit_navigation_bar import st_navbar
 import page as pg
 import time
 
+import api
+
 # Get the OpenAI API key
 # OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -33,15 +35,22 @@ st.set_page_config(
     layout='wide',
     initial_sidebar_state="collapsed"
 )
-print(f"Done page setting config #### Time  {time.time()}")
+print(f"Done page setting config #### Time  {time.time()}")   
+
+def init_api():
+    api.run_api_server()
 
 def initialize_graph():
     print(f"Starting kg_rag initialization in separate thread #### Time  {time.time()}")
     asyncio.run(kg_rag.init_graph())
 
 # Initialize the graph in a separate thread
-thread = threading.Thread(target=initialize_graph)
+thread = threading.Thread(target=initialize_graph, daemon=True)
 thread.start()
+
+thread2 = threading.Thread(target=init_api, daemon=True)
+thread2.start()
+
 
 print(f"Begin home page execution after dispatching thread #### Time  {time.time()}")
 # Load environment variables from .env file
