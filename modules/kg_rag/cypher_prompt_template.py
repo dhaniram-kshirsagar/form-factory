@@ -104,8 +104,6 @@ Question: Analyze the correlation between production volume and revenue:
 MATCH (f:Factory)-[o:OPERATED_ON]->(d:Date)
 RETURN avg(o.production_volume) AS AvgProductionVolume, avg(o.revenue) AS AvgRevenue
 ORDER BY AvgProductionVolume DESC
-Analyze the impact of market demand index on revenue and profit margin:
-Cypher
 
 Question: Identify recurring defects for a specific machine:
 
