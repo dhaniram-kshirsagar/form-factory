@@ -12,6 +12,8 @@ load_dotenv()
 
 # Get the OpenAI API key
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+URI = os.getenv("NEO4J_URI")
+USERNAME = os.getenv("NEO4J_USERNAME")
 
 graph = None
 chain = None
@@ -20,7 +22,7 @@ async def init_graph( ):
     global graph, chain
 
     if graph is None:
-        graph = Neo4jGraph(url="bolt://172.104.129.10:7787", username="neo4j", password=NEO4J_PASSWORD, enhanced_schema=True)
+        graph = Neo4jGraph(url=URI, username=USERNAME, password=NEO4J_PASSWORD, enhanced_schema=True)
 
         chain = GraphCypherQAChain.from_llm(
             ChatOpenAI(temperature=0), graph=graph, verbose=True, return_intermediate_steps=True,
