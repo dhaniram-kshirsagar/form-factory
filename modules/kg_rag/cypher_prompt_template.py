@@ -188,16 +188,15 @@ WHERE AvgProfitMargin < 20 // Adjust threshold as needed
 RETURN f.factory_id AS FactoryID, AvgProfitMargin
 ORDER BY AvgProfitMargin ASC
 
-Question: How does the profit margin change over time for Factory 1?
-
-// Use this query to return result date wise: 
+Question: How does the profit margin change over time for Factory 1 (return date wise data)?
 
 MATCH (f:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
 WITH d.date AS Date, avg(u.profit_margin) AS AvgProfitMargin
 RETURN Date, AvgProfitMargin
 ORDER BY Date
 
-// Use this query to return result Monthly: 
+Question: How does the profit margin change over time for Factory 1 (return quarter wise data)?
+
 MATCH (f:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
 WITH d, u,
      toString(d.date) AS DateString,
@@ -206,7 +205,7 @@ WITH YearMonth, avg(u.profit_margin) AS AvgProfitMargin
 RETURN YearMonth, AvgProfitMargin
 ORDER BY YearMonth
 
-// Use this query to return result Quarterwise: 
+Question: How does the profit margin change over time for Factory 1 (return yearly data)?
 
 MATCH (f:Factory {{factory_id: 'Factory 1'}})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
 WITH d, u, 
