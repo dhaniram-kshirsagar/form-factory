@@ -33,10 +33,10 @@ def show_factorybot():
     #####
     ##### 3. **Defects & Operators**
     - **Defect Analysis:**
-        - Which machines experienced defects caused by 'Material Impurity', and what was their utilization on the day of the defect?
+        - Which machines experienced defects, what was their utilization on the day of the defect?
      - **Operator Experience:**
         - Which operators have experience greater than 7 years?
-        - Which operators operated machines that experienced defects?
+        - Which teams operated machines that experienced defects?
     ##### 4. **Efficiency & Downtime**
     -  **Downtime Analysis**:
          - What is the average downtime for each machine type?"""

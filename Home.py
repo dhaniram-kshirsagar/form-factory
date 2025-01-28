@@ -27,7 +27,6 @@ import api
 # from modules.data import data
 #from modules.chatbot import chatbot
 
-print(f"Starting Home.py execution #### Time  {time.time()}")
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
     #page_title='Foam Factories',
@@ -35,13 +34,10 @@ st.set_page_config(
     layout='wide',
     initial_sidebar_state="collapsed"
 )
-print(f"Done page setting config #### Time  {time.time()}")   
-
 def init_api():
     api.run_api_server()
 
 def initialize_graph():
-    print(f"Starting kg_rag initialization in separate thread #### Time  {time.time()}")
     asyncio.run(kg_rag.init_graph())
 
 # Initialize the graph in a separate thread
@@ -51,8 +47,6 @@ thread.start()
 thread2 = threading.Thread(target=init_api, daemon=True)
 thread2.start()
 
-
-print(f"Begin home page execution after dispatching thread #### Time  {time.time()}")
 # Load environment variables from .env file
 st.session_state.OPENAI_API_KEY = None
 
@@ -118,8 +112,6 @@ functions = {
 go_to = functions.get(page)
 if go_to:
     go_to()
-
-print(f"Done home page execution after dispatching thread #### Time  {time.time()}")
 
 # -----------------------------------------------------------------------------
 # Declare some useful functions.

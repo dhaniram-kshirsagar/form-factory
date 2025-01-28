@@ -23,7 +23,6 @@ async def init_graph( ):
 
     if graph is None:
         graph = Neo4jGraph(url=URI, username=USERNAME, password=NEO4J_PASSWORD, enhanced_schema=True)
-
         chain = GraphCypherQAChain.from_llm(
             ChatOpenAI(temperature=0), graph=graph, verbose=True, return_intermediate_steps=True,
             cypher_prompt=CYPHER_RECOMMENDATION_PROMPT,
