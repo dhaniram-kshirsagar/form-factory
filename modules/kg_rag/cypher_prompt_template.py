@@ -151,12 +151,6 @@ MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})-[u:USED_ON]->(d:
 RETURN m.machine_id AS MachineID, u.defect_rate AS DefectRate, d.date AS Date
 ORDER BY d.date
 
-Question: Analyze the relationship between supplier raw material quality and batch quality
-
-MATCH (p:Product)-[pu:PRODUCED_USING]->(rm:RawMaterial)
-RETURN rm.raw_material_quality AS RawMaterialQuality, avg(pu.batch_quality) AS AvgBatchQuality
-ORDER BY RawMaterialQuality
-
 Question: Analyze the combined impact of machine downtime and defect rate on production volume:
 
 MATCH (m:Machine)-[u:USED_ON]->(d:Date)
@@ -193,14 +187,6 @@ WITH f, avg(u.profit_margin) AS AvgProfitMargin
 WHERE AvgProfitMargin < 20 // Adjust threshold as needed
 RETURN f.factory_id AS FactoryID, AvgProfitMargin
 ORDER BY AvgProfitMargin ASC
-
-Question: What is the average batch quality for products supplied by each supplier?
-
-MATCH (r:RawMaterial)-[sb:SUPPLIED_BY]->(s:Supplier)
-MATCH (p:Product)-[pu:PRODUCED_USING]->(rm:RawMaterial)
-WHERE sb.date = pu.date
-WITH s, pu.batch_quality AS BatchQuality
-RETURN s.supplier_name AS Supplier, avg(BatchQuality) AS AvgBatchQuality
 
 Question: How does the profit margin change over time for Factory 1?
 
@@ -265,17 +251,17 @@ return DISTINCT(f.location)
 
 Question: What is the average absenteeism rate?
 
-MATCH ()-[u:USED_BY_TEAM]->(t:Team)
+MATCH (m:Machine)-[u:USED_BY_TEAM]->(t:Team)
 return avg(u.average_absentialism)
 
 Question: What is average absenteeism rate for each team?
 
-MATCH (m)-[u:USED_BY_TEAM]->(t:Team)
+MATCH (m:Machine)-[u:USED_BY_TEAM]->(t:Team)
 RETURN t.id AS Team, avg(u.average_absentialism) AS AverageAbsenteeism
 
 Question: What is the average absenteeism rate for location?
 
-MATCH (m)-[u:USED_BY_TEAM]->(t:Team)
+MATCH (m:Machine)-[u:USED_BY_TEAM]->(t:Team)
 RETURN t.location AS Location, avg(u.average_absentialism) AS AverageAbsenteeism
 
 Question: Which year was the most profitable
@@ -317,6 +303,30 @@ WITH m, u, d
 MATCH(m)-[ut:USED_BY_TEAM]->(t:Team)
 WHERE d.date = ut.date
 Return t.id, u.production_volume as ProductionVolume
+
+Question: Analyze the relationship between supplier raw material quality and batch quality
+
+Incorrect cypher for above question:
+
+MATCH (r:RawMaterial)-[sb:SUPPLIED_BY]->(s:Supplier)
+MATCH (p:Product)-[pu:PRODUCED_USING]->(r:RawMaterial)
+RETURN r.raw_material_quality AS RawMaterialQuality, avg(pu.batch_quality) AS AvgBatchQuality
+
+Correct cypher for above question:
+
+MATCH (p:Product)-[pu:PRODUCED_USING]->(rm:RawMaterial)
+RETURN rm.raw_material_quality AS RawMaterialQuality, avg(pu.batch_quality) AS AvgBatchQuality
+ORDER BY RawMaterialQuality
+
+Question: What is the average batch quality for products supplied by each supplier?
+
+Correct cypher for above question:
+
+MATCH (r:RawMaterial)-[sb:SUPPLIED_BY]->(s:Supplier)
+MATCH (p:Product)-[pu:PRODUCED_USING]->(rm:RawMaterial)
+WHERE sb.date = pu.date
+WITH s, pu.batch_quality AS BatchQuality
+RETURN s.supplier_name AS Supplier, avg(BatchQuality) AS AvgBatchQuality
 
 Note: 
 Do not include any explanations or apologies in your responses.
