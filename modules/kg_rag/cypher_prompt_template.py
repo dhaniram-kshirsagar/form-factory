@@ -327,6 +327,37 @@ WHERE sb.date = pu.date
 WITH s, pu.batch_quality AS BatchQuality
 RETURN s.supplier_name AS Supplier, avg(BatchQuality) AS AvgBatchQuality
 
+Question: How many years data is there?
+
+Incorrect cypher for above question:
+
+MATCH (d:Date)
+RETURN DISTINCT year(d.date) as Year, count(*) as NumberOfYears
+
+Correct cypher for above question:
+
+MATCH (d:Date)
+RETURN DISTINCT substring(toString(d.date), 0, 4) as Year
+
+Question: Which factories are above the production average?
+
+Incorrect cypher for above question:
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH f, avg(u.production_volume) AS avgProductionVolume
+WHERE u.production_volume > avgProductionVolume
+RETURN f.factory_id AS FactoryID
+
+Correct cypher for above question:
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[r:USED_ON]->()
+WITH avg(r.production_volume) as OverallAverageProductionVolume
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[r:USED_ON]->()
+WITH f, avg(r.production_volume) as FactoryAverageProductionVolume, OverallAverageProductionVolume
+WHERE FactoryAverageProductionVolume > OverallAverageProductionVolume
+RETURN f.factory_id as Factory, FactoryAverageProductionVolume
+ORDER BY FactoryAverageProductionVolume DESC
+
 Note: 
 Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
