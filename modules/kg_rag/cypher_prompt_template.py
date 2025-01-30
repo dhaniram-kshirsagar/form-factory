@@ -271,6 +271,28 @@ RETURN Year
 ORDER BY TotalRevenue DESC
 LIMIT 1
 
+Question: What's the primary cause of bad production capacity?
+
+MATCH (m:Machine)-[r:USED_ON]->(d:Date)
+WHERE r.production_volume < 550
+WITH m, r, d
+
+MATCH (m)-[r2:USED_ON]->(d)
+WITH m, r, r2, d
+
+RETURN
+  m.machine_id as Machine,
+  r.production_volume as ProductionVolume,
+  r2.machine_utilization as MachineUtilization,
+  r2.breakdowns as Breakdowns,
+  r2.energy_consumption as EnergyConsumption,
+  r2.absentialism as Absenteeism,
+  r2.cycle_time as CycleTime,
+  r2.defect_rate as DefectRate,
+  r2.safety_incidents as SafetyIncidents,
+  r2.waste_generated as WasteGenerated
+ORDER BY ProductionVolume ASC
+
 Incorrectly generated Cypher query examples:
 
 Question: List teams that operated on a 23-Jan-2023 and their average operator experience?
