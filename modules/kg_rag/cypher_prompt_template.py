@@ -1,9 +1,14 @@
 from langchain.prompts.prompt import PromptTemplate
 
-CYPHER_RECOMMENDATION_TEMPLATE = """Task:Generate Cypher statement to query a graph database.
+CYPHER_RECOMMENDATION_TEMPLATE = """
+Task: Generate Cypher statement to query a graph database.
+
 Instructions:
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided or not related to that node 
+
+Use History: {history}
+
 Schema:
 
 ////Create Nodes
@@ -381,16 +386,19 @@ RETURN f.factory_id as Factory, FactoryAverageProductionVolume
 ORDER BY FactoryAverageProductionVolume DESC
 
 Note: 
-Do not include any explanations or apologies in your responses.
-Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
-Do not include any text except the generated Cypher statement.
 Handle errors or exception while generating cypher query gracefully
-If unable to build cypher query then return that i don't understand this type of questions
-If question includes any text which doesn't match with any of given knowledge graph node information then return a dummy query which results in no data
+Strictly build query based on the given question and history
+If unable to build cypher query then use given history (following are some examples) else return that i don't understand this type of questions
+    Non absolute or relative questions:
+        question: 'where it is located?' 
+        history: **Answer:** Factory 1 has profit margin of 26.5%. 
+        cypher query: MATCH (f:Factory {{factory_id: 'Factory 1'}}) RETURN f.location AS FactoryLocation
+Do not include any explanations or apologies in your responses.
+Do not include any text except the generated Cypher statement.
 
 The question is:
 {question}"""
 
 CYPHER_RECOMMENDATION_PROMPT = PromptTemplate(
-    input_variables=['question'], template=CYPHER_RECOMMENDATION_TEMPLATE
+    input_variables=['question', 'history'], template=CYPHER_RECOMMENDATION_TEMPLATE
 )

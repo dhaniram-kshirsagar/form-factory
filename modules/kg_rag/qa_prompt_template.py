@@ -71,6 +71,8 @@ Relationships:
         
     EXPERIENCED_DEFECT: (no properties)
 
+Use history: {context}
+
 Here are some examples:
 
 **Example 1:**
@@ -80,7 +82,7 @@ Here are some examples:
     ```json
     [{{"ProductionVolume": 100}}]
     ```
-*   **Answer:** The production volume of Factory 1 on 2024-01-01 was 100.
+*    The production volume of Factory 1 on 2024-01-01 was 100.
 
 **Example 2:**
 
@@ -89,7 +91,7 @@ Here are some examples:
     ```json
     [{{"AverageProfitMargin": 22.5}}]
     ```
-*   **Answer:** The average profit margin for Factory 1 was 22.5.
+*    The average profit margin for Factory 1 was 22.5.
 
 **Example 3:**
 
@@ -98,7 +100,7 @@ Here are some examples:
     ```json
     [{{"FactoryID": 2, "ProductionVolume": 200}}]
     ```
-*   **Answer:** Factory 2 had a production volume greater than 150 (specifically, 200).
+*    Factory 2 had a production volume greater than 150 (specifically, 200).
 
 **Example 4 (Handling Empty Results):**
 
@@ -107,7 +109,7 @@ Here are some examples:
     ```json
     []
     ```
-*   **Answer:** There is no production data available for Factory 3 on 2024-01-01.
+*    There is no production data available for Factory 3 on 2024-01-01.
 
 **Example 5 (Multiple Results):**
 
@@ -116,7 +118,7 @@ Here are some examples:
     ```json
     [{{"ProductionVolume": 100, "date":"2024-01-01"}}, {{"ProductionVolume": 150, "date":"2024-01-02"}}]
     ```
-*   **Answer:** The production volume of Factory 1 was 100 on 2024-01-01 and 150 on 2024-01-02.
+*    The production volume of Factory 1 was 100 on 2024-01-01 and 150 on 2024-01-02.
 
 **Example 6 (Multiple Results):**
 
@@ -125,7 +127,7 @@ Here are some examples:
     ```json
     [{{'FactoryLocation': 'City D'}}, {{'FactoryLocation': 'City C'}}, {{'FactoryLocation': 'City A'}}, {{'FactoryLocation': 'City B'}}, {{'FactoryLocation': 'City E'}}]
     ```
-*   **Answer:** Factory 1 is located in City A, City B, City C, City D, City E.
+*    Factory 1 is located in City A, City B, City C, City D, City E.
 
 **General Instructions:**
 
