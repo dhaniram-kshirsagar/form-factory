@@ -45,7 +45,7 @@
 
 ---
 
-## 4. Sample Code for Batch Inference  
+## 4. Sample Code for Single record or Batch Inference  
 
 ```python  
 import pandas as pd  
