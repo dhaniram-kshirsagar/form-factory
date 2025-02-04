@@ -1,0 +1,851 @@
+Factory and Location Analysis (20 Questions):
+
+What is the average machine utilization for Factory 1?
+
+Cypher
+
+MATCH (f:Factory {factory_id: 'Factory 1'})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN avg(u.machine_utilization)
+List all locations and the number of factories in each location.
+
+Cypher
+
+MATCH (f:Factory)
+RETURN f.location, count(f) AS NumberOfFactories
+What is the total revenue for each factory?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.factory_id, sum(u.revenue) AS TotalRevenue
+Find the factory with the highest average profit margin.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+WITH f, avg(u.profit_margin) AS AvgProfitMargin
+ORDER BY AvgProfitMargin DESC
+LIMIT 1
+RETURN f.factory_id, AvgProfitMargin
+What is the average energy consumption for each location?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.location, avg(u.energy_consumption) AS AvgEnergyConsumption
+List all factories that have an average defect rate below 1%.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+WITH f, avg(u.defect_rate) AS AvgDefectRate
+WHERE AvgDefectRate < 0.01
+RETURN f.factory_id, AvgDefectRate
+What is the total water usage for each factory on 2020-01-01?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date {date: date('2020-01-01')})
+RETURN f.factory_id, sum(u.water_usage) AS TotalWaterUsage
+Find the location with the lowest average CO2 emissions.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+WITH f, avg(u.co2_emissions) AS AvgCO2Emissions
+RETURN f.location, AvgCO2Emissions
+ORDER BY AvgCO2Emissions ASC
+LIMIT 1
+List all factories and their average cycle time.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.factory_id, avg(u.cycle_time) AS AvgCycleTime
+What is the distribution of machine types across all factories?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)
+RETURN m.machine_type, count(m) AS NumberOfMachines
+Find the factory with the most breakdowns.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+WITH f, sum(u.breakdowns) AS TotalBreakdowns
+ORDER BY TotalBreakdowns DESC
+LIMIT 1
+RETURN f.factory_id, TotalBreakdowns
+What is the average safety incident count for each location?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.location, avg(u.safety_incidents) AS AvgSafetyIncidents
+List all factories and the dates they operated.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+RETURN f.factory_id, collect(DISTINCT d.date) AS OperatingDates
+Find the factory with the highest total production volume.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+WITH f, sum(u.production_volume) AS TotalProductionVolume
+ORDER BY TotalProductionVolume DESC
+LIMIT 1
+RETURN f.factory_id, TotalProductionVolume
+What is the average machine age for each location?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)
+RETURN f.location, avg(m.machine_age) AS AvgMachineAge
+List all factories and their average energy efficiency rating.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.factory_id, avg(u.energy_efficiency_rating) AS AvgEnergyEfficiencyRating
+What is the total cost of downtime for each factory?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.factory_id, sum(u.cost_of_downtime) AS TotalCostOfDowntime
+Find the location with the highest average machine downtime.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+WITH f, avg(u.machine_downtime) AS AvgMachineDowntime
+RETURN f.location, AvgMachineDowntime
+ORDER BY AvgMachineDowntime DESC
+LIMIT 1
+List all factories and their average waste generated.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.factory_id, avg(u.waste_generated) AS AvgWasteGenerated
+What is the average pressure for each location?
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->()
+RETURN f.location, avg(u.pressure) AS AvgPressure
+Machine Analysis (20 Questions):
+
+What is the average utilization of machines of type 'Type 2'?
+
+Cypher
+
+MATCH (m:Machine {machine_type: 'Type 2'})-[u:USED_ON]->()
+RETURN avg(u.machine_utilization)
+List all machines and their maintenance history.
+
+Cypher
+
+MATCH (m:Machine)
+RETURN m.machine_id, m.maintenance_history
+Find the machine with the highest energy consumption.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+WITH m, u.energy_consumption AS EnergyConsumption
+ORDER BY EnergyConsumption DESC
+LIMIT 1
+RETURN m.machine_id, EnergyConsumption
+What is the average cycle time for each machine type?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_type, avg(u.cycle_time) AS AvgCycleTime
+List all machines that have had a safety incident.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+WHERE u.safety_incidents > 0
+RETURN m.machine_id
+What is the total production volume for each machine?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, sum(u.production_volume) AS TotalProductionVolume
+Find the machine with the lowest defect rate.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+WITH m, avg(u.defect_rate) AS AvgDefectRate
+ORDER BY AvgDefectRate ASC
+LIMIT 1
+RETURN m.machine_id, AvgDefectRate
+
+What is the average temperature for each machine?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, avg(u.temperature) AS AvgTemperature
+List all machines and their average pressure.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, avg(u.pressure) AS AvgPressure
+Find the machine with the highest average machine downtime.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, avg(u.machine_downtime) AS AvgDowntime
+ORDER BY AvgDowntime DESC
+LIMIT 1
+What is the total waste generated by each machine?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, sum(u.waste_generated) AS TotalWasteGenerated
+List all machines and their average water usage.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, avg(u.water_usage) AS AvgWaterUsage
+Find the machine with the highest revenue on a specific date (e.g., '2020-01-01').
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date {date: date('2020-01-01')})
+RETURN m.machine_id, u.revenue
+ORDER BY u.revenue DESC
+LIMIT 1
+What is the average chemical ratio for each machine type?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_type, avg(u.chemical_ratio) AS AvgChemicalRatio
+List all machines and their average mixing speed.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, avg(u.mixing_speed) AS AvgMixingSpeed
+Find the top 5 machines with the highest production volume.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+WITH m, sum(u.production_volume) AS TotalProductionVolume
+ORDER BY TotalProductionVolume DESC
+LIMIT 5
+RETURN m.machine_id, TotalProductionVolume
+What is the distribution of machine ages across all machines?
+
+Cypher
+
+MATCH (m:Machine)
+RETURN m.machine_age, count(m) AS NumberOfMachines
+List all machines and the number of times they have been operated.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, count(u) AS NumberOfOperations
+Find the machine with the most irregular maintenance history entries.  (This requires parsing the maintenance history string).  This is complex and depends on the format of your maintenance_history property.  A possible approach (if it's a comma-separated string) using APOC:
+
+Cypher
+
+MATCH (m:Machine)
+CALL apoc.text.split(m.maintenance_history, ',') YIELD value AS maintenanceEntry
+RETURN m.machine_id, count(maintenanceEntry) AS NumberOfMaintenanceEntries
+ORDER BY NumberOfMaintenanceEntries DESC
+LIMIT 1
+What is the average energy efficiency rating for each machine type?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_type, avg(u.energy_efficiency_rating) AS AvgEnergyEfficiencyRating
+List all machines that have an energy consumption greater than a certain threshold (e.g., 800 kWh).
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+WHERE u.energy_consumption > 800
+RETURN m.machine_id
+Find the machine with the lowest average cycle time.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+WITH m, avg(u.cycle_time) AS AvgCycleTime
+ORDER BY AvgCycleTime ASC
+LIMIT 1
+RETURN m.machine_id, AvgCycleTime
+What is the total cost of downtime for each machine?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, sum(u.cost_of_downtime) AS TotalCostOfDowntime
+List all machines and the number of breakdowns they have experienced.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, sum(u.breakdowns) AS TotalBreakdowns
+Find the machine with the most safety incidents.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->()
+RETURN m.machine_id, sum(u.safety_incidents) AS TotalSafetyIncidents
+ORDER BY TotalSafetyIncidents DESC
+LIMIT 1
+What is the average defect rate for machines older than a certain age (e.g., 7 years)?
+
+Cypher
+
+MATCH (m:Machine {machine_age: m.machine_age > 7})-[u:USED_ON]->()
+RETURN avg(u.defect_rate) AS AvgDefectRate
+Team Analysis (15+ Questions):
+
+What is the average operator experience for each team?
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, avg(m.experience) AS AvgOperatorExperience
+List all teams and their average operator training level.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, avg(m.trainingLevel) AS AvgOperatorTrainingLevel
+Find the team with the lowest average absenteeism rate.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, avg(m.absenteeismRate) AS AvgAbsenteeismRate
+ORDER BY AvgAbsenteeismRate ASC
+LIMIT 1
+What is the total number of members in each team?
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, count(m) AS NumberOfMembers
+List all teams and the names of their members.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, collect(m.name) AS MemberNames
+Find the team with the most experienced operators (highest average experience).
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+WITH t, avg(m.experience) AS AvgExperience
+ORDER BY AvgExperience DESC
+LIMIT 1
+RETURN t.id, AvgExperience
+What is the average absenteeism rate across all teams?
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN avg(m.absenteeismRate) AS OverallAvgAbsenteeismRate
+List all teams that have an average operator training level above a certain threshold (e.g., 3).
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+WITH t, avg(m.trainingLevel) AS AvgTrainingLevel
+WHERE AvgTrainingLevel > 3
+RETURN t.id, AvgTrainingLevel
+Find the team with the highest average absenteeism rate.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, avg(m.absenteeismRate) AS AvgAbsenteeismRate
+ORDER BY AvgAbsenteeismRate DESC
+LIMIT 1
+
+What is the total experience of each team (sum of member experience)?
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, sum(m.experience) AS TotalTeamExperience
+List all teams and the number of members with a training level above a certain threshold (e.g., 2.5).
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+WHERE m.trainingLevel > 2.5
+RETURN t.id, count(m) AS NumberOfHighlyTrainedMembers
+Find the team with the lowest total absenteeism rate.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+RETURN t.id, sum(m.absenteeismRate) AS TotalTeamAbsenteeism
+ORDER BY TotalTeamAbsenteeism ASC
+LIMIT 1
+What is the average experience of operators in each shift for a specific factory?
+
+Cypher
+
+MATCH (f:Factory {factory_id: 'Factory 1'})-[:HAS_MACHINE]->(m:Machine)-[ut:USED_BY_TEAM]->(t:Team)
+RETURN ut.shift, avg(t.average_operator_experience) AS AverageOperatorExperience
+List all teams that operated a specific machine on a specific date.
+
+Cypher
+
+MATCH (m:Machine {machine_id: 'Location A-Factory 1-Type 2'})-[ut:USED_BY_TEAM {date: date('2020-01-01')}]->(t:Team)
+RETURN t.id
+Product Analysis (10+ Questions):
+
+What are the different product categories?
+
+Cypher
+
+MATCH (p:Product)
+RETURN DISTINCT p.product_category
+What is the average batch quality for each product category?
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
+RETURN p.product_category, avg(p.batch_quality) AS AverageBatchQuality
+List all products and the suppliers of their raw materials.
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)-[:SUPPLIED_BY]->(s:Supplier)
+RETURN p.product_category, s.supplier_name
+Find the product category with the highest average batch quality.
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
+WITH p, avg(p.batch_quality) AS AvgBatchQuality
+ORDER BY AvgBatchQuality DESC
+LIMIT 1
+RETURN p.product_category, AvgBatchQuality
+What is the distribution of batch qualities across all products?
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
+RETURN p.batch_quality, count(p) AS NumberOfBatches
+List all products and the dates they were produced.
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
+RETURN p.product_category, collect(DISTINCT d.date) AS ProductionDates
+Find the product category that uses the most raw materials.
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)
+RETURN p.product_category, count(r) AS NumberOfRawMaterials
+ORDER BY NumberOfRawMaterials DESC
+LIMIT 1
+What is the average raw material quality used for each product category?
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)
+RETURN p.product_category, avg(r.raw_material_quality) AS AvgRawMaterialQuality
+List all products and their average production volume.  (This assumes you can link products to production volume, perhaps through the USED_ON relationship of the machines that produce them).  This will require careful relationship traversal.  Here's a possible approach, assuming products are associated with machines:
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)<-[:PRODUCED_USING]-(p2:Product),
+      (m:Machine)-[u:USED_ON]->(d:Date)
+WHERE p = p2 // Ensure the same product
+RETURN p.product_category, avg(u.production_volume) AS AvgProductionVolume
+Find the product category with the lowest average batch quality.
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_ON]->(d:Date)
+WITH p, avg(p.batch_quality) AS AvgBatchQuality
+ORDER BY AvgBatchQuality ASC
+LIMIT 1
+RETURN p.product_category, AvgBatchQuality
+Supplier Analysis (5+ Questions):
+
+List all suppliers and the number of raw materials they supply.
+
+Cypher
+
+MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial)
+RETURN s.supplier_name, count(r) AS NumberOfRawMaterialsSupplied
+Find the supplier who has the most delays.
+
+Cypher
+
+MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial)
+RETURN s.supplier_name, sum(r.supplier_delays) AS TotalSupplierDelays
+ORDER BY TotalSupplierDelays DESC
+LIMIT 1
+What is the average raw material quality supplied by each supplier?
+
+Cypher
+
+MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial)
+RETURN s.supplier_name, avg(r.raw_material_quality) AS AvgRawMaterialQuality
+List all suppliers who have supplied raw materials with a quality above a certain threshold (e.g., 0.8).
+
+Cypher
+
+MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial)
+WHERE r.raw_material_quality > 0.8
+RETURN s.supplier_name
+Find the supplier who supplies the highest quality raw materials on average.
+
+Cypher
+
+MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial)
+WITH s, avg(r.raw_material_quality) AS AvgRawMaterialQuality
+ORDER BY AvgRawMaterialQuality DESC
+LIMIT 1
+RETURN s.supplier_name, AvgRawMaterialQuality
+Date Analysis (5+ Questions):
+
+What is the total production volume for each date?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN d.date, sum(u.production_volume) AS TotalProductionVolume
+Find the date with the highest total revenue.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN d.date, sum(u.revenue) AS TotalRevenue
+ORDER BY TotalRevenue DESC
+LIMIT 1
+What is the average profit margin for each date?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN d.date, avg(u.profit_margin) AS AverageProfitMargin
+List all dates and the number of machines that were operated on each date.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN d.date, count(DISTINCT m) AS NumberOfMachinesOperated
+Find the date with the lowest average defect rate.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN d.date, avg(u.defect_rate) AS AverageDefectRate
+ORDER BY AverageDefectRate ASC
+LIMIT 1
+Combined Analysis (10+ Questions):
+
+What is the correlation between machine utilization and defect rate?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN avg(u.machine_utilization) AS AvgUtilization, avg(u.defect_rate) AS AvgDefectRate
+
+
+What is the correlation between machine utilization and defect rate?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN avg(u.machine_utilization) AS AvgUtilization, avg(u.defect_rate) AS AvgDefectRate
+Analyze the impact of operator experience on production volume.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member),
+      (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date)
+WHERE ut.date = d.date // Important: Match dates
+RETURN avg(m.experience) AS AvgOperatorExperience, avg(u.production_volume) AS AvgProductionVolume
+How does raw material quality affect batch quality?
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)
+RETURN r.raw_material_quality AS RawMaterialQuality, avg(p.batch_quality) AS AvgBatchQuality
+ORDER BY RawMaterialQuality
+Is there a relationship between supplier delays and production volume?
+cypher MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial)<-[:PRODUCED_USING]-(p:Product), (m:Machine)-[u:USED_ON]->(d:Date) WHERE r.date = u.date RETURN avg(s.supplier_delays) AS AvgSupplierDelays, avg(u.production_volume) AS AvgProductionVolume
+
+Analyze the combined effect of machine age and maintenance history (if you can parse it) on downtime.  This one is complex and depends heavily on the format of your maintenance_history property.  If you have a way to extract "days since last maintenance" or similar:
+cypher // Example (assuming you have a "days_since_last_maintenance" property): MATCH (m:Machine) RETURN m.machine_age, m.days_since_last_maintenance, avg(m.machine_downtime) AS AvgDowntime ORDER BY m.machine_age, m.days_since_last_maintenance
+
+Combined Analysis (Continued - Part 2):
+
+What is the relationship between team size and production volume?
+cypher MATCH (t:Team)-[:HAS_MEMBER]->(m:Member), (m2:Machine)-[ut:USED_BY_TEAM]->(t), (m2)-[u:USED_ON]->(d:Date) WHERE ut.date = d.date RETURN size((t)-[:HAS_MEMBER]->()) AS TeamSize, avg(u.production_volume) AS AvgProductionVolume
+
+How does shift affect production volume and profit margin?
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN u.shift, avg(u.production_volume) AS AvgProductionVolume, avg(u.profit_margin) AS AvgProfitMargin
+
+Is there a correlation between energy consumption and CO2 emissions?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN avg(u.energy_consumption) AS AvgEnergyConsumption, avg(u.co2_emissions) AS AvgCO2Emissions
+Analyze the impact of operator training level on defect rate.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member),
+      (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date)
+WHERE ut.date = d.date
+RETURN avg(m.trainingLevel) AS AvgTrainingLevel, avg(u.defect_rate) AS AvgDefectRate
+What is the combined effect of machine utilization and cycle time on production volume?
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+RETURN avg(u.machine_utilization) AS AvgUtilization, avg(u.cycle_time) AS AvgCycleTime, avg(u.production_volume) AS AvgProductionVolume
+Combined Analysis (Continued - Part 3):
+
+Analyze the relationship between market demand index and revenue.
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN avg(u.market_demand_index) AS AvgMarketDemand, avg(u.revenue) AS AvgRevenue
+
+How does temperature affect defect rate?
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN avg(u.temperature) AS AvgTemperature, avg(u.defect_rate) AS AvgDefectRate
+
+Is there a link between pressure and mixing speed?
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN avg(u.pressure) AS AvgPressure, avg(u.mixing_speed) AS AvgMixingSpeed
+
+Analyze the combined impact of chemical ratio and mixing speed on batch quality (if you can link products to this data).  This will require careful relationship traversal.  Example, assuming the chemical ratio and mixing speed data is available for the same date as the batch information:
+cypher MATCH (p:Product)-[:PRODUCED_ON]->(d:Date), (m:Machine)-[u:USED_ON]->(d) // Assuming this is how you connect to the machine data for that date. RETURN avg(u.chemical_ratio) AS AvgChemicalRatio, avg(u.mixing_speed) AS AvgMixingSpeed, avg(p.batch_quality) AS AvgBatchQuality
+
+What is the relationship between absenteeism rate and production volume, considering operator experience?
+cypher MATCH (t:Team)-[:HAS_MEMBER]->(m:Member), (m2:Machine)-[ut:USED_BY_TEAM]->(t), (m2)-[u:USED_ON]->(d:Date) WHERE ut.date = d.date RETURN avg(m.absenteeismRate) AS AvgAbsenteeism, avg(m.experience) AS AvgExperience, avg(u.production_volume) AS AvgProductionVolume
+
+Analyze the impact of supplier delays on cost of downtime.
+cypher MATCH (s:Supplier)-[:SUPPLIED_BY]->(r:RawMaterial), (m:Machine)-[u:USED_ON]->(d:Date) WHERE r.date = u.date RETURN avg(s.supplier_delays) AS AvgSupplierDelays, avg(u.cost_of_downtime) AS AvgCostOfDowntime
+
+How does the number of breakdowns affect revenue?
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN avg(u.breakdowns) AS AvgBreakdowns, avg(u.revenue) AS AvgRevenue
+
+Is there a correlation between safety incidents and absenteeism rate?
+cypher MATCH (m:Machine)-[ut:USED_BY_TEAM]->(t:Team), (m)-[u:USED_ON]->(d:Date) WHERE ut.date = d.date RETURN avg(u.safety_incidents) AS AvgSafetyIncidents, avg(t.average_absentism) AS AvgAbsenteeismRate
+
+Analyze the combined impact of waste generated and water usage on profit margin.
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN avg(u.waste_generated) AS AvgWaste, avg(u.water_usage) AS AvgWaterUsage, avg(u.profit_margin) AS AvgProfitMargin
+
+What is the relationship between energy efficiency rating and CO2 emissions?
+cypher MATCH (m:Machine)-[u:USED_ON]->(d:Date) RETURN avg(u.energy_efficiency_rating) AS AvgEfficiency, avg(u.co2_emissions) AS AvgCO2Emissions
+
+Trend Analysis: Find the top 3 machines with the most improved energy efficiency rating over the last quarter of 2020.  (This requires date filtering and potentially APOC for date manipulation if needed.)
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WHERE d.date >= date('2020-10-01') AND d.date <= date('2020-12-31')
+WITH m, collect(u) AS usages
+ORDER BY [x IN usages | x.energy_efficiency_rating][-1] - [x IN usages | x.energy_efficiency_rating][0] DESC // Assuming data is in chronological order within the collect
+LIMIT 3
+RETURN m.machine_id, [x IN usages | x.energy_efficiency_rating][-1] - [x IN usages | x.energy_efficiency_rating][0] AS Improvement
+Comparative Analysis: Compare the average defect rate and production volume for machines using raw materials from Supplier X vs. Supplier Z in January 2020.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date {date: date('2020-01-01')}),
+      (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)<-[:PRODUCED_USING]-(p2:Product),
+      (r)-[:SUPPLIED_BY]->(s:Supplier)
+WHERE r.date = u.date and p = p2
+WITH m, u, s
+WHERE s.supplier_name IN ['Supplier X', 'Supplier Z']
+RETURN s.supplier_name, avg(u.defect_rate) AS AvgDefectRate, avg(u.production_volume) AS AvgProductionVolume
+Impact Analysis: Analyze the correlation between average operator experience on a team and the number of safety incidents on the machines they operate.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member),
+      (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date)
+WHERE ut.date = d.date
+RETURN avg(m.experience) AS AvgOperatorExperience, sum(u.safety_incidents) AS TotalSafetyIncidents
+Root Cause Analysis: Identify potential factors contributing to low profit margins (below 15%) in Factory 1 during February 2020, considering machine utilization, defect rate, and downtime cost.
+
+Cypher
+
+MATCH (f:Factory {factory_id: 'Factory 1'})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE d.date >= date('2020-02-01') AND d.date <= date('2020-02-29') AND u.profit_margin < 15
+RETURN m.machine_id, avg(u.machine_utilization) AS AvgUtilization, avg(u.defect_rate) AS AvgDefectRate, avg(u.cost_of_downtime) AS AvgDowntimeCost
+Trend Comparison: Compare the trend of average production volume for 'Type 1' machines vs. 'Type 2' machines over the first six months of 2020.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WHERE d.date >= date('2020-01-01') AND d.date <= date('2020-06-30')
+WITH m.machine_type AS MachineType, substring(toString(d.date), 0, 7) AS Month, avg(u.production_volume) AS AvgProductionVolume
+RETURN MachineType, collect([Month, AvgProductionVolume]) AS MonthlyProduction
+Performance Ranking: Rank teams based on their average production volume per machine they operate in 2020.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member),
+      (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date)
+WHERE ut.date = d.date AND substring(toString(d.date), 0, 4) = '2020'
+WITH t, avg(u.production_volume) AS AvgProductionVolume
+ORDER BY AvgProductionVolume DESC
+RETURN t.id, AvgProductionVolume
+Anomaly Detection: Identify any days in 2020 where the average defect rate for Factory 1 was significantly higher (more than 2 standard deviations) than the overall average defect rate for that factory in 2020.  (This requires calculating standard deviation and potentially APOC for it).
+
+Cypher
+
+MATCH (f:Factory {factory_id: 'Factory 1'})-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE substring(toString(d.date), 0, 4) = '2020'
+WITH avg(u.defect_rate) AS OverallAvgDefectRate, stdev(u.defect_rate) AS StdDevDefectRate
+MATCH (f)-[:HAS_MACHINE]->(m)-[u:USED_ON]->(d:Date)
+WHERE substring(toString(d.date), 0, 4) = '2020'
+WITH d.date AS Date, avg(u.defect_rate) AS DailyAvgDefectRate, OverallAvgDefectRate, StdDevDefectRate
+WHERE DailyAvgDefectRate > OverallAvgDefectRate + 2 * StdDevDefectRate
+RETURN Date, DailyAvgDefectRate
+Complex Filtering: Find all machines that were operated by a team with an average absenteeism rate below 2% and produced products using raw materials supplied by Supplier Z, and had a defect rate below 0.5% on 2020-01-15.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member)
+WHERE m.absenteeismRate < 0.02
+WITH t
+MATCH (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date {date: date('2020-01-15')}),
+      (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)<-[:PRODUCED_USING]-(p2:Product),
+      (r)-[:SUPPLIED_BY]->(s:Supplier {supplier_name: 'Supplier Z'})
+WHERE u.defect_rate < 0.005 and ut.date = d.date and r.date = u.date and p=p2
+RETURN m2.machine_id
+Multi-Level Aggregation:  What is the average profit margin for each product category, considering the average machine utilization for the machines that produce them?
+
+Cypher
+
+MATCH (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)<-[:PRODUCED_USING]-(p2:Product),
+      (m:Machine)-[u:USED_ON]->(d:Date)
+WHERE r.date = u.date and p = p2
+RETURN p.product_category, avg(u.profit_margin) AS AvgProfitMargin, avg(u.machine_utilization) as AvgUtilization
+
+Time-Based Analysis with APOC (Example):  Calculate the rolling 3-month average of production volume for each machine. (This requires APOC library).  This is a very complex example and requires APOC setup and careful adaptation to your data.  The general idea would be:
+Complex Relationship Traversal (Continued): Find all teams that operated machines that produced products using raw materials supplied by Supplier X in January 2020, and return the average operator experience for those teams.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member),
+      (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date {date: date('2020-01-01')}),
+      (p:Product)-[:PRODUCED_USING]->(r:RawMaterial)<-[:PRODUCED_USING]-(p2:Product),
+      (r)-[:SUPPLIED_BY]->(s:Supplier {supplier_name: 'Supplier X'})
+WHERE ut.date = d.date and r.date = u.date and p = p2
+RETURN t.id, avg(m.experience) AS AvgOperatorExperience
+Weighted Average: Calculate the weighted average profit margin for each factory, where the weight is the production volume.
+
+Cypher
+
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH f, sum(u.production_volume * u.profit_margin) AS WeightedProfitMarginSum, sum(u.production_volume) AS TotalProductionVolume
+RETURN f.factory_id, WeightedProfitMarginSum / TotalProductionVolume AS WeightedAvgProfitMargin
+Percentile Calculation (APOC): Find the 90th percentile of machine utilization for each factory. (Requires APOC).
+
+Cypher
+
+// Requires APOC
+MATCH (f:Factory)-[:HAS_MACHINE]->(m:Machine)-[u:USED_ON]->(d:Date)
+WITH f, collect(u.machine_utilization) AS utilizations
+RETURN f.factory_id, apoc.math.percentile(utilizations, 0.9) AS P90Utilization
+Gap Analysis: Identify machines where the current cycle time is significantly higher (e.g., 15% higher) than the average cycle time for that machine type.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WITH m.machine_type AS MachineType, avg(u.cycle_time) AS AvgCycleTime
+MATCH (m)-[u:USED_ON]->(d:Date)
+WHERE u.cycle_time > 1.15 * AvgCycleTime
+RETURN m.machine_id, u.cycle_time, AvgCycleTime
+Sequential Event Analysis (APOC): Find sequences of events where a machine breakdown is followed by a safety incident within 24 hours. (Requires APOC for time difference calculations).  This will be highly dependent on how your data is structured and will likely require significant adaptation.
+
+Cohort Analysis: Analyze the production volume of machines based on the age of the machine at the time of production. Group machines by age ranges (e.g., 0-2 years, 2-4 years, etc.) and calculate the average production volume for each group.
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WITH m, u, d, m.machine_age + duration.between(date(substring(toString(d.date),0,10)),date()).years as machineAgeAtProduction
+WITH m, u, d, CASE
+    WHEN machineAgeAtProduction < 2 THEN '0-2 years'
+    WHEN machineAgeAtProduction < 4 THEN '2-4 years'
+    // Add more ranges as needed
+    ELSE '> 6 years'
+    END AS AgeRange
+RETURN AgeRange, avg(u.production_volume) AS AvgProductionVolume
+Complex Aggregation and Filtering: Find the top 2 teams in each location that have the highest average production volume per machine, considering only machines that have had fewer than 2 breakdowns in the last month.
+
+Cypher
+
+MATCH (t:Team)-[:HAS_MEMBER]->(m:Member),
+      (m2:Machine)-[ut:USED_BY_TEAM]->(t),
+      (m2)-[u:USED_ON]->(d:Date)
+WHERE ut.date = d.date
+WITH t, m2, u, d
+WHERE size((m2)-[uu:USED_ON]->(dd:Date) WHERE dd >= date('2024-01-01') AND dd <= date('2024-01-31') AND uu.breakdowns > 0) < 2
+WITH t, avg(u.production_volume) AS AvgProductionVolume, m2.location as Location
+ORDER BY AvgProductionVolume DESC
+WITH Location, collect(t) as Teams
+RETURN Location, [team IN Teams | team.id][0..1] as TopTeams
+Statistical Analysis (APOC): Calculate the correlation coefficient between machine utilization and profit margin. (Requires APOC).
+
+Cypher
+
+// Requires APOC
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WITH collect(u.machine_utilization) AS utilizations, collect(u.profit_margin) AS profitMargins
+RETURN apoc.stats.correl(utilizations, profitMargins) AS CorrelationCoefficient
+Complex Pattern Matching: Find all instances where a machine of type 'Type 1' was used on a date where the average defect rate for all machines was above 1%, and the team that operated that machine had an average operator experience of less than 3 years.
+
+Cypher
+
+MATCH (m:Machine {machine_type: 'Type 1'})-[u:USED_ON]->(d:Date)
+WITH d, avg(u.defect_rate) AS AvgDefectRate
+WHERE AvgDefectRate > 0.01
+MATCH (m)-[ut:USED_BY_TEAM]->(t:Team)-[:HAS_MEMBER]->(m2:Member)
+WHERE ut.date = d.date
+WITH t, avg(m2.experience) AS AvgOperatorExperience, d, m
+WHERE AvgOperatorExperience < 3
+RETURN m.machine_id, d.date
+Multi-Criteria Optimization: Find the machine that maximizes production volume while minimizing defect rate and downtime cost, considering data from the last quarter of 2020.  (This will require defining how you balance these criteria; a simple approach is a weighted sum).
+
+Cypher
+
+MATCH (m:Machine)-[u:USED_ON]->(d:Date)
+WHERE d.date >= date('2020-10-01') AND d.date <= date('2020-12-31')
+WITH m, avg(u.production_volume) AS AvgProduction, avg(u.defect_rate) AS AvgDefect, avg(u.cost_of_downtime) AS AvgDowntime
+// Example: maximize Production - (0.1 * Defect) - (0.001 * Downtime) - adjust weights as needed
+RETURN m.machine_id, AvgProduction - (0.1 * AvgDefect) - (0.001 * AvgDowntime) AS OptimizationScore
+ORDER BY OptimizationScore DESC
+LIMIT 1
