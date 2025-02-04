@@ -1,0 +1,704 @@
+Question: Find all customers.
+
+Cypher
+
+MATCH (c:Customer)
+RETURN c.CustomerID
+Question: Find all churned customers.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})
+RETURN c.CustomerID
+Question: Find all customers who haven't churned.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'No'})
+RETURN c.CustomerID
+Question: Find customers with a "Month-to-month" contract.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Month-to-month'})
+RETURN c.CustomerID
+Question: Find customers with a "One year" contract.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'One year'})
+RETURN c.CustomerID
+Question: Find customers with a "Two year" contract.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Two year'})
+RETURN c.CustomerID
+Question: Find customers with paperless billing.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaperlessBilling: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers without paperless billing.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaperlessBilling: 'No'})
+RETURN c.CustomerID
+Question: Find customers with electronic check payment.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Electronic check'})
+RETURN c.CustomerID
+Question: Find customers with mailed check payment.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Mailed check'})
+RETURN c.CustomerID
+Question: Find customers with credit card payment.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Credit card (automatic)'})
+RETURN c.CustomerID
+Question: Find customers with bank transfer payment.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Bank transfer (automatic)'})
+RETURN c.CustomerID
+Question: Find customers with DSL internet service.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'DSL'})
+RETURN c.CustomerID
+Question: Find customers with fiber optic internet service.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic'})
+RETURN c.CustomerID
+Question: Find customers with no internet service.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->())
+RETURN c.CustomerID
+Question: Find customers with phone service.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
+RETURN c.CustomerID
+Question: Find customers without phone service.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE NOT EXISTS((c)-[:HAS_PHONE_SERVICE]->())
+RETURN c.CustomerID
+Question: Find male customers.
+
+Cypher
+
+MATCH (c:Customer {Gender: 'Male'})
+RETURN c.CustomerID
+Question: Find female customers.
+
+Cypher
+
+MATCH (c:Customer {Gender: 'Female'})
+RETURN c.CustomerID
+Question: Find senior citizens.
+
+Cypher
+
+MATCH (c:Customer {SeniorCitizen: 1})
+RETURN c.CustomerID
+Question: Find non-senior citizens.
+cypher MATCH (c:Customer {SeniorCitizen: 0}) RETURN c.CustomerID
+
+Medium Queries (30+)
+
+Question: Find churned customers with a "Month-to-month" contract.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Month-to-month'})
+RETURN c.CustomerID
+Question: Find customers with fiber optic internet and streaming TV.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic'})-[:HAS_STREAMING_TV]->(st:StreamingTV {StreamingTV: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with DSL internet and no online security.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'DSL', OnlineSecurity: 'No'})
+RETURN c.CustomerID
+Question: Find customers with a "One year" contract and paperless billing.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'One year'})-[:HAS_BILLING]->(b:Billing {PaperlessBilling: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with no internet service and no phone service.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->()) AND NOT EXISTS((c)-[:HAS_PHONE_SERVICE]->())
+RETURN c.CustomerID
+Question: Find customers with streaming movies but no streaming TV.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies {StreamingMovies: 'Yes'})
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->())
+RETURN c.CustomerID
+Question: Find male customers with a "Two year" contract.
+
+Cypher
+
+MATCH (c:Customer {Gender: 'Male'})-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Two year'})
+RETURN c.CustomerID
+Question: Find female senior citizens with DSL internet.
+
+Cypher
+
+MATCH (c:Customer {Gender: 'Female', SeniorCitizen: 1})-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'DSL'})
+RETURN c.CustomerID
+Question: Find churned customers who pay by mailed check.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Mailed check'})
+RETURN c.CustomerID
+Question: Find customers with fiber optic and online backup.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic', OnlineBackup: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with no tech support.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {TechSupport: 'Yes'}))
+RETURN c.CustomerID
+Question: Find customers with device protection.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {DeviceProtection: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers without device protection.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {DeviceProtection: 'No'})
+RETURN c.CustomerID
+Question: Find customers with online security and online backup.
+
+
+
+
+Medium Queries (Continued and Expanded)
+
+Question: Find customers with online security but no tech support.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {OnlineSecurity: 'Yes'})
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {TechSupport: 'Yes'}))
+RETURN c.CustomerID
+Question: Find customers with streaming TV and streaming movies.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_STREAMING_TV]->(st:StreamingTV {StreamingTV: 'Yes'})-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies {StreamingMovies: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with streaming TV but no streaming movies.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_STREAMING_TV]->(st:StreamingTV {StreamingTV: 'Yes'})
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
+RETURN c.CustomerID
+Question: Find customers with a "Two year" contract and no churn.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'No'})-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Two year'})
+RETURN c.CustomerID
+Question: Find customers who pay by credit card and have fiber optic internet.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Credit card (automatic)'})-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic'})
+RETURN c.CustomerID
+Question: Find customers with a monthly charge greater than $80.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > 80
+RETURN c.CustomerID
+Question: Find customers with a total charge less than $500.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges < 500
+RETURN c.CustomerID
+Question: Find customers with a tenure greater than 24 months.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE c.Tenure > 24
+RETURN c.CustomerID
+Question: Find customers with a tenure less than 12 months.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE c.Tenure < 12
+RETURN c.CustomerID
+Question: Find male customers with a monthly charge less than $60.
+
+Cypher
+
+MATCH (c:Customer {Gender: 'Male'})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges < 60
+RETURN c.CustomerID
+Question: Find female customers with a total charge greater than $2000.
+
+Cypher
+
+MATCH (c:Customer {Gender: 'Female'})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges > 2000
+RETURN c.CustomerID
+Question: Find senior citizens with DSL internet and no streaming services.
+
+Cypher
+
+MATCH (c:Customer {SeniorCitizen: 1})-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'DSL'})
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->()) AND NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
+RETURN c.CustomerID
+Question: Find non-senior citizens with fiber optic internet and streaming TV.
+
+Cypher
+
+MATCH (c:Customer {SeniorCitizen: 0})-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic'})-[:HAS_STREAMING_TV]->(st:StreamingTV {StreamingTV: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with multiple lines and a "One year" contract.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_PHONE_SERVICE]->(p:PhoneService {MultipleLines: 'Yes'})-[:HAS_CONTRACT]->(ct:Contract {Contract: 'One year'})
+RETURN c.CustomerID
+Question: Find customers with no phone service and a "Month-to-month" contract.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE NOT EXISTS((c)-[:HAS_PHONE_SERVICE]->())
+MATCH (c)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Month-to-month'})
+RETURN c.CustomerID
+Question: Find customers with online backup and device protection.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {OnlineBackup: 'Yes', DeviceProtection: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with no online backup and no device protection.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {OnlineBackup: 'No', DeviceProtection: 'No'})
+RETURN c.CustomerID
+Question: Find customers with tech support and streaming movies.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {TechSupport: 'Yes'})-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies {StreamingMovies: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers with no tech support and no streaming TV.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {TechSupport: 'Yes'}))
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_TV]->())
+RETURN c.CustomerID
+Question: Find customers with a total charge between $1000 and $3000.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges >= 1000 AND ch.TotalCharges <= 3000
+RETURN c.CustomerID
+Question: Find customers with a monthly charge between $50 and $100.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges >= 50 AND ch.MonthlyCharges <= 100
+RETURN c.CustomerID
+Question: Find customers with a tenure between 12 and 36 months.
+
+Cypher
+
+MATCH (c:Customer)
+WHERE c.Tenure >= 12 AND c.Tenure <= 36
+RETURN c.CustomerID
+Question: Find churned customers who pay by electronic check and have fiber optic internet.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Electronic check'})-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic'})
+RETURN c.CustomerID
+Question: Find customers who haven't churned, have a "Two year" contract, and pay by mailed check.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'No'})-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Two year'})-[:HAS_BILLING]->(b:Billing {PaymentMethod: 'Mailed check'})
+RETURN c.CustomerID
+Question: Find customers with DSL internet, no online security, and streaming movies.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'DSL', OnlineSecurity: 'No'})-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies {StreamingMovies: 'Yes'})
+RETURN c.CustomerID
+
+
+Question: Find the average total charge for churned customers.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CHARGES]->(ch:Charges)
+RETURN avg(ch.TotalCharges) AS average_total_charge
+Question: Find the number of customers with each type of contract.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract)
+RETURN ct.Contract, count(*) AS number_of_customers
+Question: Find the number of churned customers for each internet service type.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+RETURN i.InternetService, count(*) AS number_of_churned_customers
+Question: Find the most common payment method among churned customers.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_BILLING]->(b:Billing)
+RETURN b.PaymentMethod, count(*) AS count
+ORDER BY count DESC
+LIMIT 1
+Question: Find the least common internet service among all customers.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+RETURN i.InternetService, count(*) AS count
+ORDER BY count ASC
+LIMIT 1
+Question: Find customers who have a higher monthly charge than the average monthly charge.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.MonthlyCharges) AS average_monthly_charge
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > average_monthly_charge
+RETURN c.CustomerID
+Question: Find customers who have a lower total charge than the average total charge.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.TotalCharges) AS average_total_charge
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges < average_total_charge
+RETURN c.CustomerID
+Question: Find customers who have a tenure longer than the average tenure.
+
+Cypher
+
+MATCH (c:Customer)
+WITH avg(c.Tenure) AS average_tenure
+MATCH (c:Customer)
+WHERE c.Tenure > average_tenure
+RETURN c.CustomerID
+Question: Find customers who have a tenure shorter than the average tenure.
+
+Cypher
+
+MATCH (c:Customer)
+WITH avg(c.Tenure) AS average_tenure
+MATCH (c:Customer)
+WHERE c.Tenure < average_tenure
+RETURN c.CustomerID
+Question: Find the top 5 most common combinations of internet service and streaming services.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+RETURN i.InternetService, st.StreamingTV, sm.StreamingMovies, count(*) AS count
+ORDER BY count DESC
+LIMIT 5
+Question: Find customers who have churned and have a monthly charge greater than $70.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > 70
+RETURN c.CustomerID
+Question: Find customers who have not churned and have a total charge less than $1000.
+
+Cypher
+
+MATCH (c:Customer {Churn: 'No'})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges < 1000
+RETURN c.CustomerID
+Question: Find customers who have a "Month-to-month" contract and have streaming TV.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Month-to-month'})-[:HAS_STREAMING_TV]->(st:StreamingTV {StreamingTV: 'Yes'})
+RETURN c.CustomerID
+Question: Find customers who have a "Two year" contract and do not have streaming movies.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'Two year'})
+WHERE NOT EXISTS((c)-[:HAS_STREAMING_MOVIES]->())
+RETURN c.CustomerID
+Question: Find customers who have DSL internet and online security but do not have tech support.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'DSL', OnlineSecurity: 'Yes'})
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {TechSupport: 'Yes'}))
+RETURN c.CustomerID
+Question: Find customers who have fiber optic internet and streaming TV but do not have online backup.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {InternetService: 'Fiber optic'})-[:HAS_STREAMING_TV]->(st:StreamingTV {StreamingTV: 'Yes'})
+WHERE NOT EXISTS((c)-[:HAS_INTERNET_SERVICE]->(i {OnlineBackup: 'Yes'}))
+RETURN c.CustomerID
+Question: Find customers who have a monthly charge greater than $90 and a tenure greater than 36.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.MonthlyCharges > 90 AND c.Tenure > 36
+RETURN c.CustomerID
+Question: Find customers who have a total charge less than $500 and a tenure less than 12.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges < 500 AND c.Tenure < 12
+RETURN c.CustomerID
+Question: Find the average monthly charge for customers with each payment method.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing)-[:HAS_CHARGES]->(ch:Charges)
+RETURN b.PaymentMethod, avg(ch.MonthlyCharges) AS average_monthly_charge
+Question: Find the total number of customers for each internet service type.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+RETURN i.InternetService, count(*) AS total_customers
+Question: Find the churn rate for each contract type.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract)
+WITH ct.Contract AS contract_type, count(*) AS total_customers
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CONTRACT]->(ct:Contract)
+WHERE ct.Contract = contract_type
+WITH contract_type, total_customers, count(*) AS churned_customers
+RETURN contract_type, toFloat(churned_customers) / total_customers AS churn_rate
+Question: Find the average tenure of customers who have churned.
+cypher MATCH (c:Customer {Churn: 'Yes'}) RETURN avg(c.Tenure) AS average_tenure
+
+Question: Find the average tenure of customers who have not churned.
+cypher MATCH (c:Customer {Churn: 'No'}) RETURN avg(c.Tenure) AS average_tenure
+
+Question: Find the total charges for each customer.
+cypher MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges) RETURN c.CustomerID, ch.TotalCharges
+
+Question: What is the churn rate by internet service type?
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WITH i.InternetService AS internet_service, count(*) AS total_customers
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WHERE i.InternetService = internet_service
+WITH internet_service, total_customers, count(*) AS churned_customers
+RETURN internet_service, toFloat(churned_customers) / total_customers AS churn_rate
+Question: What is the churn rate by contract type and internet service type?  (More granular analysis)
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WITH ct.Contract AS contract_type, i.InternetService AS internet_service, count(*) AS total_customers
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CONTRACT]->(ct:Contract)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+WHERE ct.Contract = contract_type AND i.InternetService = internet_service
+WITH contract_type, internet_service, total_customers, count(*) AS churned_customers
+RETURN contract_type, internet_service, toFloat(churned_customers) / total_customers AS churn_rate
+Question: How does tenure affect churn? (Group by tenure ranges)
+
+Cypher
+
+MATCH (c:Customer)
+WITH CASE
+    WHEN c.Tenure < 12 THEN '0-12 months'
+    WHEN c.Tenure < 24 THEN '12-24 months'
+    WHEN c.Tenure < 36 THEN '24-36 months'
+    ELSE '36+ months'
+END AS tenure_range, count(*) AS total_customers
+MATCH (c:Customer {Churn: 'Yes'})
+WITH CASE
+    WHEN c.Tenure < 12 THEN '0-12 months'
+    WHEN c.Tenure < 24 THEN '12-24 months'
+    WHEN c.Tenure < 36 THEN '24-36 months'
+    ELSE '36+ months'
+END AS tenure_range, total_customers, count(*) AS churned_customers
+RETURN tenure_range, toFloat(churned_customers) / total_customers AS churn_rate
+Question: What is the average monthly charge for churned vs. non-churned customers?
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.MonthlyCharges) AS avg_churned_monthly_charge
+MATCH (c:Customer {Churn: 'No'})-[:HAS_CHARGES]->(ch:Charges)
+RETURN avg_churned_monthly_charge, avg(ch.MonthlyCharges) AS avg_non_churned_monthly_charge
+Question: What is the distribution of total charges for churned customers? (Use bucketing/ranges)
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CHARGES]->(ch:Charges)
+WITH CASE
+    WHEN ch.TotalCharges < 500 THEN 'Less than $500'
+    WHEN ch.TotalCharges < 1000 THEN '$500 - $1000'
+    WHEN ch.TotalCharges < 2000 THEN '$1000 - $2000'
+    ELSE '$2000+'
+END AS charge_range, count(*) AS number_of_customers
+RETURN charge_range, number_of_customers
+Question: Are there specific combinations of services that correlate with higher churn?
+
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})
+OPTIONAL MATCH (c)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+RETURN i.InternetService, p.PhoneService, st.StreamingTV, sm.StreamingMovies, count(*) AS churn_count
+ORDER BY churn_count DESC
+LIMIT 10 // Top 10 correlating services
+Question: How does paperless billing affect churn rate?
+
+Cypher
+
+MATCH (c:Customer)
+WITH c.Churn AS churn_status, c:Customer-[:HAS_BILLING]->(b:Billing {PaperlessBilling: 'Yes'}) AS has_paperless, count(*) AS total_customers
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_BILLING]->(b:Billing {PaperlessBilling: 'Yes'})
+WHERE c.Churn = churn_status and c:Customer-[:HAS_BILLING]->(b:Billing {PaperlessBilling: 'Yes'}) = has_paperless
+WITH has_paperless, total_customers, count(*) as churned_customers
+RETURN has_paperless, toFloat(churned_customers)/total_customers AS churn_rate
+Question:  What's the average tenure for customers who have both streaming TV and movies?
+cypher MATCH (c:Customer)-[:HAS_STREAMING_TV]->(st:StreamingTV)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies) RETURN avg(c.Tenure) AS average_tenure
+
+Question:  Which payment method is associated with the highest average total charge?
+cypher MATCH (c:Customer)-[:HAS_BILLING]->(b:Billing)-[:HAS_CHARGES]->(ch:Charges) RETURN b.PaymentMethod, avg(ch.TotalCharges) AS average_total_charge ORDER BY average_total_charge DESC LIMIT 1
+
+Question:  How many customers have each combination of phone service and multiple lines?
+cypher MATCH (c:Customer)-[:HAS_PHONE_SERVICE]->(p:PhoneService) RETURN p.PhoneService, p.MultipleLines, count(*) AS customer_count
+
+Question:  What percentage of customers have online backup and device protection?
+cypher MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService {OnlineBackup: 'Yes', DeviceProtection: 'Yes'}) WITH count(*) AS customers_with_both MATCH (c:Customer)-[:HAS_INTERNET_SERVICE]->(i:InternetService) RETURN toFloat(customers_with_both) / count(*) * 100 AS percentage
+
+Question: What are the top 5 most common services used by customers with "One year" contracts?
+cypher MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract {Contract: 'One year'}) OPTIONAL MATCH (c)-[:HAS_INTERNET_SERVICE]->(i:InternetService) OPTIONAL MATCH (c)-[:HAS_PHONE_SERVICE]->(p:PhoneService) OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV) OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies) RETURN i.InternetService, p.PhoneService, st.StreamingTV, sm.StreamingMovies, count(*) AS usage_count ORDER BY usage_count DESC LIMIT 5
+
+Question: Find customers who have churned and whose total charges are in the top 10% of all total charges.
+
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH collect(ch.TotalCharges) AS all_total_charges, count(*) AS total_count
+WITH all_total_charges, apoc.math.percentile(all_total_charges, 0.9) AS top_10_percent_cutoff // Using APOC for percentile calculation
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CHARGES]->(ch:Charges)
+WHERE ch.TotalCharges >= top_10_percent_cutoff
+RETURN c.CustomerID, ch.TotalCharges
+(Requires APOC Library): This query uses the APOC (Awesome Procedures on Cypher) library, which you'll need to install in your Neo4j instance. 1   The apoc.math.percentile function makes calculating percentiles much easier.  If you don't have APOC installed, you can calculate the percentile using a subquery, but it's more complex.   
+1.
+Installation - APOC Documentation - Neo4j
+
+neo4j.com
+
+
+Bonus Complex Queries (Examples)
+
+Question: Find customers who have churned and have a combination of services (Internet, Phone, Streaming) that is less common than the average combination of services for churned customers. (Advanced Analysis)
+Cypher
+
+MATCH (c:Customer {Churn: 'Yes'})
+OPTIONAL MATCH (c)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+WITH i.InternetService AS internet_service, p.PhoneService AS phone_service, st.StreamingTV AS streaming_tv, sm.StreamingMovies AS streaming_movies, count(*) AS combination_count
+WITH avg(combination_count) AS avg_combination_count, collect(DISTINCT [internet_service, phone_service, streaming_tv, streaming_movies]) as all_combinations
+MATCH (c:Customer {Churn: 'Yes'})
+OPTIONAL MATCH (c)-[:HAS_INTERNET_SERVICE]->(i:InternetService)
+OPTIONAL MATCH (c)-[:HAS_PHONE_SERVICE]->(p:PhoneService)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_TV]->(st:StreamingTV)
+OPTIONAL MATCH (c)-[:HAS_STREAMING_MOVIES]->(sm:StreamingMovies)
+WITH avg_combination_count, all_combinations, i.InternetService AS internet_service, p.PhoneService AS phone_service, st.StreamingTV AS streaming_tv, sm.StreamingMovies AS streaming_movies, count(*) as current_combination_count
+WHERE current_combination_count < avg_combination_count
+RETURN c.CustomerID, internet_service, phone_service, streaming_tv, streaming_movies
+Question: For each contract type, what is the average monthly charge for customers who have churned vs. those who have not?
+Cypher
+
+MATCH (c:Customer)-[:HAS_CONTRACT]->(ct:Contract)
+WITH ct.Contract AS contract_type
+MATCH (c:Customer {Churn: 'Yes'})-[:HAS_CONTRACT]->(ct2:Contract)-[:HAS_CHARGES]->(ch:Charges)
+WHERE ct2.Contract = contract_type
+WITH contract_type, avg(ch.MonthlyCharges) AS avg_churned_monthly_charge
+MATCH (c2:Customer {Churn: 'No'})-[:HAS_CONTRACT]->(ct3:Contract)-[:HAS_CHARGES]->(ch2:Charges)
+WHERE ct3.Contract = contract_type
+RETURN contract_type, avg_churned_monthly_charge, avg(ch2.MonthlyCharges) AS avg_non_churned_monthly_charge
+Question: Identify customer segments based on their service usage and spending patterns. (Example using tenure and monthly charges - expand with more criteria)
+Cypher
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH CASE
+    WHEN c.Tenure < 12 AND ch.MonthlyCharges < 50 THEN 'Low Tenure, Low Spending'
+    WHEN c.Tenure < 12 AND ch.MonthlyCharges >= 50 THEN 'Low Tenure, High Spending'
+    WHEN c.Tenure >= 12 AND ch.MonthlyCharges < 50 THEN 'High Tenure, Low Spending'
+    ELSE 'High Tenure, High Spending'
+END AS customer_segment, count(*) AS number_of_customers
+RETURN customer_segment, number_of_customers
