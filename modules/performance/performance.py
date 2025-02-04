@@ -17,12 +17,12 @@ def yearFilter(factory_profit_df):
     return from_year, to_year
 
 def selectedFactories(factory_profit_df):
-    factories = factory_profit_df['FactoryID'].unique()
+    factories = factory_profit_df['Factory'].unique()
 
     selected_factories = st.multiselect(
         'Which factories would you like to view?',
         factories,
-        ['F1', 'F5', 'F10'])
+        ['Factory 1', 'Factory 2', 'Factory 3'])
     
     return selected_factories
 
@@ -30,7 +30,7 @@ def lineGraph(factory_profit_df, selected_factories, from_year, to_year):
         
     # Filter the data
     filtered_factory_df = factory_profit_df[
-        (factory_profit_df['FactoryID'].isin(selected_factories))
+        (factory_profit_df['Factory'].isin(selected_factories))
         & (factory_profit_df['Year'] <= to_year)
         & (from_year <= factory_profit_df['Year'])
     ]
@@ -45,23 +45,23 @@ def lineGraph(factory_profit_df, selected_factories, from_year, to_year):
         st.line_chart(
             filtered_factory_df,
             x='Date',
-            y='TotalProfit',
-            color='FactoryID',
+            y='Profit Margin (%)',
+            color='Factory',
         )
 
         ''
         ''
 
     with colgraph[1]:
-        st.header('Profit Per Unit', divider='gray')
+        st.header('Cost of Downtime', divider='gray')
 
         ''
 
         st.line_chart(
             filtered_factory_df,
             x='Date',
-            y='ProfitPerUnit',
-            color='FactoryID',
+            y='Profit Margin (%)',
+            color='Factory',
         )
 
 def performancePage(factory_profit_df):

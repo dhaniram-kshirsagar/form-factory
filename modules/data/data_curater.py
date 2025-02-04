@@ -19,7 +19,7 @@ def load_data(table_name):
 
 
 def getFactoryComplexDataProfit(): 
-    DATA_FILENAME = Path(__file__).parent.parent/'data/large-data/Complex_Expanded_Factory_Data.csv'
+    DATA_FILENAME = Path(__file__).parent.parent/'data/large-data/FoamFactory_V2_27K.csv'
     raw_df =  pd.read_csv(DATA_FILENAME)
 
     from os import replace

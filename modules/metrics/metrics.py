@@ -23,7 +23,7 @@ def selectedFactories(factory_profit_df):
     selected_factories = st.multiselect(
         'Which factories would you like to view?',
         factories,
-        ['Factory 3', 'Factory 5', 'Factory 7', 'Factory 10'])
+        ['Factory 3', 'Factory 5'])
     
     return selected_factories
 
