@@ -1,4 +1,4 @@
-# ML Model Handover Specification  
+# Sample ML Model Handover Specification  
 **Model Purpose**: Predict customer churn (Yes/No) for a telecom company.  
 
 ---
