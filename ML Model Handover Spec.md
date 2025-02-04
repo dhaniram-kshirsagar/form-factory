@@ -57,6 +57,27 @@ config = joblib.load("feature_config.json")
 scaler = config["scaler"]  
 feature_order = config["feature_order"]  
 
+#########Single Inference
+# Single prediction example  
+raw_data = {  
+    "gender": "Female",  
+    "SeniorCitizen": 0,  
+    "tenure": 12,  
+    "MonthlyCharges": 29.85,  
+    "PaymentMethod": "ElectronicCheck",  
+    ...  # Include all schema fields except customerID  
+}  
+
+# Preprocess input  
+df = pd.DataFrame([raw_data])  
+df_encoded = pd.get_dummies(df).reindex(columns=config["feature_order"], fill_value=0)  
+df_scaled = scaler.transform(df_encoded)  # Use saved scaler  
+
+# Predict  
+prob = model.predict_proba(df_scaled)[:, 1]  
+churn = "Yes" if prob > 0.5 else "No"  
+
+######Batch Inference
 # Load CSV batch file  
 batch_df = pd.read_csv("input_batch.csv")  
 
