@@ -7,7 +7,6 @@ import os
 from dotenv import load_dotenv
 
 from streamlit_navigation_bar import st_navbar
-import page as pg
 import time
 
 async def initialize_graph():
@@ -24,6 +23,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+import page as pg
+
 # Initialize the graph in a separate thread
 thread = threading.Thread(target=run_initialize_graph)
 thread.start()
@@ -38,10 +39,10 @@ if st.session_state.OPENAI_API_KEY is None:
 
 #st.set_page_config(initial_sidebar_state="collapsed")
 
-pages = ["Home", "Churn Bot", "Churn Astro", "Churn Analysis", "Churn Prediction", "Churn Model"]
+pages = ["Home", "Dynamic Churn Analysis", "Churn Astro", "Churn Bot"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "no_bg_logo.svg")
-#urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
+
 styles = {
     "nav": {
         "background-color": "white",
@@ -81,10 +82,10 @@ page = st_navbar(
 
 functions = {
     "Home": pg.show_image,
-    "Churn Analysis": pg.show_page,
+    "Dynamic Churn Analysis": pg.show_r_dash,
     "Churn Bot": pg.show_factorybot,
-    #"Churn Astro":pg.Show_Factoryastro,
-    #"Predictive Performance": pg.show_PredictivePerformance,
+    "Churn Astro":pg.show_churn_pred,
+    "Churn Prediction": pg.show_PredictivePerformance,
     #"Current Performance": pg.show_currentPerformance,
     
     

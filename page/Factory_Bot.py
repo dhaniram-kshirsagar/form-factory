@@ -6,18 +6,236 @@ import trubrics
 
 from modules.kg_rag import kg_rag
 
-# with st.sidebar:
-#     openai_api_key = st.text_input("OpenAI API Key", key="feedback_api_key", type="password")
-#     "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-#     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/pages/5_Chat_with_user_feedback.py)"
-#     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+def set_custom_css():
+    st.markdown("""
+    <style>
+    :root {
+        
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .stApp {
+        background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1) 0%, rgba(var(--background-color-rgb), 1) 100%);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--primary-color);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    .stMarkdown a {
+        color: var(--primary-color);
+        text-decoration: none;
+        border-bottom: 1px solid var(--primary-color);
+        transition: opacity 0.2s ease;
+    }
+
+    .stMarkdown a:hover {
+        opacity: 0.8;
+    }
+
+    .stat-card, .churner-stat-card {
+        background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1) 0%, rgba(var(--background-color-rgb), 0.9) 100%);
+        color: var(--text-color);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover, .churner-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Style the subheader */
+    .stMarkdown h3 {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    /* Style code blocks in markdown */
+    .stMarkdown pre {
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Improve readability of radio buttons */
+    .stRadio > div[role="radiogroup"] > label {
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stRadio > div[role="radiogroup"] > label:hover {
+        background-color: rgba(var(--primary-color-rgb), 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .stRadio > div[role="radiogroup"] > label[data-checked="true"] {
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+        border-color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    /* Style buttons */
+    .stButton > button {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Style text inputs */
+    .stTextInput > div > div > input {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        background-color: var(--background-color);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+
+    .stTextInput > div > div > input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+    }
+
+    /* Style selectbox */
+    .stSelectbox > div > div > div {
+        border-radius: 8px;
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        background-color: var(--background-color);
+    }
+
+    /* Improve overall spacing */
+    .stMarkdown {
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .stMarkdown p {
+        margin-bottom: 15px;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+# Chatbot function
+def chatbot(query):
+    return  kg_rag.get_kg_answer(query)
+
+# Chat interface
+def chat_interface():
+    st.subheader('Ask Questions! to analyze and understand your churn data')
+    if prompt := st.chat_input(placeholder='Hello! I am here to help. What would you like to know?'):
+        if prompt:
+            response = chatbot(prompt)
+            st.session_state.chat_history_bot.append(('You', prompt))
+            st.session_state.chat_history_bot.append(('Bot', response))
+    
+    chat_container = st.container()
+    with chat_container:
+        st.markdown('<div class="chat-container"><h5>Chat History</h5>', unsafe_allow_html=True)
+        # Display message pairs in reverse order
+        for i in range(len(st.session_state.chat_history_bot)-1, -1, -2):
+            if i-1 >= 0:
+                bot_role, bot_msg = st.session_state.chat_history_bot[i-1]
+                with st.chat_message("assistant"):
+                    st.markdown(f'<div class="chat-message {bot_role.lower()}"><strong>{bot_role}</strong>: {bot_msg}</div>', unsafe_allow_html=True)
+            if i >= 0:
+                user_role, user_msg = st.session_state.chat_history_bot[i]
+                with st.chat_message("user"):
+                    st.markdown(f'<div class="chat-message {user_role.lower()}"><strong>{user_role}</strong>: {user_msg}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def show_factorybot():
-    st.subheader(":robot_face: Get insights from your churn data")
+    set_custom_css()
+    st.title("Churn Analysis ChatBot")
+    st.markdown("---")
 
-    
-    markdown = """
-    You can start with following examples:
+     # Initialize session state for chat history
+    if 'chat_history_bot' not in st.session_state:
+        st.session_state.chat_history_bot = []
+
+    col1, col2 = st.columns([2, 2])
+
+    with col1:
+        if "chat_history_bot" not in st.session_state:
+            st.session_state.chat_history_bot = [
+                {"role": "assistant", "content": "Hello! I'm here to help you analyze customer churn data. What would you like to know?"}
+            ]
+        chat_interface()
+        '''# Initialize session state variables
+        if "messages" not in st.session_state:
+            st.session_state.messages = [
+                {"role": "assistant", "content": "Hello! I'm here to help you analyze customer churn data. What would you like to know?"}
+            ]
+
+        if "response" not in st.session_state:
+            st.session_state["response"] = None
+
+        if "waiting_for_response" not in st.session_state:
+            st.session_state.waiting_for_response = False
+
+        if "last_user_message" not in st.session_state:
+            st.session_state.last_user_message = None
+
+        # Show bot's initial message
+        if len(st.session_state.messages) == 1:
+            st.chat_message("assistant").write(st.session_state.messages[0]["content"])
+
+        # Chat input
+        if prompt := st.chat_input(placeholder="Ask a question about customer churn...", disabled=st.session_state.waiting_for_response) or st.session_state.waiting_for_response:
+            if not st.session_state.waiting_for_response:
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                st.session_state.last_user_message = prompt
+                st.session_state.waiting_for_response = True
+                st.rerun()
+            else:
+                with st.spinner("Analyzing data..."):
+                    time.sleep(1)
+                    print(prompt)
+                    st.session_state["response"] = kg_rag.get_kg_answer(st.session_state.last_user_message)
+                    st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
+                    st.session_state.waiting_for_response = False
+                    st.rerun()
+
+        # Display all messages except initial bot message
+        messages = st.session_state.messages[1:]
+        for i in range(len(messages)):
+            msg = messages[i]
+            st.chat_message(msg["role"]).write(msg["content"])'''
+        
+
+    with col2:
+        st.subheader("Example Questions")
+        markdown = """
+        You can start with the following examples:
 
         1. How does the tenure of customers correlate with their service usage?
         2. Is there a significant difference in churn rates based on payment methods?
@@ -34,55 +252,17 @@ def show_factorybot():
         13. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
         14. Find customers who have churned and have the least common combination of internet service and streaming services.
         15. Which factors are most strongly associated with customer churn (e.g., monthly charges, tenure, contract type)?
+        16. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
+        """
+        st.markdown(markdown)
 
-    """
-
-
-
-    st.markdown(markdown)
-
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {"role": "assistant", "content": "How can I help you? Leave feedback to help me improve!"}
-        ]
-
-    if "response" not in st.session_state:
-        st.session_state["response"] = None
-
-    if "waiting_for_response" not in st.session_state:
-        st.session_state.waiting_for_response = False
-
-    messages = st.session_state.messages
-    for msg in messages:
-        st.chat_message(msg["role"]).write(msg["content"])
-
-    if prompt := st.chat_input(placeholder="e.g. List factories which are having low production vlume.", disabled=st.session_state.waiting_for_response) or st.session_state.waiting_for_response:
-        if not st.session_state.waiting_for_response:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.session_state.last_user_message = prompt
-            st.chat_message("user").write(prompt)
-            st.session_state.waiting_for_response = True
-            st.rerun()
-        else:
-            with st.spinner("Assistant is typing..."):
-                time.sleep(1)
-                print(prompt)
-                st.session_state["response"] = kg_rag.get_kg_answer(st.session_state.last_user_message)
-                with st.chat_message("assistant"):
-                    st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
-                    st.write(st.session_state["response"])
-                st.session_state.waiting_for_response = False
-                st.rerun()
-
+# Commented out feedback section
 # if st.session_state["response"]:
 #     feedback = streamlit_feedback(
 #         feedback_type="thumbs",
 #         optional_text_label="[Optional] Please provide an explanation",
 #         key=f"feedback_{len(messages)}",
 #     )
-#     # This app is logging feedback to Trubrics backend, but you can send it anywhere.
-#     # The return value of streamlit_feedback() is just a dict.
-#     # Configure your own account at https://trubrics.streamlit.app/
 #     if feedback and "TRUBRICS_EMAIL" in st.secrets:
 #         config = trubrics.init(
 #             email=st.secrets.TRUBRICS_EMAIL,
