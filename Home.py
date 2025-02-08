@@ -17,8 +17,8 @@ def run_initialize_graph():
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
-    page_title='Foam Factories',
-    page_icon=':factory:', # This is an emoji shortcode. Could be a URL too.
+    page_title='Customer Churn Intelligence',
+    #page_icon='::', # This is an emoji shortcode. Could be a URL too.
     layout='wide',
     initial_sidebar_state="collapsed"
 )
