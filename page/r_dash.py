@@ -2,13 +2,16 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
+from pathlib import Path
 
 from modules.kg_rag import kg_rag
+
+CHURN_DATA_FILE = Path(__file__).parent.parent / "modules/data/telchurn/TelecomChurn.csv"
 
 # Load data
 @st.cache_data
 def load_data():
-    df = pd.read_csv("/Users/dhani/foamvenv/telecom_churn/form-factory/modules/data/telchurn/TelecomChurn.csv")  # Replace with your actual CSV file path
+    df = pd.read_csv(CHURN_DATA_FILE)  # Replace with your actual CSV file path
     df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
     df = df.dropna()  # Drop rows with NaN values
     df['SeniorCitizen'] = df['SeniorCitizen'].map({0: 'No', 1: 'Yes'})
