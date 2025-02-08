@@ -5,16 +5,16 @@ from pathlib import Path
 
 @st.cache_data
 def getFactoryDataProfit(): 
-    DATA_FILENAME = Path(__file__).parent.parent/'data/sample-data/factorydata.csv'
+    DATA_FILENAME = Path(__file__).parent.parent/'data/large-data/FoamFactory_V2_27K.csv'
     raw_profit_df =  pd.read_csv(DATA_FILENAME)
-    selected_columns = ['FactoryID', 'Date', 'ProductionVolume', 'TotalProfit', 'ProfitPerUnit'] 
+    selected_columns = ['Factory', 'Date', 'Production Volume (units)', 'Cost of Downtime ($)', 'Profit Margin (%)'] 
     # Create a new DataFrame with the selected columns
     df_selected = raw_profit_df[selected_columns]
     return raw_profit_df
 
 @st.cache_data
 def getFactoryComplexDataProfit(): 
-    DATA_FILENAME = Path(__file__).parent.parent/'data/large-data/Complex_Expanded_Factory_Data.csv'
+    DATA_FILENAME = Path(__file__).parent.parent/'data/large-data/FoamFactory_V2_27K.csv'
     raw_df =  pd.read_csv(DATA_FILENAME)
 
     from os import replace

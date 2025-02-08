@@ -298,6 +298,76 @@ RETURN
   r2.waste_generated as WasteGenerated
 ORDER BY ProductionVolume ASC
 
+Question: Analyze Team Performance by Machine Utilization
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE t.factory = 'Factory 1'
+RETURN t.id AS team_id, AVG(u.machine_utilization) AS avg_utilization, AVG(u.defect_rate) AS avg_defect_rate
+
+Question: Compare Teams by Production Volume
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE t.factory = 'Factory 1'
+RETURN t.id AS team_id, SUM(u.production_volume) AS total_production
+ORDER BY total_production DESC
+
+Question: Identify Teams with Safety Incidents
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE t.factory = 'Factory 1' AND u.safety_incidents > 0
+RETURN t.id AS team_id, SUM(u.safety_incidents) AS total_incidents
+
+Question: Find Teams with High Energy Consumption
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE t.factory = 'Factory 1'
+RETURN t.id AS team_id, SUM(u.energy_consumption) AS total_energy_consumption
+ORDER BY total_energy_consumption DESC
+
+Question: Analyze Team Revenue Contribution
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE t.factory = 'Factory 1'
+RETURN t.id AS team_id, SUM(u.revenue) AS total_revenue
+ORDER BY total_revenue DESC
+
+Question: Identify best team in Factory 1
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WHERE t.factory = 'Factory 1'
+WITH t.id AS team_id, 
+     SUM(u.production_volume) AS total_production, 
+     AVG(u.defect_rate) AS avg_defect_rate, 
+     SUM(u.safety_incidents) AS total_safety_incidents, 
+     AVG(u.energy_efficiency_rating) AS avg_energy_efficiency
+RETURN team_id, 
+       total_production, 
+       avg_defect_rate, 
+       total_safety_incidents, 
+       avg_energy_efficiency, 
+       (total_production * 0.5) - (avg_defect_rate * 100) - (total_safety_incidents * 10) + (avg_energy_efficiency * 20) AS performance_score
+ORDER BY performance_score DESC
+LIMIT 1
+
+Question: Identify the best machine in all factories
+
+MATCH (t:Team)<-[:USED_BY_TEAM]-(m:Machine)-[u:USED_ON]->(d:Date)
+WITH t.id AS team_id, 
+     t.factory AS factory, 
+     SUM(u.production_volume) AS total_production, 
+     AVG(u.defect_rate) AS avg_defect_rate, 
+     SUM(u.safety_incidents) AS total_safety_incidents, 
+     AVG(u.energy_efficiency_rating) AS avg_energy_efficiency
+RETURN team_id, 
+       factory, 
+       total_production, 
+       avg_defect_rate, 
+       total_safety_incidents, 
+       avg_energy_efficiency, 
+       (total_production * 0.5) - (avg_defect_rate * 100) - (total_safety_incidents * 10) + (avg_energy_efficiency * 20) AS performance_score
+ORDER BY performance_score DESC
+LIMIT 1
+
 Incorrectly generated Cypher query examples:
 
 Question: List teams that operated on a 23-Jan-2023 and their average operator experience?
