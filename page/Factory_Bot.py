@@ -156,7 +156,7 @@ def chat_interface():
         if prompt:
             response = chatbot(prompt)
             st.session_state.chat_history_bot.append(('You', prompt))
-            st.session_state.chat_history_bot.append(('Bot', response))
+            st.session_state.chat_history_bot.append(('Bot', response['result']))
     
     chat_container = st.container()
     with chat_container:

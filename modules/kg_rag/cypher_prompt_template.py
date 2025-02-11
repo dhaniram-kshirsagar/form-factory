@@ -1,9 +1,14 @@
 from langchain.prompts.prompt import PromptTemplate
 
-CYPHER_RECOMMENDATION_TEMPLATE = """Task:Generate Cypher statement to query a graph database.
+CYPHER_RECOMMENDATION_TEMPLATE = """
+Task: Generate Cypher statement to query a graph database.
+
 Instructions:
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided or not related to that node 
+
+Use History: {history}
+
 Schema:
 ////Create Nodes
 
@@ -275,8 +280,46 @@ MATCH (c:Customer {{Churn: 'Yes'}})
 WHERE c.Tenure < avg_tenure
 RETURN c.CustomerID
 
+Question: what is the % of senior citizens?
+
+Incorrect Cypher Query:
+MATCH (c:Customer)
+WHERE c.SeniorCitizen = 1
+WITH COUNT(c) AS senior_count, COUNT(*) AS total_count
+RETURN senior_count * 100.0 / total_count AS senior_citizen_percentage
+
+Correct Cypher Query:
+MATCH (c:Customer)
+WITH COUNT(c) AS totalCustomers, SUM(c.SeniorCitizen) AS seniorCitizens
+RETURN (toFloat(seniorCitizens) / totalCustomers) * 100 AS percentageSeniorCitizens;
+
+Question: what is the total average charge?
+
+Incorrect Cypher Query:
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+WITH avg(ch.TotalCharges) AS avg_total_charges
+RETURN avg_total_charges
+
+Correct Cypher Query:
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+RETURN avg(toFloat(ch.TotalCharges)) AS averageTotalCharge;
+
+Question: what is the total no churners
+
+Incorrect Cypher Query:
+
+MATCH (c:Customer {{Churn: 'No'}})
+RETURN COUNT(c) as TotalNoChurners
+
+Correct Cypher Query:
+
+MATCH (c:Customer {{Churn: 'Yes'}})
+RETURN COUNT(c) as TotalNoChurners
+
+
 Notes for output: 
 Do not include any explanations or apologies in your responses.
+Strictly build query based on the given question and if available, include history
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
 Do not include any text except the generated Cypher statement.
 Do not include OVER clause in your Cypher statement.
@@ -286,5 +329,5 @@ The question is:
 {question}"""
 
 CYPHER_RECOMMENDATION_PROMPT = PromptTemplate(
-    input_variables=['question'], template=CYPHER_RECOMMENDATION_TEMPLATE
+    input_variables=['question', 'history'], template=CYPHER_RECOMMENDATION_TEMPLATE
 )

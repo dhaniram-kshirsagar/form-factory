@@ -13,7 +13,7 @@ CHURN_DATA_FILE = Path(__file__).parent.parent / "modules/data/telchurn/TelecomC
 def load_data():
     df = pd.read_csv(CHURN_DATA_FILE)  # Replace with your actual CSV file path
     df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
-    df = df.dropna()  # Drop rows with NaN values
+    #df = df.dropna()  # Drop rows with NaN values
     df['SeniorCitizen'] = df['SeniorCitizen'].map({0: 'No', 1: 'Yes'})
     return df
 
@@ -58,7 +58,7 @@ def set_custom_css():
 
     .stat-card {
         background: #e6f3ff;
-        color: #003366;
+        color: #DE3163;
         border: 1px solid rgba(var(--primary-color-rgb), 0.2);
         padding: 5px;
         border-radius: 5px;
@@ -202,7 +202,7 @@ def chat_interface():
         if prompt:
             response = chatbot(prompt)
             st.session_state.chat_history.append(('You', prompt))
-            st.session_state.chat_history.append(('Bot', response))
+            st.session_state.chat_history.append(('Bot', response['result']))
     
     chat_container = st.container()
     with chat_container:

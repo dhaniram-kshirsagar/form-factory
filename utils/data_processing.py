@@ -58,7 +58,7 @@ def clean_and_encode_data(df):
     
     # Encode categorical features with robust handling
     # Gender
-    df['gender'] = df['gender'].map({'Male': 0, 'Female': 1, '': 0}).fillna(0).astype(int)
+    df['gender'] = df['gender'].map({'Male': 1, 'Female': 0, '': 0}).fillna(0).astype(int)
     
     # SeniorCitizen encoding
     df['SeniorCitizen'] = df['SeniorCitizen'].map({

@@ -14,44 +14,55 @@ def parse_query_to_input(query, default_values):
     """Parse natural language query into structured input using LLM"""
     prompt = ChatPromptTemplate.from_messages([
         SystemMessage(content="""You are a helpful assistant that extracts customer attributes from natural language queries for churn prediction. Return a JSON object with extracted attributes. 
-        Map extracted feature names, data types and possible values [as given against name and after data type] to one of the following: 
-            'gender': {'type': 'string', 'enum': ['Male', 'Female']},
-            'SeniorCitizen': {'type': 'integer', 'minimum': 0, 'maximum': 1},
-            'Partner': {'type': 'string', 'enum': ['Yes', 'No']},
-            'Dependents': {'type': 'string', 'enum': ['Yes', 'No']},
-            'tenure': {'type': 'integer', 'minimum': 0},
-            'PhoneService': {'type': 'string', 'enum': ['Yes', 'No']},
-            'MultipleLines': {'type': 'string', 'enum': ['Yes', 'No', 'No phone service']},
-            'InternetService': {'type': 'string', 'enum': ['DSL', 'Fiber optic', 'No']},
-            'OnlineSecurity': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'OnlineBackup': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'DeviceProtection': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'TechSupport': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'StreamingTV': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'StreamingMovies': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'Contract': {'type': 'string', 'enum': ['Month-to-month', 'One year', 'Two year']},
-            'PaperlessBilling': {'type': 'string', 'enum': ['Yes', 'No']},
-            'PaymentMethod': {'type': 'string', 'enum': ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)']},
-            'MonthlyCharges': {'type': 'number', 'minimum': 0},
-            'TotalCharges': {'type': 'number', 'minimum': 0}
+            Map extracted feature names, data types and possible values [as given against name and after data type] to one of the following: 
+                'gender': {'type': 'string', 'enum': ['Male', 'Female']},
+                'SeniorCitizen': {'type': 'integer', 'minimum': 0, 'maximum': 1},
+                'Partner': {'type': 'string', 'enum': ['Yes', 'No']},
+                'Dependents': {'type': 'string', 'enum': ['Yes', 'No']},
+                'tenure': {'type': 'integer', 'minimum': 0},
+                'PhoneService': {'type': 'string', 'enum': ['Yes', 'No']},
+                'MultipleLines': {'type': 'string', 'enum': ['Yes', 'No', 'No phone service']},
+                'InternetService': {'type': 'string', 'enum': ['DSL', 'Fiber optic', 'No']},
+                'OnlineSecurity': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
+                'OnlineBackup': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
+                'DeviceProtection': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
+                'TechSupport': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
+                'StreamingTV': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
+                'StreamingMovies': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
+                'Contract': {'type': 'string', 'enum': ['Month-to-month', 'One year', 'Two year']},
+                'PaperlessBilling': {'type': 'string', 'enum': ['Yes', 'No']},
+                'PaymentMethod': {'type': 'string', 'enum': ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)']},
+                'MonthlyCharges': {'type': 'number', 'minimum': 0},
+                'TotalCharges': {'type': 'number', 'minimum': 0}
 
-            Example Output:
-            {'gender': 'Male', 'SeniorCitizen': 1, 'Partner': 'No', 'Dependents': 'No', 'tenure': 3, 'PhoneService': 'Yes', 'MultipleLines': 'No', 'InternetService': 'DSL', 'OnlineSecurity': 'No', 'OnlineBackup': 'No', 'DeviceProtection': 'No', 'TechSupport': 'No', 'StreamingTV': 'Yes', 'StreamingMovies': 'No', 'Contract': 'Month-to-month', 'PaperlessBilling': 'No', 'PaymentMethod': 'Electronic check', 'MonthlyCharges': 64.76, 'TotalCharges': 2283.3}
+            Notes for generating output:
+            1. If you are able to map any of the above values then use following format. Return only the map values.
+            Example Output options:
+                      a. {'gender': 'Male', 'SeniorCitizen': 1, 'Partner': 'No', 'Dependents': 'No', 'tenure': 3, 'PhoneService': 'Yes', 'MultipleLines': 'No', 'InternetService': 'DSL', 'OnlineSecurity': 'No', 'OnlineBackup': 'No', 'DeviceProtection': 'No', 'TechSupport': 'No', 'StreamingTV': 'Yes', 'StreamingMovies': 'No', 'Contract': 'Month-to-month', 'PaperlessBilling': 'No', 'PaymentMethod': 'Electronic check', 'MonthlyCharges': 64.76, 'TotalCharges': 2283.3}
+                      b. {'gender': 'Male', 'Partner': 'No'}
+                      c. {'tenure': 1}
+            
+            2. if you unable to map none of the above fields then return {}       
             """),
         ("user", f"Extract customer attributes from this query: {query}")
     ])
     
-    llm = ChatOpenAI(temperature=0)
-    chain = prompt | llm
-    result = chain.invoke({"query": query})
     
     try:
+        llm = ChatOpenAI(temperature=0)
+        chain = prompt | llm
+        result = chain.invoke({"query": query})
+
         extracted = json.loads(result.content)
         print('Extracted data:', extracted)
+        if extracted == {}:
+            print('Unable to extract values from query')
+            return {}
         # Merge extracted values with defaults
         return {**default_values, **extracted}
     except json.JSONDecodeError:
-        return default_values
+        print('Unable to parse response')
+        return {}
     print('Completed parse_query_to_input')
 
 def chatbot_prediction(model, query, default_values):
@@ -60,7 +71,9 @@ def chatbot_prediction(model, query, default_values):
     """Handle chatbot queries for churn prediction with LLM parsing"""
     # Parse query to get specific values
     extracted_data = parse_query_to_input(query, default_values)
-    print('Extracted data:', extracted_data)
+    print('Final data for encoding:', extracted_data)
+    if not extracted_data:
+        return None, None, "Unable to extract values from query", extracted_data
     # Create dataframe and preprocess
     input_df = pd.DataFrame([extracted_data])
     input_df = encode_data(input_df)
@@ -186,11 +199,14 @@ def chatbot_interface(model):
         prediction, proba, explanation, extracted_data = chatbot_prediction(model, prompt, default_values)
         
         # Format response
-        response = f"**Prediction:** {'Churn' if prediction == 1 else 'No Churn'}\n"
+        if prediction is None:
+            response = f"**Prediction:** Unable to extract values from query. Revisit your query.\n"
+        else:
+            response = f"**Prediction:** {'Churn' if prediction == 1 else 'No Churn'}\n"
         if proba is not None:
             response += f"**Probability of Churn:** {proba:.2%}\n"
         response += f"\n**Explanation:**\n{explanation}\n\n"
-        response += "**Extracted Customer Data:**\n```json\n" + json.dumps(extracted_data, indent=2) + "\n```"
+        response += "**Extracted Customer Data:**\n```json\n" + json.dumps(extracted_data, indent=2) + "\n"
         
         # Display assistant response in chat message container
         # with st.chat_message("assistant"):
@@ -213,7 +229,7 @@ def chatbot_interface(model):
             if i >= 0:
                 user_role, user_msg = st.session_state.messages_astro[i]
                 with st.chat_message("user"):
-                    st.markdown(f'<div class="chat-message {user_role.lower()}"><strong>{user_role}</strong>: {user_msg}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="chat-message {user_role.lower()}"><strong>{user_role}</strong>: {user_msg} </div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 

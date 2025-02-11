@@ -184,10 +184,13 @@ def set_custom_css():
 
 def make_predictions(model, input_data):
     print('Starting make_predictions')
-    print('Input data shape:', input_data.shape)
+    print('Input data shape:', input_data.to_csv(index=False))
     """Common prediction logic for both form and CSV inputs"""
     processed_df = clean_and_encode_data(input_data)
-    print('Processed DataFrame shape:', processed_df.shape)
+    print('Processed DataFrame shape:', processed_df.to_csv(index=False))
+    clean_columns = ['tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges']
+    processed_df = processed_df[clean_columns]
+    print('Reduced final DataFrame shape:', processed_df.to_csv(index=False))
     predictions = model.predict(processed_df)
     print('Predictions:', predictions[:5])
     proba = model.predict_proba(processed_df)[:, 1] if hasattr(model, 'predict_proba') else None
@@ -323,7 +326,7 @@ def show_churn_pred():
         selected_option = st.radio("SELECT INPUT FOR PREDICTION", ["Form Input", "CSV Upload"])
         
         st.markdown("---")
-        st.subheader("Astro Bot! Looing for churn predictions?")
+        st.subheader("Astro Bot! Looking for churn predictions?")
         st.text('We uses defaults for missing values!')
         chatbot_interface(model)
 
