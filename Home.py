@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from streamlit_navigation_bar import st_navbar
 import time
 
+import api
+
 async def initialize_graph():
     await kg_rag.init_graph()
 
@@ -28,6 +30,12 @@ import page as pg
 # Initialize the graph in a separate thread
 thread = threading.Thread(target=run_initialize_graph)
 thread.start()
+
+def init_api():
+    api.run_api_server()
+
+thread2 = threading.Thread(target=init_api, daemon=True)
+thread2.start()
 
 # Load environment variables from .env file
 st.session_state.OPENAI_API_KEY = None
