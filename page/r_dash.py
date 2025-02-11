@@ -289,7 +289,7 @@ def show_r_dash():
         st.session_state.chat_history = []
 
     # Create two columns: one for navigation and chat, one for content
-    left_col, content_col = st.columns([1, 3])
+    left_col, content_col = st.columns([1.5, 2.5])
 
     # Navigation and chat interface in the left column
     with left_col:
@@ -350,7 +350,7 @@ def summary_page(df):
             <div class="key-insight-icon">📅</div>
             <div class="key-insight-content">
                 <div class="key-insight-title">Avg Tenure (Churners)</div>
-                <div class="key-insight-value">{churners['tenure'].mean():.1f} months</div>
+                <div class="key-insight-value">{churners['tenure'].mean():.2f} months</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -361,7 +361,7 @@ def summary_page(df):
             <div class="key-insight-icon">📅</div>
             <div class="key-insight-content">
                 <div class="key-insight-title">Avg Tenure (Non-churners)</div>
-                <div class="key-insight-value">{non_churners['tenure'].mean():.1f} months</div>
+                <div class="key-insight-value">{non_churners['tenure'].mean():.2f} months</div>
             </div>
         </div>
         """, unsafe_allow_html=True)

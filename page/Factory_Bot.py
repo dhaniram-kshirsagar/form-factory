@@ -182,7 +182,7 @@ def show_factorybot():
     if 'chat_history_bot' not in st.session_state:
         st.session_state.chat_history_bot = []
 
-    col1, col2 = st.columns([2, 2])
+    col1, col2 = st.columns([1.5, 2.5])
 
     with col1:
         if "chat_history_bot" not in st.session_state:

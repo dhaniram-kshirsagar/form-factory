@@ -316,6 +316,18 @@ Correct Cypher Query:
 MATCH (c:Customer {{Churn: 'Yes'}})
 RETURN COUNT(c) as TotalNoChurners
 
+Question: what is the average tenure for churners
+
+Incorrect Cypher Query:
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+RETURN avg(ch.TotalCharges) AS averageTotalCharge;
+
+Correct Cypher Query:
+
+MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
+RETURN avg(toFloat(ch.TotalCharges)) AS averageTotalCharge;
+
 
 Notes for output: 
 Do not include any explanations or apologies in your responses.

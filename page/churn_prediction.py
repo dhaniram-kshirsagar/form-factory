@@ -318,7 +318,7 @@ def show_churn_pred():
     st.title("Customer Churn Astro - Predicts Churn!")
 
     # Create two columns for the layout
-    col1, col2 = st.columns([1, 3])
+    col1, col2 = st.columns([1.5, 2.5])
 
     # Menu in the first column
     with col1:
