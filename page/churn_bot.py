@@ -4,55 +4,62 @@ import json
 import jsonschema
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import SystemMessage
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from utils.data_processing import encode_data
 from utils.rag import create_rag_layer
+
+prompt = '''
+        You are a helpful assistant that extracts customer attributes from natural language queries for churn prediction. 
+        You need to Extract values as per following feature names and ensure the values you return in output matches the data types and possible values to be one of as in given respective enum.
+        'gender': {{'type': 'string', 'enum': ['Male', 'Female']}},
+        'SeniorCitizen': {{'type': 'integer', 'minimum': 0, 'maximum': 1}},
+        'Partner': {{'type': 'string', 'enum': ['Yes', 'No']}},
+        'Dependents': {{'type': 'string', 'enum': ['Yes', 'No']}},
+        'tenure': {{'type': 'integer', 'minimum': 0}},
+        'PhoneService': {{'type': 'string', 'enum': ['Yes', 'No']}},
+        'MultipleLines': {{'type': 'string', 'enum': ['Yes', 'No', 'No phone service']}},
+        'InternetService': {{'type': 'string', 'enum': ['DSL', 'Fiber optic', 'No']}},
+        'OnlineSecurity': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
+        'OnlineBackup': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
+        'DeviceProtection': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
+        'TechSupport': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
+        'StreamingTV': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
+        'StreamingMovies': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
+        'Contract': {{'type': 'string', 'enum': ['Month-to-month', 'One year', 'Two year']}},
+        'PaperlessBilling': {{'type': 'string', 'enum': ['Yes', 'No']}},
+        'PaymentMethod': {{'type': 'string', 'enum': ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)']}},
+        'MonthlyCharges': {{'type': 'number', 'minimum': 0}},
+        'TotalCharges': {{'type': 'number', 'minimum': 0}}
+
+        Notes for generating output:            
+        1. Do not return special characters or strings if column type is integer or float.
+        2. Return only the JSON output. Do not include any explanations, notes, or additional text.
+        3. If you are unable to map any of the above fields, return {{}}.
+        4. Example outputs: 
+           {{'gender': 'Male', 'SeniorCitizen': 1, 'Partner': 'No', 'Dependents': 'No', 'tenure': 3, 'PhoneService': 'Yes', 'MultipleLines': 'No', 'InternetService': 'DSL', 'OnlineSecurity': 'No', 'OnlineBackup': 'No', 'DeviceProtection': 'No', 'TechSupport': 'No', 'StreamingTV': 'Yes', 'StreamingMovies': 'Yes', 'Contract': 'Month-to-month', 'PaperlessBilling': 'Yes', 'PaymentMethod': 'Electronic check', 'MonthlyCharges': 70.35, 'TotalCharges': 211.05}}
+           OR
+           {{'tenure': 1}}
+
+        Question: {query}  
+        Output:
+        ```json
+        '''
+    
+from langchain.prompts.prompt import PromptTemplate
+
+
+QA_PROMPT = PromptTemplate(
+input_variables=['query'], template=prompt)
+llm = ChatOpenAI(temperature=0)
+chain = QA_PROMPT | llm
 
 def parse_query_to_input(query, default_values):
     print('Starting parse_query_to_input')
     print('Query:', query)
     """Parse natural language query into structured input using LLM"""
-    prompt = ChatPromptTemplate.from_messages([
-        SystemMessage(content="""You are a helpful assistant that extracts customer attributes from natural language queries for churn prediction. Return a JSON object with extracted attributes. 
-            Map extracted feature names, data types and possible values [as given against name and after data type] to one of the following: 
-                'gender': {'type': 'string', 'enum': ['Male', 'Female']},
-                'SeniorCitizen': {'type': 'integer', 'minimum': 0, 'maximum': 1},
-                'Partner': {'type': 'string', 'enum': ['Yes', 'No']},
-                'Dependents': {'type': 'string', 'enum': ['Yes', 'No']},
-                'tenure': {'type': 'integer', 'minimum': 0},
-                'PhoneService': {'type': 'string', 'enum': ['Yes', 'No']},
-                'MultipleLines': {'type': 'string', 'enum': ['Yes', 'No', 'No phone service']},
-                'InternetService': {'type': 'string', 'enum': ['DSL', 'Fiber optic', 'No']},
-                'OnlineSecurity': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-                'OnlineBackup': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-                'DeviceProtection': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-                'TechSupport': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-                'StreamingTV': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-                'StreamingMovies': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-                'Contract': {'type': 'string', 'enum': ['Month-to-month', 'One year', 'Two year']},
-                'PaperlessBilling': {'type': 'string', 'enum': ['Yes', 'No']},
-                'PaymentMethod': {'type': 'string', 'enum': ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)']},
-                'MonthlyCharges': {'type': 'number', 'minimum': 0},
-                'TotalCharges': {'type': 'number', 'minimum': 0}
-
-            Notes for generating output:
-            1. If you are able to map any of the above values then use following format. Return only the map values.
-            Example Output options:
-                      a. {'gender': 'Male', 'SeniorCitizen': 1, 'Partner': 'No', 'Dependents': 'No', 'tenure': 3, 'PhoneService': 'Yes', 'MultipleLines': 'No', 'InternetService': 'DSL', 'OnlineSecurity': 'No', 'OnlineBackup': 'No', 'DeviceProtection': 'No', 'TechSupport': 'No', 'StreamingTV': 'Yes', 'StreamingMovies': 'No', 'Contract': 'Month-to-month', 'PaperlessBilling': 'No', 'PaymentMethod': 'Electronic check', 'MonthlyCharges': 64.76, 'TotalCharges': 2283.3}
-                      b. {'gender': 'Male', 'Partner': 'No'}
-                      c. {'tenure': 1}
-            
-            2. if you unable to map none of the above fields then return {}       
-            """),
-        ("user", f"Extract customer attributes from this query: {query}")
-    ])
-    
-    
     try:
-        llm = ChatOpenAI(temperature=0)
-        chain = prompt | llm
         result = chain.invoke({"query": query})
-
+        print('Result:', str(result))
         extracted = json.loads(result.content)
         print('Extracted data:', extracted)
         if extracted == {}:
@@ -63,7 +70,6 @@ def parse_query_to_input(query, default_values):
     except json.JSONDecodeError:
         print('Unable to parse response')
         return {}
-    print('Completed parse_query_to_input')
 
 def chatbot_prediction(model, query, default_values):
     print('Starting chatbot_prediction')
@@ -78,7 +84,8 @@ def chatbot_prediction(model, query, default_values):
     input_df = pd.DataFrame([extracted_data])
     input_df = encode_data(input_df)
     print('Encoded DataFrame:', input_df.head())
-
+    clean_columns = ['tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges']
+    input_df =  input_df[clean_columns]
     # Make prediction
     prediction = model.predict(input_df)[0]
     print('Prediction:', prediction)

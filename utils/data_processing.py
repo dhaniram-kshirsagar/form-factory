@@ -26,7 +26,7 @@ def encode_data(df):
     one_hot_cols = ["OnlineSecurity", "OnlineBackup",
                     "DeviceProtection", "TechSupport", "StreamingTV", "StreamingMovies"]
     for col in one_hot_cols:
-        df[col] = df[col].map({"Yes": 1, "No": 0, "No internet service": 2})
+        df[col] = df[col].map({"Yes": 2, "No": 0, "No internet service": 1})
     
     conn_type = {"DSL":1, "Fiber optic":2, "No":0}
     df["InternetService"] = df["InternetService"].map(conn_type)
@@ -95,9 +95,9 @@ def clean_and_encode_data(df):
     for col in service_cols:
         df[col] = df[col].map({
             'No': 0, 
-            'Yes': 1, 
-            'No Internet Service': 2,
-            '': 2
+            'Yes': 2, 
+            'No Internet Service': 1,
+            '': 1
         }).fillna(2).astype(int)
     
     # Contract
@@ -131,6 +131,50 @@ def clean_and_encode_data(df):
                     'MonthlyCharges', 'TotalCharges']
     
     return df[clean_columns]
+
+
+def clean_and_encode_data_for_7(df):
+    '''
+    Cleans and validates the following seven columns:
+    'tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges'
+    
+    Args:
+        df: Input dataframe containing the specified columns.
+    Returns:
+        Cleaned and validated dataframe with only the specified columns.
+    '''
+    # Strip whitespace and normalize case for string columns
+    string_cols = ['OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract']
+    df[string_cols] = df[string_cols].apply(lambda x: x.str.strip().str.title())
+    
+    # Handle missing values
+    df = df.fillna(0)
+    
+    # Encode 'OnlineSecurity', 'OnlineBackup', and 'TechSupport'
+    service_cols = ['OnlineSecurity', 'OnlineBackup', 'TechSupport']
+    for col in service_cols:
+        df[col] = df[col].map({
+            'No': 0, 
+            'Yes': 2, 
+            'No Internet Service': 1,
+            '': 1
+        }).fillna(1).astype(int)
+    
+    # Encode 'Contract'
+    df['Contract'] = df['Contract'].map({
+        'Month-To-Month': 0, 
+        'One Year': 1, 
+        'Two Year': 2,
+        '': 0
+    }).fillna(0).astype(int)
+    
+    # Ensure numeric columns are properly formatted
+    numeric_cols = ['tenure', 'MonthlyCharges', 'TotalCharges']
+    for col in numeric_cols:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+    
+    # Return only the specified columns
+    return df[['tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges']]
 
 # df = pd.read_csv("/Users/dhani/foamvenv/telecom_churn/form-factory/modules/data/telchurn/sample_csv_for_input.csv")
 # df = clean_and_encode_data(df)

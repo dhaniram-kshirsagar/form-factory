@@ -5,12 +5,12 @@ import joblib
 from pathlib import Path
 import plotly.express as px
 import matplotlib.pyplot as plt
-from utils.data_processing import clean_and_encode_data, encode_data
+from utils.data_processing import clean_and_encode_data, clean_and_encode_data_for_7, encode_data
 from utils.rag import create_rag_layer
 from page.churn_bot import chatbot_prediction, chatbot_interface
 
 # Load the model
-CHURN_REG_MODEL_FILE = Path(__file__).parent.parent / "modules/data/telchurn/gradient_boosting_model.joblib"
+CHURN_REG_MODEL_FILE = Path(__file__).parent.parent / "modules/data/telchurn/gradient_boosting_model_new.joblib"
 model = joblib.load(CHURN_REG_MODEL_FILE)
 
 # Custom CSS for professional theming
@@ -186,7 +186,10 @@ def make_predictions(model, input_data):
     print('Starting make_predictions')
     print('Input data shape:', input_data.to_csv(index=False))
     """Common prediction logic for both form and CSV inputs"""
-    processed_df = clean_and_encode_data(input_data)
+    if input_data.shape[1] == 7:
+        processed_df = clean_and_encode_data_for_7(input_data)
+    else:
+        processed_df = clean_and_encode_data(input_data)
     print('Processed DataFrame shape:', processed_df.to_csv(index=False))
     clean_columns = ['tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges']
     processed_df = processed_df[clean_columns]
@@ -227,65 +230,27 @@ def show_predictions(result_df, proba):
 
 def show_form_input():
     st.header("Predict Churn with Form Input")
-    with st.form("customer_form"):
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            gender = st.selectbox("Gender", ["Male", "Female"])
-            senior_citizen = st.selectbox("Senior Citizen", [0, 1])
-            partner = st.selectbox("Partner", ["Yes", "No"])
-            dependents = st.selectbox("Dependents", ["Yes", "No"])
-            
-        with col2:
-            tenure = st.number_input("Tenure (months)", min_value=0, max_value=100, step=1)
-            phone_service = st.selectbox("Phone Service", ["Yes", "No"])
-            multiple_lines = st.selectbox("Multiple Lines", ["No", "Yes", "No phone service"])
-            internet_service = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
-            
-        with col3:
-            contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
-            paperless_billing = st.selectbox("Paperless Billing", ["Yes", "No"])
-            payment_method = st.selectbox("Payment Method", [
-                "Electronic check", "Mailed check", 
-                "Bank transfer (automatic)", "Credit card (automatic)"
-            ])
-            monthly_charges = st.number_input("Monthly Charges ($)", min_value=0.0)
-            total_charges = st.number_input("Total Charges ($)", min_value=0.0)
-
-        with st.expander("Additional Services"):
-            col1, col2 = st.columns(2)
-            with col1:
-                online_security = st.selectbox("Online Security", ["Yes", "No", "No internet service"])
-                online_backup = st.selectbox("Online Backup", ["Yes", "No", "No internet service"])
-                device_protection = st.selectbox("Device Protection", ["Yes", "No", "No internet service"])
-            with col2:
-                tech_support = st.selectbox("Tech Support", ["Yes", "No", "No internet service"])
-                streaming_tv = st.selectbox("Streaming TV", ["Yes", "No", "No internet service"])
-                streaming_movies = st.selectbox("Streaming Movies", ["Yes", "No", "No internet service"])
+    with st.form("customer_form"):        
+        tenure = st.number_input("Tenure (months)", min_value=0, max_value=100, step=1)
+        contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
+        online_security = st.selectbox("Online Security", ["Yes", "No", "No internet service"])
+        online_backup = st.selectbox("Online Backup", ["Yes", "No", "No internet service"])
+        tech_support = st.selectbox("Tech Support", ["Yes", "No", "No internet service"])
+        monthly_charges = st.number_input("Monthly Charges ($)", min_value=0.0)
+        total_charges = st.number_input("Total Charges ($)", min_value=0.0)
 
         submitted = st.form_submit_button("Predict Churn")
         if submitted:
             customer = {
-                "gender": gender,
-                "SeniorCitizen": senior_citizen,
-                "Partner": partner,
-                "Dependents": dependents,
                 "tenure": tenure,
-                "PhoneService": phone_service,
-                "MultipleLines": multiple_lines,
-                "InternetService": internet_service,
+                "Contract": contract,
                 "OnlineSecurity": online_security,
                 "OnlineBackup": online_backup,
-                "DeviceProtection": device_protection,
                 "TechSupport": tech_support,
-                "StreamingTV": streaming_tv,
-                "StreamingMovies": streaming_movies,
-                "Contract": contract,
-                "PaperlessBilling": paperless_billing,
-                "PaymentMethod": payment_method,
                 "MonthlyCharges": monthly_charges,
-                "TotalCharges": total_charges
+                "TotalCharges": total_charges,
             }
+
             input_df = pd.DataFrame([customer])
             result_df, proba = make_predictions(model, input_df)
             show_predictions(result_df, proba)
@@ -297,11 +262,8 @@ def show_csv_upload():
         try:
             df = pd.read_csv(uploaded_file)
             required_columns = set([
-                'gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure',
-                'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity',
-                'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV',
-                'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod',
-                'MonthlyCharges', 'TotalCharges'
+                'tenure', 'Contract', 'OnlineSecurity', 'OnlineBackup', 'TechSupport',
+                'MonthlyCharges', 'TotalCharges',
             ])
             if required_columns.issubset(df.columns):
                 if st.button("Predict Churn"):
