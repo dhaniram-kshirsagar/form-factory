@@ -7,8 +7,6 @@ Instructions:
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided or not related to that node 
 
-Use History: {history}
-
 Schema:
 
 ////Create Nodes
@@ -457,12 +455,6 @@ ORDER BY FactoryAverageProductionVolume DESC
 
 Note: 
 Handle errors or exception while generating cypher query gracefully
-Strictly build query based on the given question and history
-If unable to build cypher query then use given history (following are some examples) else return that i don't understand this type of questions
-    Non absolute or relative questions:
-        question: 'where it is located?' 
-        history: **Answer:** Factory 1 has profit margin of 26.5%. 
-        cypher query: MATCH (f:Factory {{factory_id: 'Factory 1'}}) RETURN f.location AS FactoryLocation
 Do not include any explanations or apologies in your responses.
 Do not include any text except the generated Cypher statement.
 
@@ -470,5 +462,5 @@ The question is:
 {question}"""
 
 CYPHER_RECOMMENDATION_PROMPT = PromptTemplate(
-    input_variables=['question', 'history'], template=CYPHER_RECOMMENDATION_TEMPLATE
+    input_variables=['question'], template=CYPHER_RECOMMENDATION_TEMPLATE
 )
