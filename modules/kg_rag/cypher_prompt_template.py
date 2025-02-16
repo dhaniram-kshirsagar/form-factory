@@ -12,10 +12,10 @@ Schema:
 ////Create Nodes
 
 // Create Teams
-Match (t:Team {{id: 'Location A_Factory 1_Member_0', factory: 'Factory 1', location: 'Location A'}})
+CREATE (t:Team {{id: 'Location A_Factory 1_Member_0', factory: 'Factory 1', location: 'Location A'}})
 
 // Create Members
-MERGE (m:Member {{
+CREATE (m:Member {{
     name: 'Member_0_0', 
     experience: 10.0, 
     trainingLevel: '3.6', 
@@ -25,23 +25,23 @@ MERGE (m:Member {{
 }})
 
 // Create Dates
-MERGE (d1:Date {{date: date('2020-01-01')}})
-MERGE (d2:Date {{date: date('2020-01-02')}})
+CREATE (d1:Date {{date: date('2020-01-01')}})
+CREATE (d2:Date {{date: date('2020-01-02')}})
 
 // Create Factories
-MERGE (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
+CREATE (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
 
 // Create Machines
-MERGE (m:Machine {{machine_id: 'Location A-Factory 1-Type 2', machine_type: 'Type 2', machine_age: 8.89}})
+CREATE (m:Machine {{machine_id: 'Location A-Factory 1-Type 2', machine_type: 'Type 2', machine_age: 8.89}})
 
 // Create Products
-MERGE (p:Product {{product_category: 'Category A'}})
+CREATE (p:Product {{product_category: 'Category A'}})
 
 // Create Suppliers
-MERGE (s:Supplier {{supplier_name: 'Supplier X'}})
+CREATE (s:Supplier {{supplier_name: 'Supplier X'}})
 
 // Create Raw Materials
-MERGE (r:RawMaterial {{raw_material_quality: 1}})
+CREATE (r:RawMaterial {{raw_material_quality: 1}})
 
 //// Create Relationships with properties
 
@@ -49,25 +49,25 @@ MERGE (r:RawMaterial {{raw_material_quality: 1}})
 
 MATCH (t:Team {{id: 'Location A_Factory 1_Member_0'}})
 MATCH (m:Member {{name: 'John Doe', experience: 5, trainingLevel: 'Level 3', absenteeismRate: 0.03, factory: 'Factory A', location: 'Location X'}})
-MERGE (t)-[:HAS_MEMBER]->(m)
+CREATE (t)-[:HAS_MEMBER]->(m)
 
 // HAS_MACHINE  relationship
 
 MATCH (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
-MERGE (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
-MERGE (f)-[:HAS_MACHINE]->(m)
+CREATE (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
+CREATE (f)-[:HAS_MACHINE]->(m)
 
 // OPERATED_ON relationship      
 
 MATCH (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
 MATCH (d:Date {{date: date('2020-01-01')}})
-MERGE (f)-[:OPERATED_ON {{shift: 'Day'}}]->(d)
+CREATE (f)-[:OPERATED_ON {{shift: 'Day'}}]->(d)
 
 // USED_ON  relationship
 
 MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
 MATCH (d:Date {{date: date('2025-01-01')}})
-MERGE  (m)-[:USED_ON {{
+CREATE  (m)-[:USED_ON {{
     shift: 'Shift 1', 
     machine_utilization: 0.8, 
     cycle_time: 120, 
@@ -96,7 +96,7 @@ MERGE  (m)-[:USED_ON {{
 
 MATCH (m:Machine {{machine_id: 'Location A-Factory 1-Type 2'}})
 MATCH (t:Team {{id: 'Location A_Factory 1_Member_0'}})
-MERGE (m)-[:USED_BY_TEAM {{
+CREATE (m)-[:USED_BY_TEAM {{
     shift: 'Day', 
     date: date('2020-01-01'), 
     average_operator_training_level: 3.6, 
@@ -108,19 +108,19 @@ MERGE (m)-[:USED_BY_TEAM {{
 
 MATCH (p:Product {{product_category: 'Category A'}})
 MATCH (d:Date {{date: date('2020-01-01')}})
-MERGE (p)-[:PRODUCED_ON {{batch: 'Batch 1', batch_quality: 'High'}}]->(d)
+CREATE (p)-[:PRODUCED_ON {{batch: 'Batch 1', batch_quality: 'High'}}]->(d)
 
 // SUPPLIED_BY relationship
 
 MATCH (r:RawMaterial {{raw_material_quality: 1}})
 MATCH (s:Supplier {{supplier_name: 'Supplier X'}})
-MERGE (r)-[:SUPPLIED_BY {{date: date('2020-01-01'), shift: 'Day', supplier_delays: 0}}]->(s)
+CREATE (r)-[:SUPPLIED_BY {{date: date('2020-01-01'), shift: 'Day', supplier_delays: 0}}]->(s)
 
 // PRODUCED_USING relationship
 
 MATCH (p:Product {{product_category: 'Category A'}})
 MATCH (r:RawMaterial {{raw_material_quality: 1}})
-MERGE (p)-[:PRODUCED_USING {{date: date('2020-01-01'), shift: 'Day', batch: 'Batch 1', batch_quality: 'High'}}]->(r)
+CREATE (p)-[:PRODUCED_USING {{date: date('2020-01-01'), shift: 'Day', batch: 'Batch 1', batch_quality: 'High'}}]->(r)
 
 Cypher Examples:
 
