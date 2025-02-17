@@ -7,8 +7,6 @@ Instructions:
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided or not related to that node 
 
-Use History: {history}
-
 Schema:
 ////Create Nodes
 
@@ -328,15 +326,12 @@ RETURN avg(toFloat(ch.TotalCharges)) AS averageTotalCharge;
 
 Notes for output: 
 Do not include any explanations or apologies in your responses.
-Strictly build query based on the given question and if available, include history
-Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
 Do not include any text except the generated Cypher statement.
 Do not include OVER clause in your Cypher statement.
-Do consider Incorrect Cypher Query examples to avoid mistakes.
 
 The question is:
 {question}"""
 
 CYPHER_RECOMMENDATION_PROMPT = PromptTemplate(
-    input_variables=['question', 'history'], template=CYPHER_RECOMMENDATION_TEMPLATE
+    input_variables=['question'], template=CYPHER_RECOMMENDATION_TEMPLATE
 )
