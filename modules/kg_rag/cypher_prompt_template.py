@@ -245,6 +245,31 @@ MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WHERE ch.TotalCharges < avg_total_charges
 RETURN c.CustomerID
 
+Question: What is the percentage of total customer who have credit cards?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (c:Customer)-[b:HAS_BILLING]->(ch:Billing {PaymentMethod: "Credit card (automatic)"})
+WITH TotalCustomers, COUNT(b) AS CreditCardCharges
+RETURN (CreditCardCharges * 1.0 / TotalCustomers) * 100 AS Percentage
+
+Question: What is the percentage of total customer who have credit cards?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (c:Customer)-[hps:HAS_PHONE_SERVICE]->(p:PhoneService)
+WITH TotalCustomers, COUNT(hps) AS phoneServiceCount
+RETURN (phoneServiceCount * 1.0 / TotalCustomers) * 100 AS Percentage
+
+Question: What is the percentage of contract are month on month?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (c:Customer)-[hc:HAS_CONTRACT]->(p:Contract {Contract: "Month-to-month"})
+WITH TotalCustomers, COUNT(hc) AS mtmContract
+RETURN (mtmContract * 1.0 / TotalCustomers) * 100 AS Percentage
+
+
 Incorrectly generated Cypher query examples:
 
 Question: Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.
