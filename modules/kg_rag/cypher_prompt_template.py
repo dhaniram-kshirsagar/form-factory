@@ -249,7 +249,7 @@ Question: What is the percentage of total customer who have credit cards?
 
 MATCH (c:Customer)
 WITH COUNT(c) AS TotalCustomers
-MATCH (c:Customer)-[b:HAS_BILLING]->(ch:Billing {PaymentMethod: "Credit card (automatic)"})
+MATCH (c:Customer)-[b:HAS_BILLING]->(ch:Billing {{PaymentMethod: "Credit card (automatic)"}})
 WITH TotalCustomers, COUNT(b) AS CreditCardCharges
 RETURN (CreditCardCharges * 1.0 / TotalCustomers) * 100 AS Percentage
 
@@ -265,7 +265,7 @@ Question: What is the percentage of contract are month on month?
 
 MATCH (c:Customer)
 WITH COUNT(c) AS TotalCustomers
-MATCH (c:Customer)-[hc:HAS_CONTRACT]->(p:Contract {Contract: "Month-to-month"})
+MATCH (c:Customer)-[hc:HAS_CONTRACT]->(p:Contract {{Contract: "Month-to-month"}})
 WITH TotalCustomers, COUNT(hc) AS mtmContract
 RETURN (mtmContract * 1.0 / TotalCustomers) * 100 AS Percentage
 
