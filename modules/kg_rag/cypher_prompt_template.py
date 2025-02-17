@@ -192,9 +192,6 @@ Question: Find customers who have churned and have a higher monthly charge than 
 
 MATCH (c:Customer)-[:HAS_CHARGES]->(ch:Charges)
 WITH avg(ch.MonthlyCharges) AS avg_monthly_charge
-
-Question: Find customers who have churned and have a higher monthly charge than the average
-
 MATCH (c:Customer {{Churn: 'Yes'}})-[:HAS_CHARGES]->(ch:Charges)
 WHERE ch.MonthlyCharges > avg_monthly_charge
 RETURN c.CustomerID
