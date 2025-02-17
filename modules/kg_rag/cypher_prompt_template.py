@@ -269,6 +269,45 @@ MATCH (c:Customer)-[hc:HAS_CONTRACT]->(p:Contract {{Contract: "Month-to-month"}}
 WITH TotalCustomers, COUNT(hc) AS mtmContract
 RETURN (mtmContract * 1.0 / TotalCustomers) * 100 AS Percentage
 
+Question: What is the percentage of customers who have internet service?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (c:Customer)-[his:HAS_INTERNET_SERVICE]->(i:InternetService)
+WITH TotalCustomers, COUNT(his) AS internetServiceCount
+RETURN (internetServiceCount * 1.0 / TotalCustomers) * 100 AS Percentage
+
+Question: What is the percentage of customers who have Streaming TV?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (c:Customer)-[hst:HAS_STREAMING_TV]->(i:StreamingTV)
+WITH TotalCustomers, COUNT(hst) AS streamingTVCount
+RETURN (streamingTVCount * 1.0 / TotalCustomers) * 100 AS Percentage
+
+Question: What is the percentage of customers who have Streaming Movies?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (c:Customer)-[hsm:HAS_STREAMING_MOVIES]->(i:StreamingMovies)
+WITH TotalCustomers, COUNT(hsm) AS streamingTVCount
+RETURN (streamingTVCount * 1.0 / TotalCustomers) * 100 AS Percentage
+
+Question: What is the percentage of customers who are senior citizens?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (sc:Customer {{SeniorCitizen: 1}})
+WITH TotalCustomers, COUNT(sc) AS seniorCitizenCount
+RETURN (seniorCitizenCount * 1.0 / TotalCustomers) * 100 AS Percentage
+
+Question: What is the percentage of customers who are female?
+
+MATCH (c:Customer)
+WITH COUNT(c) AS TotalCustomers
+MATCH (fc:Customer {{Gender: 'Female'}})
+WITH TotalCustomers, COUNT(fc) AS females
+RETURN (females * 1.0 / TotalCustomers) * 100 AS Percentage
 
 Incorrectly generated Cypher query examples:
 
