@@ -12,7 +12,7 @@ CHURN_DATA_FILE = Path(__file__).parent.parent / "modules/data/telchurn/TelecomC
 @st.cache_data
 def load_data():
     df = pd.read_csv(CHURN_DATA_FILE)  # Replace with your actual CSV file path
-    df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
+    df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce').fillna(0)
     #df = df.dropna()  # Drop rows with NaN values
     df['SeniorCitizen'] = df['SeniorCitizen'].map({0: 'No', 1: 'Yes'})
     return df
