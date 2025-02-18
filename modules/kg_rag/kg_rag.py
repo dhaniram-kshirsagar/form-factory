@@ -94,7 +94,7 @@ class Neo4jGraphChatAssistant:
 
         # Initialize QA chain with Neo4j optimizations
         self.chain = GraphCypherQAChain.from_llm(
-            llm=ChatOpenAI(temperature=0.2),
+            llm=ChatOpenAI(model="gpt-4", temperature=0.2),
             graph=self.graph,
             cypher_prompt=self.cypher_prompt,
             qa_prompt=self.qa_prompt,
