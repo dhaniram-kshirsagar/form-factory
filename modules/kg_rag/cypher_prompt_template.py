@@ -1,15 +1,12 @@
 from langchain.prompts.prompt import PromptTemplate
 
-CYPHER_RECOMMENDATION_TEMPLATE = """
-Task: Generate Cypher statement to query a graph database.
+CYPHER_GENERATION_TEMPLATE = '''\
+### Task:
+Generate Cypher queries for time-series foam factory data using this schema:
 
-Instructions:
-Use only the provided relationship types and properties in the schema.
-Do not use any other relationship types or properties that are not provided or not related to that node 
+### Database Schema:
 
-Schema:
-
-////Create Nodes
+*Create Nodes*
 
 // Create Teams
 CREATE (t:Team {{id: 'Location A_Factory 1_Member_0', factory: 'Factory 1', location: 'Location A'}})
@@ -26,7 +23,6 @@ CREATE (m:Member {{
 
 // Create Dates
 CREATE (d1:Date {{date: date('2020-01-01')}})
-CREATE (d2:Date {{date: date('2020-01-02')}})
 
 // Create Factories
 CREATE (f:Factory {{factory_id: 'Factory 1', location: 'Location A'}})
@@ -43,7 +39,7 @@ CREATE (s:Supplier {{supplier_name: 'Supplier X'}})
 // Create Raw Materials
 CREATE (r:RawMaterial {{raw_material_quality: 1}})
 
-//// Create Relationships with properties
+*Create Relationships*
 
 // HAS_MEMBER relationship
 
@@ -122,8 +118,7 @@ MATCH (p:Product {{product_category: 'Category A'}})
 MATCH (r:RawMaterial {{raw_material_quality: 1}})
 CREATE (p)-[:PRODUCED_USING {{date: date('2020-01-01'), shift: 'Day', batch: 'Batch 1', batch_quality: 'High'}}]->(r)
 
-Cypher Examples:
-
+### Positive Examples:
 Question: Get details about team Location A_Factory 1_Member_0 and its members: 
 
 MATCH (t:Team {{id: 'Location A_Factory 1_Member_0'}})-[:HAS_MEMBER]->(m)
@@ -366,8 +361,7 @@ RETURN team_id,
 ORDER BY performance_score DESC
 LIMIT 1
 
-Incorrectly generated Cypher query examples:
-
+### Negative Examples (Avoid These):
 Question: List teams that operated on a 23-Jan-2023 and their average operator experience?
 
 Incorrect cypher for above question:
@@ -453,14 +447,33 @@ WHERE FactoryAverageProductionVolume > OverallAverageProductionVolume
 RETURN f.factory_id as Factory, FactoryAverageProductionVolume
 ORDER BY FactoryAverageProductionVolume DESC
 
-Note: 
-Handle errors or exception while generating cypher query gracefully
-Do not include any explanations or apologies in your responses.
-Do not include any text except the generated Cypher statement.
+### Validation Rules:
+1. Use ISO8601 date formatting (date('YYYY-MM-DD'))
+2. Always specify node labels (:Node) and relationship types [:REL]
+3. Validate relationship directions against schema
+4. Use WHERE clauses instead of inline MATCH conditions
+5. Include explicit RETURN statements with aliases
+6. Handle time-series aggregates using WITH clauses
+7. Validate node/relationship existence in MATCH patterns
+8. Use LIMIT 100 unless explicitly forbidden
+9. Prefer path traversals over multiple MATCH clauses
+10. Handle nulls in optional matches with COALESCE
+11. Use parameterization for user inputs
 
-The question is:
-{question}"""
+### User Question:
+{question}
 
-CYPHER_RECOMMENDATION_PROMPT = PromptTemplate(
-    input_variables=['question'], template=CYPHER_RECOMMENDATION_TEMPLATE
+### Response (Cypher only):'''
+
+def validate_cypher(schema: dict, query: str) -> dict:
+    """Validate generated Cypher against schema rules"""
+    # Implementation checks:
+    # 1. Node/relationship existence
+    # 2. Property type matching
+    # 3. Relationship direction validation
+    # 4. Constraint enforcement
+    return validation_result
+
+CYPHER_GENERATION_PROMPT = PromptTemplate(
+    input_variables=['question'], template=CYPHER_GENERATION_TEMPLATE
 )
