@@ -80,7 +80,8 @@ from langchain_neo4j import (
 # from cypher_prompt_template import CYPHER_RECOMMENDATION_PROMPT
 # from qa_prompt_template import QA_PROMPT
 
-from modules.kg_rag.cypher_prompt_template import CYPHER_RECOMMENDATION_PROMPT
+#from modules.kg_rag.cypher_prompt_template import CYPHER_GENERATION_PROMPT
+from modules.kg_rag.cypher_prompt import CYPHER_GENERATION_PROMPT
 from modules.kg_rag.qa_prompt_template import QA_PROMPT
 
 # Load environment variables
@@ -108,7 +109,7 @@ class Neo4jGraphChatAssistant:
         )
         
         # Configure domain-specific prompts
-        self.cypher_prompt = CYPHER_RECOMMENDATION_PROMPT
+        self.cypher_prompt = CYPHER_GENERATION_PROMPT
         
         self.qa_prompt = QA_PROMPT
 
@@ -137,7 +138,7 @@ class Neo4jGraphChatAssistant:
             print("HISTORY TO BE USED:" +str(hist))
             result = self.chain.invoke({
                 "query": question,
-                "history": hist,
+                #"history": hist,
             })
             
             # Persist conversation
