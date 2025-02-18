@@ -147,6 +147,7 @@ def set_custom_css():
 
 # Chatbot function
 def chatbot(query):
+    time.sleep(1)  # Simulate a longer processing time
     return  kg_rag.get_kg_answer(query)
 
 # Chat interface
@@ -154,7 +155,8 @@ def chat_interface():
     st.subheader('Ask Questions! to analyze and understand your churn data')
     if prompt := st.chat_input(placeholder='Hello! I am here to help. What would you like to know?'):
         if prompt:
-            response = chatbot(prompt)
+            with st.spinner("Analyzing data... ⏳"): # Added hourglass emoji
+                response = chatbot(prompt)
             st.session_state.chat_history_bot.append(('You', prompt))
             st.session_state.chat_history_bot.append(('Bot', response['result']))
     
@@ -182,7 +184,7 @@ def show_factorybot():
     if 'chat_history_bot' not in st.session_state:
         st.session_state.chat_history_bot = []
 
-    col1, col2 = st.columns([1.5, 2.5])
+    col1, col2 = st.columns([2, 1])  # Adjust column widths here
 
     with col1:
         if "chat_history_bot" not in st.session_state:
@@ -254,7 +256,35 @@ def show_factorybot():
         15. Which factors are most strongly associated with customer churn (e.g., monthly charges, tenure, contract type)?
         16. Identify customers who have churned and have a lower tenure than the average tenure of all customers.
         """
-        st.markdown(markdown)
+        examples = [
+            "How does the tenure of customers correlate with their service usage?",
+            "Is there a significant difference in churn rates based on payment methods?",
+            "How does the presence of online security, backup, and tech support services affect customer satisfaction and churn?",
+            "What payment methods are most commonly used by customers?",
+            "Identify customers who have churned, have fiber optic internet service, and have not subscribed to any streaming services.",
+            "Find customers who have churned, have a low tenure (e.g., less than 2 years), and have not opted for paperless billing.",
+            "Identify customers who have churned, have a high monthly charge (e.g., above $80), and have a low tenure (e.g., less than 2 years).",
+            "Find customers who have churned, have fiber optic internet service, and have not opted for tech support or online security.",
+            "Identify the top 5 services most frequently used by churned customers.",
+            "Retrieve customers who have a 'Month-to-month' contract.",
+            "Calculate the churn rate for customers with 'Month-to-month' contracts.",
+            "Find customers who have churned and have a higher monthly charge than the average monthly charge of all customers.",
+            "Identify customers who have churned and have a lower tenure than the average tenure of all customers.",
+            "Find customers who have churned and have the least common combination of internet service and streaming services.",
+            "Which factors are most strongly associated with customer churn (e.g., monthly charges, tenure, contract type)?",
+            "Identify customers who have churned and have a lower tenure than the average tenure of all customers."
+        ]
+
+        for i, example in enumerate(examples):
+            if st.button(example, key=f"example_{i}"):
+                # Call the chatbot function and display the response
+                with st.spinner("Analyzing data... ⏳"):
+                    response = chatbot(example)
+                # Update the chat history
+                st.session_state.chat_history_bot.append(('You', example))
+                st.session_state.chat_history_bot.append(('Bot', response['result']))
+                # Rerun the app to display the updated chat history
+                st.rerun()
 
 # Commented out feedback section
 # if st.session_state["response"]:
