@@ -6,106 +6,220 @@ import trubrics
 
 from modules.kg_rag import kg_rag
 
-# with st.sidebar:
-#     openai_api_key = st.text_input("OpenAI API Key", key="feedback_api_key", type="password")
-#     "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-#     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/pages/5_Chat_with_user_feedback.py)"
-#     "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+def set_custom_css():
+    st.markdown("""
+    <style>
+    :root {
+        
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .stApp {
+        background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1) 0%, rgba(var(--background-color-rgb), 1) 100%);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--primary-color);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    .stMarkdown a {
+        color: var(--primary-color);
+        text-decoration: none;
+        border-bottom: 1px solid var(--primary-color);
+        transition: opacity 0.2s ease;
+    }
+
+    .stMarkdown a:hover {
+        opacity: 0.8;
+    }
+
+    .stat-card, .churner-stat-card {
+        background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1) 0%, rgba(var(--background-color-rgb), 0.9) 100%);
+        color: var(--text-color);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover, .churner-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Style the subheader */
+    .stMarkdown h3 {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    /* Style code blocks in markdown */
+    .stMarkdown pre {
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Improve readability of radio buttons */
+    .stRadio > div[role="radiogroup"] > label {
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stRadio > div[role="radiogroup"] > label:hover {
+        background-color: rgba(var(--primary-color-rgb), 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .stRadio > div[role="radiogroup"] > label[data-checked="true"] {
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+        border-color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    /* Style buttons */
+    .stButton > button {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+         /* Add left alignment */
+        display: block;
+        text-align: left;
+        width: 100%;  /* Make buttons full width of the column */
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Style text inputs */
+    .stTextInput > div > div > input {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        background-color: var(--background-color);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+
+    .stTextInput > div > div > input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+    }
+
+    /* Style selectbox */
+    .stSelectbox > div > div > div {
+        border-radius: 8px;
+        border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+        background-color: var(--background-color);
+    }
+
+    /* Improve overall spacing */
+    .stMarkdown {
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .stMarkdown p {
+        margin-bottom: 15px;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+
+# Chatbot function
+def chatbot(query):
+    time.sleep(1)  # Simulate a longer processing time
+    return  kg_rag.get_kg_answer(query)
+
+# Chat interface
+def chat_interface():
+    st.subheader('Ask Questions! to analyze and understand your Factories data')
+    if prompt := st.chat_input(placeholder='Hello! I am here to help. What would you like to know?'):
+        if prompt:
+            with st.spinner("Analyzing data... ⏳"): # Added hourglass emoji
+                response = chatbot(prompt)
+            st.session_state.chat_history_bot.append(('You', prompt))
+            st.session_state.chat_history_bot.append(('Bot', response['result']))
+    
+    chat_container = st.container()
+    with chat_container:
+        st.markdown('<div class="chat-container"><h5>Chat History</h5>', unsafe_allow_html=True)
+        # Display message pairs in reverse order
+        for i in range(len(st.session_state.chat_history_bot)-1, -1, -2):
+            if i-1 >= 0:
+                bot_role, bot_msg = st.session_state.chat_history_bot[i-1]
+                with st.chat_message("assistant"):
+                    st.markdown(f'<div class="chat-message {bot_role.lower()}"><strong>{bot_role}</strong>: {bot_msg}</div>', unsafe_allow_html=True)
+            if i >= 0:
+                user_role, user_msg = st.session_state.chat_history_bot[i]
+                with st.chat_message("user"):
+                    st.markdown(f'<div class="chat-message {user_role.lower()}"><strong>{user_role}</strong>: {user_msg}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def show_factorybot():
-    st.subheader(":robot_face: Chat with Foam Factories")
-    
-    # Define the content for each column
-    column_1_content = """
-        ### Examples of questions you can ask:
-    ##### 1. **Quality Analysis**
-     - **Average Quality:**
-        - What is the average batch quality for each product category?
-        - What is the average batch quality for products supplied by each supplier?
-    ##### 2. **Profitability & Revenue**
-     - **Profit Margin**:
-        - How does the profit margin change over time for Factory 1?
-     - **Revenue Comparison**:
-        - Which factory had the highest total revenue in 2023?
-   """
+    set_custom_css()
+    st.title(":robot_face: Chat with Foam Factories")
+    st.markdown("---")
 
-    column_2_content = """
-    #####
-    ##### 3. **Defects & Operators**
-    - **Defect Analysis:**
-        - Which machines experienced defects, what was their utilization on the day of the defect?
-     - **Operator Experience:**
-        - Which operators have experience greater than 7 years?
-        - Which teams operated machines that experienced defects?
-    ##### 4. **Efficiency & Downtime**
-    -  **Downtime Analysis**:
-         - What is the average downtime for each machine type?"""
+    # Initialize session state for chat history
+    if 'chat_history_bot' not in st.session_state:
+        st.session_state.chat_history_bot = []
 
-    # Create two columns
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([3, 1])  # Adjust column widths here - col2 is smaller
 
-    # Render the content in the respective columns
     with col1:
-        st.markdown(column_1_content)
+        if "chat_history_bot" not in st.session_state:
+            st.session_state.chat_history_bot = [
+                {"role": "assistant", "content": "Hello! I'm here to help you analyze customer churn data. What would you like to know?"}
+            ]
+        chat_interface()
+
 
     with col2:
-        st.markdown(column_2_content)
-
-
-
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {"role": "assistant", "content": "How can I help you? Leave feedback to help me improve!"}
+        st.subheader("Example Questions")
+        
+        examples = [
+            "What is the average batch quality for each product category?",
+            "What is the average batch quality for products supplied by each supplier?",
+            "How does the profit margin change over time for Factory 1?",
+            "Which factory had the highest total revenue in 2023?",
+            "Which machines experienced defects, what was their utilization on the day of the defect?",
+            "Which operators have experience greater than 7 years?",
+            "Which teams operated machines that experienced defects?",
+            "What is the average downtime for each machine type?"
         ]
 
-    if "response" not in st.session_state:
-        st.session_state["response"] = None
-
-    if "waiting_for_response" not in st.session_state:
-        st.session_state.waiting_for_response = False
-
-    messages = st.session_state.messages
-    for msg in messages:
-        st.chat_message(msg["role"]).write(msg["content"])
-
-    if prompt := st.chat_input(placeholder="e.g. List factories which are having low production vlume.", disabled=st.session_state.waiting_for_response) or st.session_state.waiting_for_response:
-        if not st.session_state.waiting_for_response:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.session_state.last_user_message = prompt
-            st.chat_message("user").write(prompt)
-            st.session_state.waiting_for_response = True
-            st.rerun()
-        else:
-            with st.spinner("Assistant is typing..."):
-                time.sleep(1)
-                llmresp = kg_rag.get_kg_answer(st.session_state.last_user_message)
-                print(llmresp)
-                st.session_state["response"] = llmresp['result']
-                with st.chat_message("assistant"):
-                    st.session_state.messages.append({"role": "assistant", "content": st.session_state["response"]})
-                    st.write(st.session_state["response"])
-                st.session_state.waiting_for_response = False
+        for i, example in enumerate(examples):
+            if st.button(example, key=f"example_{i}"):
+                # Call the chatbot function and display the response
+                with st.spinner("Analyzing data... ⏳"):
+                    response = chatbot(example)
+                # Update the chat history
+                st.session_state.chat_history_bot.append(('You', example))
+                st.session_state.chat_history_bot.append(('Bot', response['result']))
+                # Rerun the app to display the updated chat history
                 st.rerun()
-
-# if st.session_state["response"]:
-#     feedback = streamlit_feedback(
-#         feedback_type="thumbs",
-#         optional_text_label="[Optional] Please provide an explanation",
-#         key=f"feedback_{len(messages)}",
-#     )
-#     # This app is logging feedback to Trubrics backend, but you can send it anywhere.
-#     # The return value of streamlit_feedback() is just a dict.
-#     # Configure your own account at https://trubrics.streamlit.app/
-#     if feedback and "TRUBRICS_EMAIL" in st.secrets:
-#         config = trubrics.init(
-#             email=st.secrets.TRUBRICS_EMAIL,
-#             password=st.secrets.TRUBRICS_PASSWORD,
-#         )
-#         collection = trubrics.collect(
-#             component_name="default",
-#             model="gpt",
-#             response=feedback,
-#             metadata={"chat": messages},
-#         )
-#         trubrics.save(config, collection)
-#         st.toast("Feedback recorded!", icon="📝")
