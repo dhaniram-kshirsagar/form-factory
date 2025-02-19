@@ -103,6 +103,7 @@ def set_custom_css():
         font-weight: 500;
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: left; /* Add this line to left-align text */
     }
 
     .stButton > button:hover {

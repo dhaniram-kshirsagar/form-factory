@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from pathlib import Path
+from streamlit_option_menu import option_menu  # Import streamlit_option_menu
 
 from modules.kg_rag import kg_rag
 
@@ -203,7 +204,7 @@ def chat_interface():
             response = chatbot(prompt)
             st.session_state.chat_history.append(('You', prompt))
             st.session_state.chat_history.append(('Bot', response['result']))
-    
+
     chat_container = st.container()
     with chat_container:
         st.markdown('<div class="chat-container"><h5>Chat History</h5>', unsafe_allow_html=True)
@@ -295,45 +296,50 @@ def show_r_dash():
     with left_col:
         #st.title("TELECOM CUSTOMER CHURN ANALYSIS")
         st.subheader("Menu")
-        page = st.radio("SELECT CHURN ANALYSIS", ["Summary", "Customer Profile", "Churner Profile"])
-        
+        selected = option_menu(
+            "Profile Menu",
+            ["Summary", "Customer Profile", "Churner Profile"],
+            icons=['house', 'person', 'exclamation-triangle'],
+            menu_icon="cast", default_index=0,
+        )
+
         st.markdown("---")
         chat_interface()
 
     # Main content in the right column
     with content_col:
-        if page == "Summary":
+        if selected == "Summary":
             summary_page(df)
-        elif page == "Customer Profile":
+        elif selected == "Customer Profile":
             customer_profile_page(df)
-        elif page == "Churner Profile":
+        elif selected == "Churner Profile":
             churner_profile_page(df)
 
 # Summary page
 def summary_page(df):
     st.title("SUMMARY")
-    
+
     churners = df[df['Churn'] == 'Yes']
     non_churners = df[df['Churn'] == 'No']
-    
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.markdown('<div class="stat-card"><h4>Customer Profile Overview</h4></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="stat-card">Total Customers <br><h2> {len(df)}</h2></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="stat-card">Avg Monthly Charge <br><h2> ${df["MonthlyCharges"].mean():.2f}</h2></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="stat-card">Avg Total Charge <br><h2> ${df["TotalCharges"].mean():.2f}</h2></div>', unsafe_allow_html=True)
-    
+
     with col2:
         st.markdown('<div class="churner-stat-card"><h4>Churner Profile Overview</h4></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="churner-stat-card">Total Churners <br><h2> {len(churners)}</h2></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="churner-stat-card">Avg Monthly Charge <br><h2> ${churners["MonthlyCharges"].mean():.2f}</h2></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="churner-stat-card">Avg Total Charge <br><h2> ${churners["TotalCharges"].mean():.2f}</h2></div>', unsafe_allow_html=True)
-    
+
     st.subheader("Key Insights")
-    
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.markdown(f"""
         <div class="key-insight-card">
@@ -344,7 +350,7 @@ def summary_page(df):
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         st.markdown(f"""
         <div class="key-insight-card">
             <div class="key-insight-icon">📅</div>
@@ -354,7 +360,7 @@ def summary_page(df):
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
     with col2:
         st.markdown(f"""
         <div class="key-insight-card">
@@ -365,7 +371,7 @@ def summary_page(df):
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         st.markdown(f"""
         <div class="key-insight-card">
             <div class="key-insight-icon">📑</div>
@@ -375,7 +381,7 @@ def summary_page(df):
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
+
     st.markdown(f"""
     <div class="key-insight-card">
         <div class="key-insight-icon">🌐</div>
@@ -414,9 +420,9 @@ def customer_profile_page(df):
         st.plotly_chart(create_donut_chart(df, 'Contract', "CONTRACT", ['#1e90ff', '#4169e1', '#0047ab']), use_container_width=True)
 
     st.subheader("ADDITIONAL STATS")
-    
+
     col1, col2 = st.columns(2)
-    
+
     # Senior Citizens
     senior_citizens = df['SeniorCitizen'].value_counts()
     with col1:
@@ -427,7 +433,7 @@ def customer_profile_page(df):
             f"{senior_citizens.get('Yes', 0) / len(df):.1%} of customers"
         ), unsafe_allow_html=True)
         st.plotly_chart(create_small_donut_chart(df, senior_citizens.values, senior_citizens.index, "Senior Citizens"), use_container_width=True)
-    
+
     # Customers with Partners
     partner_counts = df['Partner'].value_counts()
     with col2:
@@ -438,7 +444,7 @@ def customer_profile_page(df):
             f"{partner_counts.get('Yes', 0) / len(df):.1%} of customers"
         ), unsafe_allow_html=True)
         st.plotly_chart(create_small_donut_chart(df, partner_counts.values, partner_counts.index, "Customers with Partners"), use_container_width=True)
-    
+
     # Phone Service Subscribers
     phone_service_counts = df['PhoneService'].value_counts()
     with col1:
@@ -449,7 +455,7 @@ def customer_profile_page(df):
             f"{phone_service_counts.get('Yes', 0) / len(df):.1%} of customers"
         ), unsafe_allow_html=True)
         st.plotly_chart(create_small_donut_chart(df, phone_service_counts.values, phone_service_counts.index, "Phone Service Subscribers"), use_container_width=True)
-    
+
     # Payment Methods
     payment_methods = df['PaymentMethod'].value_counts()
     with col2:
@@ -490,9 +496,9 @@ def churner_profile_page(df):
         st.plotly_chart(create_donut_chart(churners, 'Contract', "CONTRACT", ['#ff4444', '#ff6b6b', '#ff8888']), use_container_width=True)
 
     st.subheader("ADDITIONAL STATS")
-    
+
     col1, col2 = st.columns(2)
-    
+
     # Senior Citizen Churners
     senior_citizens = churners['SeniorCitizen'].value_counts()
     with col1:
@@ -503,7 +509,7 @@ def churner_profile_page(df):
             f"{senior_citizens.get('Yes', 0) / len(churners):.1%} of churners"
         ), unsafe_allow_html=True)
         st.plotly_chart(create_small_donut_chart(churners, senior_citizens.values, senior_citizens.index, "Senior Citizen Churners"), use_container_width=True)
-    
+
     # Churners with Partners
     partner_counts = churners['Partner'].value_counts()
     with col2:
@@ -514,7 +520,7 @@ def churner_profile_page(df):
             f"{partner_counts.get('Yes', 0) / len(churners):.1%} of churners"
         ), unsafe_allow_html=True)
         st.plotly_chart(create_small_donut_chart(churners, partner_counts.values, partner_counts.index, "Churners with Partners"), use_container_width=True)
-    
+
     # Churners with Phone Service
     phone_service_counts = churners['PhoneService'].value_counts()
     with col1:
@@ -525,7 +531,7 @@ def churner_profile_page(df):
             f"{phone_service_counts.get('Yes', 0) / len(churners):.1%} of churners"
         ), unsafe_allow_html=True)
         st.plotly_chart(create_small_donut_chart(churners, phone_service_counts.values, phone_service_counts.index, "Churners with Phone Service"), use_container_width=True)
-    
+
     # Payment Methods of Churners
     payment_methods_churners = churners['PaymentMethod'].value_counts()
     with col2:
