@@ -4,3 +4,4 @@ from page.Factory_Astro import Show_Factoryastro
 from page.Predictive_Performance import show_PredictivePerformance
 from page.Current_Performance import show_currentPerformance
 from page.Startup import show_image
+from page.all_metrics import show_allmetrics
