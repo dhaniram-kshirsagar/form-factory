@@ -5,12 +5,8 @@ import plotly.graph_objects as go
 from streamlit_option_menu import option_menu
 from datetime import datetime, timedelta
 
-# Set page config - MUST BE THE FIRST STREAMLIT COMMAND
-st.set_page_config(page_title="Foam Factory Dashboard", layout="wide")
-
-
 # Custom CSS to improve appearance in both light and dark themes
-st.markdown("""
+css = """
 <style>
     :root {
         --background-color: #f0f2f6;
@@ -85,7 +81,11 @@ st.markdown("""
         height: 400px !important;
     }
 </style>
-""", unsafe_allow_html=True)
+"""
+
+from pathlib import Path
+
+DATA_FILE = Path(__file__).parent.parent/"modules/data/large-data/FoamFactory_V2_27K.csv"
 
 def show_allmetrics():  #No need to call it but let's fix its position
 
@@ -93,7 +93,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
     @st.cache_data
     def load_data():
         try:
-            df = pd.read_csv(r"C:\\Users\\athar\\OneDrive\\Documents\\GitHub\\form-factory\\modules\\data\\large-data\\FoamFactory_V2_27K.csv")
+            df = pd.read_csv(DATA_FILE)
             df['Date'] = pd.to_datetime(df['Date'])
             return df
         except Exception as e:
@@ -101,6 +101,8 @@ def show_allmetrics():  #No need to call it but let's fix its position
             return pd.DataFrame()
 
     df = load_data()
+
+    st.markdown(css, unsafe_allow_html=True)
 
     if df.empty:
         st.error("No data available. Please check your CSV file.")
@@ -141,7 +143,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
                     (df['Factory'] == factory)]
 
     # Resample data to monthly frequency
-    monthly_df = filtered_df.set_index('Date').resample('ME').agg({
+    monthly_df = filtered_df.set_index('Date').resample('MS').agg({
         'Production Volume (units)': 'sum',
         'Batch Quality (Pass %)': 'mean',
         'Cycle Time (minutes)': 'mean',
