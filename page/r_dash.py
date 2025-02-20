@@ -295,12 +295,17 @@ def show_r_dash():
     # Navigation and chat interface in the left column
     with left_col:
         #st.title("TELECOM CUSTOMER CHURN ANALYSIS")
-        st.subheader("Menu")
         selected = option_menu(
             "Profile Menu",
             ["Summary", "Customer Profile", "Churner Profile"],
             icons=['house', 'person', 'exclamation-triangle'],
             menu_icon="cast", default_index=0,
+            styles={
+                "container": {"padding": "45px 10px!important", "background-color": "transparent"},
+                "icon": {"color": "var(--primary-color)", "font-size": "20px"}, 
+                "nav-link": {"font-size": "20px", "text-align": "left", "margin":"0px", "--hover-color": "rgba(255, 255, 255, 0.1)"},
+                "nav-link-selected": {"background-color": "var(--primary-color)", "color": "white"},
+            }
         )
 
         st.markdown("---")

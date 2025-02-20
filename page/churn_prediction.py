@@ -285,12 +285,17 @@ def show_churn_pred():
 
     # Menu in the first column
     with col1:
-        st.subheader("Menu")
         selected_option = option_menu(
             "Select Input for Prediction",
             ["Form Input", "CSV Upload"],
             icons=['file-earmark-person', 'upload'],
             menu_icon="cast", default_index=0,
+            styles={
+                "container": {"padding": "35px 10px!important", "background-color": "transparent"},
+                "icon": {"color": "var(--primary-color)", "font-size": "20px"}, 
+                "nav-link": {"font-size": "20px", "text-align": "left", "margin":"0px", "--hover-color": "rgba(255, 255, 255, 0.1)"},
+                "nav-link-selected": {"background-color": "var(--primary-color)", "color": "white"},
+            }
         )
 
         st.markdown("---")
