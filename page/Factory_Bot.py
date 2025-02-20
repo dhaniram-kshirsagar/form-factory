@@ -182,7 +182,7 @@ def chat_interface():
 
 def show_factorybot():
     set_custom_css()
-    st.title(":robot_face: Chat with Foam Factories")
+    st.title("Chat with Foam Factories")
     st.markdown("---")
 
     # Initialize session state for chat history

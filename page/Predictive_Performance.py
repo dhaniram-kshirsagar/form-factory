@@ -10,7 +10,7 @@ def show_PredictivePerformance():
     #     layout='wide',
     # )
 
-    st.subheader('🤖  Predictive Performance')
+    st.title('Predictive Performance')
 
     result_vol_df = p.get_vol_prediction_for_6month('Production Volume (units)')
     result_rev_df = p.get_rev_prediction_for_6month('Revenue ($)') #pd.read_csv('C:\\compny project\\form-factory-main\\form-factory-main\\modules\\ml\\output_results.csv')

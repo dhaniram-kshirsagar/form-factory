@@ -6,7 +6,7 @@ from modules.ml import ml_rag
 import plotly.express as px
 
 def Show_Factoryastro():
-    st.subheader("📝 Predict Factory Performance with Factory Astro")
+    st.title("Predict Factory Performance with Factory Astro")
 
     markdown = """
         ### Examples of questions you can ask:

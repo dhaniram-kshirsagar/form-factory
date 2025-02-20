@@ -8,47 +8,24 @@ from datetime import datetime, timedelta
 # Custom CSS to improve appearance in both light and dark themes
 css = """
 <style>
-    :root {
-        --background-color: #f0f2f6;
-        --secondary-background-color: #ffffff;
-        --text-color: #31333F;
-        --primary-color: #4e79a7;
-    }
-    [data-testid="stAppViewContainer"] {
-        background-color: var(--background-color);
-    }
-    .stApp {
-        background-color: var(--background-color);
-        color: var(--text-color);
-    }
-    .main {
-        background-color: var(--secondary-background-color);
-        padding: 1rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    }
     .stPlotlyChart {
-        background-color: var(--secondary-background-color);
         border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        #box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         padding: 1rem;
         margin-bottom: 1rem;
     }
     .stMetric {
-        background-color: var(--secondary-background-color);
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         padding: 1rem;
         margin-bottom: 1rem;
     }
     .menu-container {
-        background-color: var(--secondary-background-color);
         border-radius: 0.5rem;
         padding: 1rem;
         margin-bottom: 1rem;
     }
     .content-container {
-        background-color: var(--secondary-background-color);
         border-radius: 0.5rem;
         padding: 0.5rem;
         margin-bottom: 1rem;
@@ -58,12 +35,10 @@ css = """
         color: var(--text-color) !important;
     }
     .stMetric [data-testid="stMetricLabel"] {
-        color: var(--text-color) !important;
         font-size: 1rem !important;
         font-weight: 600 !important;
     }
     .stMetric [data-testid="stMetricValue"] {
-        color: var(--text-color) !important;
         font-size: 1.5rem !important;
         font-weight: 700 !important;
     }
@@ -72,13 +47,12 @@ css = """
         :root {
             --background-color: #1e1e1e;
             --secondary-background-color: #2d2d2d;
-            --text-color: #e0e0e0;
             --primary-color: #6d9eeb;
         }
     }
     /* Fix for graph container height */
     .stPlotlyChart > div {
-        height: 400px !important;
+        height: 600px !important;
     }
 </style>
 """
@@ -129,9 +103,9 @@ def show_allmetrics():  #No need to call it but let's fix its position
             menu_icon="cast",
             default_index=0,
             styles={
-                "container": {"padding": "0!important", "background-color": "transparent"},
-                "icon": {"color": "var(--primary-color)", "font-size": "14px"}, 
-                "nav-link": {"font-size": "14px", "text-align": "left", "margin":"0px", "--hover-color": "rgba(255, 255, 255, 0.1)"},
+                "container": {"padding": "0!important", "background-color": "transparent", "height": "725px"},
+                "icon": {"color": "var(--primary-color)", "font-size": "20px"}, 
+                "nav-link": {"font-size": "20px", "text-align": "left", "margin":"0px", "--hover-color": "rgba(255, 255, 255, 0.1)"},
                 "nav-link-selected": {"background-color": "var(--primary-color)", "color": "white"},
             }
         )
@@ -175,7 +149,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
         fig.update_traces(line=dict(width=3))
         fig.update_layout(
             template=get_plot_theme(),
-            height=400,
+            height=800,
             xaxis_title="Months",
             yaxis_title=y,
             hovermode="x unified",
@@ -249,7 +223,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
             fig_operator.update_layout(
                 title='Monthly Operator Performance Trends',
                 template=get_plot_theme(),
-                height=400,
+                height=800,
                 xaxis_title="Months",
                 yaxis_title="Value",
                 hovermode="x unified",
@@ -276,7 +250,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
             fig_env.update_layout(
                 title='Monthly Environmental Impact Trends',
                 template=get_plot_theme(),
-                height=400,
+                height=800,
                 xaxis_title="Months",
                 yaxis_title="Value",
                 hovermode="x unified",
@@ -302,7 +276,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
             fig_finance.update_layout(
                 title='Monthly Revenue vs Cost of Downtime Trend',
                 template=get_plot_theme(),
-                height=400,
+                height=800,
                 xaxis_title="Months",
                 yaxis_title="Value (Millions $)",
                 hovermode="x unified",

@@ -10,7 +10,7 @@ def show_currentPerformance():
     #     layout='wide',
     # )
 
-    st.subheader('🤖  Current Performance')
+    st.subheader('Current Performance')
 
     factories_df = data.getFactoryDataProfit()
     factories_df['Year'] = pd.DatetimeIndex(factories_df['Date']).year
