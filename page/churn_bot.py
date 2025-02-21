@@ -5,70 +5,69 @@ import jsonschema
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import SystemMessage
 from langchain_openai import ChatOpenAI
-from utils.data_processing import encode_data
+from utils.data_processing import encode_data_7
 from utils.rag import create_rag_layer
 
 prompt = '''
-        You are a helpful assistant that extracts customer attributes from natural language queries for churn prediction. 
-        You need to Extract values as per following feature names and ensure the values you return in output matches the data types and possible values to be one of as in given respective enum.
-        'gender': {{'type': 'string', 'enum': ['Male', 'Female']}},
-        'SeniorCitizen': {{'type': 'integer', 'minimum': 0, 'maximum': 1}},
-        'Partner': {{'type': 'string', 'enum': ['Yes', 'No']}},
-        'Dependents': {{'type': 'string', 'enum': ['Yes', 'No']}},
-        'tenure': {{'type': 'integer', 'minimum': 0}},
-        'PhoneService': {{'type': 'string', 'enum': ['Yes', 'No']}},
-        'MultipleLines': {{'type': 'string', 'enum': ['Yes', 'No', 'No phone service']}},
-        'InternetService': {{'type': 'string', 'enum': ['DSL', 'Fiber optic', 'No']}},
-        'OnlineSecurity': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
-        'OnlineBackup': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
-        'DeviceProtection': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
-        'TechSupport': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
-        'StreamingTV': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
-        'StreamingMovies': {{'type': 'string', 'enum': ['Yes', 'No', 'No internet service']}},
-        'Contract': {{'type': 'string', 'enum': ['Month-to-month', 'One year', 'Two year']}},
-        'PaperlessBilling': {{'type': 'string', 'enum': ['Yes', 'No']}},
-        'PaymentMethod': {{'type': 'string', 'enum': ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)']}},
-        'MonthlyCharges': {{'type': 'number', 'minimum': 0}},
-        'TotalCharges': {{'type': 'number', 'minimum': 0}}
+You are a helpful assistant that extracts specific features from natural language queries for churn prediction. 
+Extract values only for these features:
+- 'tenure': integer (minimum: 0)
+- 'OnlineSecurity': string (enum: ['Yes', 'No', 'No internet service'])
+- 'OnlineBackup': string (enum: ['Yes', 'No', 'No internet service'])
+- 'TechSupport': string (enum: ['Yes', 'No', 'No internet service'])
+- 'Contract': string (enum: ['Month-to-month', 'One year', 'Two year'])
+- 'MonthlyCharges': number (minimum: 0)
+- 'TotalCharges': number (minimum: 0)
 
-        Notes for generating output:            
-        1. Do not return special characters or strings if column type is integer or float.
-        2. Return only the JSON output. Do not include any explanations, notes, or additional text.
-        3. If you are unable to map any of the above fields, return {{}}.
-        4. Example outputs: 
-           {{'gender': 'Male', 'SeniorCitizen': 1, 'Partner': 'No', 'Dependents': 'No', 'tenure': 3, 'PhoneService': 'Yes', 'MultipleLines': 'No', 'InternetService': 'DSL', 'OnlineSecurity': 'No', 'OnlineBackup': 'No', 'DeviceProtection': 'No', 'TechSupport': 'No', 'StreamingTV': 'Yes', 'StreamingMovies': 'Yes', 'Contract': 'Month-to-month', 'PaperlessBilling': 'Yes', 'PaymentMethod': 'Electronic check', 'MonthlyCharges': 70.35, 'TotalCharges': 211.05}}
-           OR
-           {{'tenure': 1}}
+Rules:
+1. Return only valid JSON containing extracted values
+2. If unable to map any fields, return {{}}
+3. Do not include any explanations, notes, or additional text
+4. Maintain exact JSON format: {{"key": value}}
 
-        Question: {query}  
-        Output:
-        ```json
-        '''
-    
+Examples:
+{{"tenure": 3, "OnlineSecurity": "No", "OnlineBackup": "No", "TechSupport": "No", "Contract": "Month-to-month", "MonthlyCharges": 70.35, "TotalCharges": 211.05}}
+or
+{{"tenure": 1}}
+
+Question: {query}
+Output:
+'''
+
 from langchain.prompts.prompt import PromptTemplate
 
 
-QA_PROMPT = PromptTemplate(
-input_variables=['query'], template=prompt)
-llm = ChatOpenAI(temperature=0)
-chain = QA_PROMPT | llm
+prompt = PromptTemplate(
+        input_variables=["query"],
+        template=prompt,
+    )
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+
+from langchain.schema import HumanMessage
+
 
 def parse_query_to_input(query, default_values):
     print('Starting parse_query_to_input')
     print('Query:', query)
     """Parse natural language query into structured input using LLM"""
+
+
+    final_prompt = prompt.format(query=query)
+
+
     try:
-        result = chain.invoke({"query": query})
-        print('Result:', str(result))
-        extracted = json.loads(result.content)
+        messages = [HumanMessage(content=final_prompt)] # Create a list of messages
+        extracted = llm.invoke(messages).content
         print('Extracted data:', extracted)
+        extracted = json.loads(extracted)
+        print('Extracted data:', type(extracted), extracted)
         if extracted == {}:
             print('Unable to extract values from query')
             return {}
         # Merge extracted values with defaults
         return {**default_values, **extracted}
-    except json.JSONDecodeError:
-        print('Unable to parse response')
+    except Exception as e:
+        print('Unable to parse response', e)
         return {}
 
 def chatbot_prediction(model, query, default_values):
@@ -82,7 +81,7 @@ def chatbot_prediction(model, query, default_values):
         return None, None, "Unable to extract values from query", extracted_data
     # Create dataframe and preprocess
     input_df = pd.DataFrame([extracted_data])
-    input_df = encode_data(input_df)
+    input_df = encode_data_7(input_df)
     print('Encoded DataFrame:', input_df.head())
     clean_columns = ['tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges']
     input_df =  input_df[clean_columns]
@@ -93,8 +92,8 @@ def chatbot_prediction(model, query, default_values):
     print('Probability:', proba)
 
     # Generate explanation using RAG
-    rag = create_rag_layer(model)
-    explanation = rag.run(f"Explain why this customer might {'churn' if prediction == 1 else 'not churn'}")
+    rag = create_rag_layer()
+    explanation = rag.run(f"Explain why this customer might {'churn' if prediction == 1 else 'not churn'} given inputs are {extracted_data}")
     print('Explanation:', explanation)
 
     return prediction, proba, explanation, extracted_data
@@ -107,27 +106,15 @@ def validate_default_values(data):
     schema = {
         'type': 'object',
         'properties': {
-            'gender': {'type': 'string', 'enum': ['Male', 'Female']},
-            'SeniorCitizen': {'type': 'integer', 'minimum': 0, 'maximum': 1},
-            'Partner': {'type': 'string', 'enum': ['Yes', 'No']},
-            'Dependents': {'type': 'string', 'enum': ['Yes', 'No']},
             'tenure': {'type': 'integer', 'minimum': 0},
-            'PhoneService': {'type': 'string', 'enum': ['Yes', 'No']},
-            'MultipleLines': {'type': 'string', 'enum': ['Yes', 'No', 'No phone service']},
-            'InternetService': {'type': 'string', 'enum': ['DSL', 'Fiber optic', 'No']},
             'OnlineSecurity': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
             'OnlineBackup': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'DeviceProtection': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
             'TechSupport': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'StreamingTV': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
-            'StreamingMovies': {'type': 'string', 'enum': ['Yes', 'No', 'No internet service']},
             'Contract': {'type': 'string', 'enum': ['Month-to-month', 'One year', 'Two year']},
-            'PaperlessBilling': {'type': 'string', 'enum': ['Yes', 'No']},
-            'PaymentMethod': {'type': 'string', 'enum': ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)']},
             'MonthlyCharges': {'type': 'number', 'minimum': 0},
             'TotalCharges': {'type': 'number', 'minimum': 0}
         },
-        'required': ['gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure', 'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod', 'MonthlyCharges', 'TotalCharges'],
+        'required': ['tenure', 'OnlineSecurity', 'OnlineBackup', 'TechSupport', 'Contract', 'MonthlyCharges', 'TotalCharges'],
         'additionalProperties': False
     }
     try:
@@ -141,33 +128,22 @@ def chatbot_interface(model):
     print('Starting chatbot_interface')
     """Handle the chatbot UI and interactions"""
     # Initialize default values
-    default_values = {
-        'gender': 'Male',
-        'SeniorCitizen': 0,
-        'Partner': 'No',
-        'Dependents': 'No',
-        'tenure': 3,
-        'PhoneService': 'Yes',
-        'MultipleLines': 'No',
-        'InternetService': 'DSL',
-        'OnlineSecurity': 'No',
-        'OnlineBackup': 'No',
-        'DeviceProtection': 'No',
-        'TechSupport': 'No',
-        'StreamingTV': 'No',
-        'StreamingMovies': 'No',
-        'Contract': 'Month-to-month',
-        'PaperlessBilling': 'No',
-        'PaymentMethod': 'Electronic check',
-        'MonthlyCharges': 64.76,
-        'TotalCharges': 2283.30
-    }
+    if 'default_values' not in st.session_state:
+        st.session_state.default_values = {
+            'tenure': 3,
+            'OnlineSecurity': 'No',
+            'OnlineBackup': 'No',
+            'TechSupport': 'No',
+            'Contract': 'Two year',
+            'MonthlyCharges': 164.76,
+            'TotalCharges': 2283.30
+        }
 
     # Main area for default values
     with st.expander("Edit Default Values Configuration", expanded=False):
         default_json = st.text_area(
             "Modify the default values in JSON format:",
-            value=json.dumps(default_values, indent=2),
+            value=json.dumps(st.session_state.default_values, indent=2),
             height=300,
             help="Edit the default values used for chatbot predictions"
         )
@@ -177,7 +153,7 @@ def chatbot_interface(model):
                 parsed_values = json.loads(default_json)
                 is_valid, error_msg = validate_default_values(parsed_values)
                 if is_valid:
-                    default_values = parsed_values
+                    st.session_state.default_values = parsed_values
                     st.success("Default values updated successfully!")
                 else:
                     st.error(error_msg)
@@ -203,6 +179,8 @@ def chatbot_interface(model):
         #     st.markdown(prompt)
 
         # Get prediction and explanation
+        if st.session_state.default_values:
+            default_values = st.session_state.default_values
         prediction, proba, explanation, extracted_data = chatbot_prediction(model, prompt, default_values)
         
         # Format response

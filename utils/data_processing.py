@@ -39,6 +39,24 @@ def encode_data(df):
     print('Completed encode_data')
     return df
 
+def encode_data_7(df):
+    print('Starting encode_data')
+    print('Input DataFrame shape:', df.shape)
+    """Encodes categorical features appropriately for ML without get_dummies."""
+
+    contract_mapping = {"Month-to-month": 0, "One year": 1, "Two year": 2}
+    df["Contract"] = df["Contract"].map(contract_mapping)
+    print('After contract encoding:', df.to_csv(index=False))
+
+    # One-hot encoding (Internet Service, Payment Method, Additional Services)
+    one_hot_cols = ["OnlineSecurity", "OnlineBackup",
+                     "TechSupport"]
+    for col in one_hot_cols:
+        df[col] = df[col].map({"Yes": 2, "No": 0, "No internet service": 1})
+
+    print('Completed encode_data')
+    return df
+
 def clean_and_encode_data(df):
     """
     Transforms input dataframe to match the structure of tel_churn_clean.csv
