@@ -82,7 +82,7 @@ def lineGraph_rev(factory_profit_df, selected_factories, selected_locations, fro
     st.plotly_chart(fig)
 
     # Add table with preview (5 rows) and expand for full table
-    st.subheader("Predicted Data for Revenue")
+    # st.subheader("Predicted Data for Revenue")
     st.write("Preview of Predicted data (first 5 rows):")
     try:
         st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Revenue ($)']].head(5))
@@ -112,7 +112,7 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
 
         filtered_factory_df['Predicted Foam Density'] = filtered_factory_df.apply(adjust_foam, axis=1)
 
-    st.header('Predicted Foam Density for Six Months', divider='gray')
+    # st.title('Predicted Foam Density for Six Months')
 
     fig = px.line(
         filtered_factory_df, 
@@ -129,7 +129,7 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
    
 
     # Add table with preview (5 rows) and expand for full table
-    st.subheader("Predicted Data for Foam Density")
+    # st.subheader("Predicted Data for Foam Density")
     st.write("Preview of Predicted data (first 5 rows):")
     st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Foam Density']].head(5))
 
@@ -177,7 +177,7 @@ def lineGraph_vol(factory_profit_df, selected_factories, selected_locations, fro
 
 
     # Add table with preview (5 rows) and expand for full table
-    st.subheader("Predicted Data for Production Volume")
+    # st.subheader("Predicted Data for Production Volume")
     st.write("Preview of Predicted data (first 5 rows):")
     st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Production Volume (units)']].head(5))
 
