@@ -149,7 +149,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
         fig.update_traces(line=dict(width=3))
         fig.update_layout(
             template=get_plot_theme(),
-            height=800,
+            height=650,
             xaxis_title="Months",
             yaxis_title=y,
             hovermode="x unified",
@@ -223,7 +223,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
             fig_operator.update_layout(
                 title='Monthly Operator Performance Trends',
                 template=get_plot_theme(),
-                height=800,
+                height=650,
                 xaxis_title="Months",
                 yaxis_title="Value",
                 hovermode="x unified",
@@ -276,7 +276,7 @@ def show_allmetrics():  #No need to call it but let's fix its position
             fig_finance.update_layout(
                 title='Monthly Revenue vs Cost of Downtime Trend',
                 template=get_plot_theme(),
-                height=800,
+                height=650,
                 xaxis_title="Months",
                 yaxis_title="Value (Millions $)",
                 hovermode="x unified",
