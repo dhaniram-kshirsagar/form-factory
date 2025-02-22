@@ -1,4 +1,4 @@
-# 🏭 Foam Factory Data Intelligence
+# 🏭 Churn Data Intelligence
 
 ### How to run it on your own machine 🪟
 
@@ -30,7 +30,7 @@
 
 (foamvenv)> pip install -r requirements.txt
 
-4. Now deploy streamlit form-factoy app
+4. Now deploy streamlit churn app
 
 (foamvenv) > nohup streamlit run Home.py &
 

@@ -92,62 +92,9 @@ functions = {
     "Home": pg.show_image,
     "Dynamic Churn Analysis": pg.show_r_dash,
     "Churn Bot": pg.show_factorybot,
-    "Churn Astro":pg.show_churn_pred,
-    "Churn Prediction": pg.show_PredictivePerformance,
-    #"Current Performance": pg.show_currentPerformance,
-    
-    
+    "Churn Astro":pg.show_churn_pred,    
 }
 
 go_to = functions.get(page)
 if go_to:
     go_to()
-
-# -----------------------------------------------------------------------------
-# Declare some useful functions.
-
-
-#factories_df = data.getFactoryComplexDataProfit()
-# factories_df['Year'] = pd.DatetimeIndex(factories_df['date']).year
-# factories_df['Month'] = pd.DatetimeIndex(factories_df['date']).month
-# -----------------------------------------------------------------------------
-# Draw the actual page
-
-# Add logo to the sidebar
-# st.sidebar.image("no_bg_logo.png", width=200)
-
-# # Set the title that appears at the top of the page.
-# col1, col2, col3 = st.columns([1, 2, 1])
-
-# with col2:
-#     st.image("no_bg_logo.png", width=400)
-
-'''
-
-'''
-
-# Add some spacing
-''
-
-# m.metricsPage(factories_df)
-
-#m.metricsPage()
-
-
-# def click_button():
-#     st.session_state.clicked = True
-#     chatbot.open_chatbot()
-
-# from streamlit_float import *
-
-# # Float feature initialization
-# float_init()
-
-# # Container with expand/collapse button
-# button_container = st.container()
-# with button_container:
-#     st.button(":material/robot_2:", on_click=click_button, type="primary")
-
-# button_css = float_css_helper(width="2.2rem", right="2rem", bottom="0rem", transition=0)
-
-# button_container.float(button_css)
