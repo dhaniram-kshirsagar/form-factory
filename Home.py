@@ -104,7 +104,7 @@ functions = {
     "Factory Bot": pg.show_factorybot,
     "Factory Astro":pg.Show_Factoryastro,
     "Factory Dashboard": pg.show_allmetrics,
-    "Predictive Performance": pg.show_PredictivePerformance,
+    "Predictive Performance Dashboard": pg.show_PredictivePerformance,
     # "Financial": pg.show_currentPerformance,
     
     
