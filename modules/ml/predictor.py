@@ -15,7 +15,7 @@ models = {}
 model_files = {
     "production_volume_model": PRODUCTION_MODEL_FILE,
     "revenue_model": REVENUE_MODEL_FILE,
-    "foam_density_model": FACTORY_PROFIT_MODEL
+    "profit_margin_model": FACTORY_PROFIT_MODEL
 }
 for model_name, file_path in model_files.items():
     try:
@@ -37,5 +37,5 @@ def get_rev_prediction_for_6month(input_data):
     return model.predict(input_data) 
 
 def get_foam_prediction_for_6month(input_data):
-    model = models['foam_density_model']
+    model = models['profit_margin_model']
     return model.predict(input_data) 

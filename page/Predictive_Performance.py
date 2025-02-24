@@ -63,7 +63,7 @@ def show_PredictivePerformance():
     # Note: For revenue, we now use 'Revenue ($)' so that the column exists in the data.
     result_vol_df = p.get_vol_prediction_for_6month('Production Volume (units)')
     result_rev_df = p.get_rev_prediction_for_6month('Revenue ($)')
-    result_foam_df = p.get_foam_prediction_for_6month('Foam Density')
+    result_foam_df = p.get_foam_prediction_for_6month('Profit Margin')
 
     # Define main menu options for the prediction targets.
     menu_options = [
