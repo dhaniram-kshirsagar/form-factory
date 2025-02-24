@@ -6,16 +6,16 @@ from pathlib import Path
 # REVENUE_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"revenue_model.pkl"
 # FOAM_DENSITY_MODEL_FILE = '/workspaces/form-factory/modules/ml/'+"foam_density_model.pkl"
 
-PRODUCTION_MODEL_FILE = Path(__file__).parent.parent/"ml/production_volume_model.pkl"
-REVENUE_MODEL_FILE = Path(__file__).parent.parent/"ml/revenue_model.pkl"
-FOAM_DENSITY_MODEL_FILE = Path(__file__).parent.parent/"ml/foam_density_model.pkl"
+PRODUCTION_MODEL_FILE = Path(__file__).parent.parent/"ml/models/factory_production_model.pkl"
+REVENUE_MODEL_FILE = Path(__file__).parent.parent/"ml/models/factory_revenue_model.pkl"
+FACTORY_PROFIT_MODEL = Path(__file__).parent.parent/"ml/models/factory_profit_margin_model.pkl"
 
 # Load ML Models (with error handling)
 models = {}
 model_files = {
     "production_volume_model": PRODUCTION_MODEL_FILE,
     "revenue_model": REVENUE_MODEL_FILE,
-    "foam_density_model": FOAM_DENSITY_MODEL_FILE
+    "foam_density_model": FACTORY_PROFIT_MODEL
 }
 for model_name, file_path in model_files.items():
     try:

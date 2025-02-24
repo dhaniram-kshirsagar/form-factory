@@ -8,10 +8,10 @@ print('Initializing vectory db for ML model RAG...')
 from pathlib import Path
 
 #MODEL_DESCRTIPTIONS_FILE = '/workspaces/form-factory/modules/ml/'+"model_descriptions.json"
-MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/model_descriptions.json"
+MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/mdoels/model_descriptions.json"
 
 #DATA_DESCRIPTION_FILE = '/workspaces/form-factory/modules/ml/'+"data_descriptions.json"
-DATA_DESCRIPTION_FILE = Path(__file__).parent.parent/"ml/data_descriptions.json"
+DATA_DESCRIPTION_FILE = Path(__file__).parent.parent/"ml/models/data_descriptions.json"
 
 # --- Configuration ---
 #VECTOR_DB_PATH = '/workspaces/form-factory/modules/ml/'+"factory_vector_db"
@@ -54,9 +54,9 @@ for df_name, df_data in data_descriptions.items():
 
 # Example questions (optional - you can add more)
 example_questions = [
-    {"question": "What will be the production volume next week for factory 1?", "model_name": "production_model", "input_features": ["date", "factory_id"]},
-    {"question": "Predict the profit margin if market demand is high and production volume is 1500.", "model_name": "profit_model", "input_features": ["market_demand", "production_volume"]},
-        {"question": "How many breakdowns can be predicted on 2024-01-01 for machine A", "model_name": "breakdown_model", "input_features": ["date", "machine_id"]}
+    {"question": "What will be the production volume next week for factory 1?", "model_name": "production_volume_model", "input_features": ["Year","Month","Day","Factory"]},
+    {"question": "Predict the profit margin if market demand is high and production volume is 1500.", "model_name": "profit_margin_model", "input_features": ["Year","Month","Day","Factory"]},
+        {"question": "How much revenue can be predicted on 2025-02-01 for machine A", "model_name": "revenue_model", "input_features": ["Year","Month","Day","Factory"]}
 
 ]
 
