@@ -1,0 +1,20 @@
+{
+    "production_volume_model": {
+      "target_variable": "Production Volume (units)",
+      "input_features": ["Year","Month","Day","Factory"],
+      "model_type": "XGBoostRegressor",
+      "description": "Predicts production volume based on year, month, day, factory"
+    },
+    "revenue_model": {
+      "target_variable": "Revenue ($)",
+      "input_features": ["Year","Month","Day","Factory"],
+      "model_type": "XGBoostRegressor",
+          "description": "Predicts revenue based on year, month, day, factory"
+    },
+      "profit_margin_model": {
+      "target_variable": "Profit Margin (%)",
+      "input_features": ["Year","Month","Day","Factory"],
+      "model_type": "XGBoostRegressor",
+      "description": "Predicts profit margin based on year, month, day, factory"
+    }
+  }
