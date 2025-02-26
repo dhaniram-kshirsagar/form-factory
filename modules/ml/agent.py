@@ -3,15 +3,13 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.tools import StructuredTool
 import json
 import os
-
 from pathlib import Path
 import pandas as pd
-
-from modules.ml import predictor
+from modules.ml import predictor as predictor
+from datetime import datetime
 
 if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = ""
-
 
 FEATURE_COLUMN = ["Year", "Month", "Factory", "Location", "Machine Type", "Machine Utilization (%)", "Machine Downtime (hours)", "Maintenance History", "Machine Age (years)", "Batch Quality (Pass %)", "Cycle Time (minutes)", "Energy Consumption (kWh)", "Energy Efficiency Rating", "CO2 Emissions (kg)", "Emission Limit Compliance", "Waste Generated (kg)", "Water Usage (liters)", "Shift", "Operator Experience (years)", "Team Size", "Operator Training Level", "Absenteeism Rate (%)", "Product Category", "Supplier", "Supplier Delays (days)", "Raw Material Quality", "Market Demand Index", "Cost of Downtime ($)", "Profit Margin (%)", "Breakdowns (count)", "Safety Incidents (count)", "Defect Root Cause", "Production Volume (units)", "Defect Rate (%)", "Foam Density", "Sales Data", "Day"]
 PREDICATION_MEAN_DATA = [0.983,75.087384853468,5.1235797895128,0.9932,10.3998,92.721868736494,32.5424621251856,299.331898,1.5288,29.956514000000002,0.4986,10.570336,3020.259442,1.0016,14.8794,6.0178,0.9918,10.005598411952,0.989,1.0148,15.1528,1.0186,0.5008611607164,5435.944922,17.551766,2.0352,2.5354,0.9832,5487.2412,5.008947999999999,1.2468540000000001,27596.527794,15.7162]
@@ -38,7 +36,11 @@ keys = [
     "Predicted Revenue ($)"
 ]
 
-# Define the values for the first row
+keys_revenue = ["month","year","Factory","Location","Cycle Time (minutes)","Product Category","Waste Generated (kg)","Production Volume (units)",
+    "Water Usage (liters)","Machine Utilization (%)",
+    "Machine Age (years)","Machine Type","Supplier","Operator Experience (years)"
+]
+
 values_row_1 = [
     2025, 1, 2, 1, 0.983, 
     75.087384853468, 5.1235797895128, 0.9932, 10.3998, 
@@ -57,65 +59,82 @@ values_row_1 = [
    -487572.42814425984
 ]
 
+values_row_2 = [0,
+    6.521072796934866,
+    2022.0,
+    2.0,
+    2.0,
+    20.02371829958037,
+    1.0023718299580369,
+    297.2048896186827,
+    680.4226195949644,
+    6269.731800766283,
+    73.59872286079182,
+    6.0622437511403025,
+    1.0023718299580369,
+    1.0694033935413245,
+    4.963446086480569
+]
+
 dict_row_1 = dict(zip(keys, values_row_1))
+dict_row_2 = dict(zip(keys_revenue, values_row_2))
 
-#print(PRED_DATA)
-
-#MODEL_DESCRTIPTIONS_FILE = '/workspaces/form-factory/modules/ml/'+"model_descriptions.json"
 MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/model_descriptions.json"
+DATA_DESCRIPTIONS_FILE = Path(__file__).parent.parent/"ml/data_descriptions.json"
 
 LLM_MODEL = "gpt-4"
 ALL_MONTHS = list(range(1, 13))  # All 12 months
 ALL_LOCATIONS = [0,1,2,3] # All 4 locations
 
-
-
-# Generate Sample Data (Multiple Months/Locations)
 def generate_sample_data(model_name, years, months, factories, locations):
-    """Generates sample data for multiple months and locations."""
+    """Generates sample data for multiple months and locations.
 
+    Args:
+        model_name (str): Name of the model
+        years (list): List of years to generate data for
+        months (list): List of months to generate data for
+        factories (list): List of factories to generate data for
+        locations (list): List of locations to generate data for
+
+    Returns:
+        pd.DataFrame: Generated sample data
+    """
     future_data = pd.DataFrame()
     for year in years:
         for month in months:
             for factory in factories:
                 for location in locations:
                     temp_data = pd.DataFrame({
-                        'Year': [year],
-                        'Month': month,
+                        'month': month,
+                        'year': [year],
                         'Factory': [factory],
                         'Location': [location]
                     })
-                    for col in FEATURE_COLUMN:
+                    for col in keys_revenue:
                         if col not in temp_data.columns:
-                            temp_data[col] = dict_row_1[col]
+                            temp_data[col] = dict_row_2[col]
 
                     future_data = pd.concat([future_data, temp_data], ignore_index=True)
 
     return future_data
 
-# Define Prediction Functions (generalized)
 def predict(model_name, years, months, factories, locations):
     """Generalized prediction function for multiple inputs."""
     try:
-        # Step 1: Generate the sample data
         input_data = generate_sample_data(model_name, years, months, factories, locations)
         if input_data is None:
             return "Unknown model name or no data generated."
         
-        # Step 2: Generate predictions
         predictions = predictor.getPrediction(model_name, input_data)
         input_data['prediction'] = predictions
         
-        # Step 3: Filter columns to include only relevant data
-        filtered_data = input_data[['Year', 'Month', 'Factory', 'Location', 'prediction']]
+        filtered_data = input_data[['year', 'month', 'Factory', 'Location', 'prediction']]
         
-        # Step 4: Return the filtered result as a JSON string
         return filtered_data.to_json(orient='records')  # Return only the filtered data as JSON string
     
     except (KeyError, IndexError, ValueError, TypeError) as e:
         return f"Error during prediction for {model_name}: {e}"
 
-# Define Tools (dynamically)
 tools = []
 
 try:
@@ -130,7 +149,6 @@ for model_name, model_data in model_descriptions.items():
     description = f"Useful for predicting {model_data['target_variable'].lower()}. Input should be "
     description += ", ".join([f"{feature} ({'array of integer' if str(feature).lower() in ['year','month'] else 'array of integer'})" for feature in model_data['input_features']]) + "."
     input_params = model_data['input_features']
-    #print(description)
     tools.append(
         StructuredTool.from_function(
             name=tool_name,
@@ -138,17 +156,6 @@ for model_name, model_data in model_descriptions.items():
             description=description
         )
     )
-
-# prompt = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", "You are a ml model prediction assistant. Use input as it is. Don't break numbers in multiple prediction call. "),
-#         ("placeholder", "{chat_history}"),
-#         # Then the new input
-#         ("human", "{input}"),
-#         # Finally the scratchpad
-#         ("placeholder", "{agent_scratchpad}"),
-#     ]
-# )
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -206,41 +213,8 @@ def run_agent(model_name, input_params):
     if not locations:
         locations = ALL_LOCATIONS
     
-    #print('Starting agent run3')
-
     prompt_string = f"Predict {model_descriptions[model_name]['target_variable'].lower()} for "
     prompt_string += ", ".join([f"{key} {value}" for key,value in input_params.items()]) + "."
 
     print(prompt_string)
     return agent_executor.invoke({"input":prompt_string})
-
-
-#data = run_agent('foam_density_model', '{"years": [2025], "months": [1, 4], "factories": [0], "locations": [0]}')
-# for d in data['output']:
-#     print(d)
-#print(data['output'])
-# Example Usage
-# questions = [
-#     "What will be the production volume in 2024 for all months for factory A in all locations?",
-#     "Predict the revenue in 2023 for December for factory B in Location Y.",
-#     "What is the foam density predicted for 2025 February for factory C in location Z?",
-#     "What will be the production volume in 2024 for factory A in Location A and Location B?", #Example for multiple locations
-#     "What is the weather like in London?"
-# ]
-
-# for question in questions:
-#     model, params = get_model_and_params(question)
-#     if model:
-#         print(f"Question: {question}")
-#         print(f"Selected Model: {model}")
-#         print(f"Input Parameters: {params}")
-#         prediction = run_agent(model, params)
-#         print(f"Prediction: {prediction}")
-#         print("-" * 20)
-#     else:
-#         print(f"Question: {question}")
-#         print("No suitable model found.")
-#         print("-" * 20)
-
-# df = generate_sample_data("test", [2025, 2026], [2, 4, 5, 7], [1], [3, 0, 1])
-# df.to_csv("tesdataaaa.csv", index=False)
