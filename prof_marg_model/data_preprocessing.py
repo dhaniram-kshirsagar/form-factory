@@ -26,7 +26,8 @@ categorical_columns = data.select_dtypes(include=["object"]).columns
 label_encoders = {}
 for col in categorical_columns:
     le = LabelEncoder()
-    data[col] = le.fit_transform(data[col].iloc[:, 0] if len(data[col].shape) > 1 else data[col])
+    print(col)
+    data[col] = le.fit_transform(data[col])
     label_encoders[col] = le
 
 means = data.mean(axis=0)

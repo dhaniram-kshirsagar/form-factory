@@ -9,4 +9,3 @@
 | Revenue ($)                 |   0.0148525  |
 | Batch Quality (Pass %)      |   0.0144999  |
 | Cost of Downtime ($)        |   0.0118358  |
-| Factory                     |   0.00455195 |

@@ -18,16 +18,16 @@ with open("imp_prod_features.md", "r") as file:
 # Prepend month, year, Factory, and Location to the important features list
 important_features = ['month', 'year', 'Factory', 'Location'] + important_features
 
-print(important_features)
 # Select only the important features and the target variable
 data = data[important_features + ["Production Volume (units)"]]
-
+print(data.dtypes)
 # Handle categorical columns using LabelEncoder
 categorical_columns = data.select_dtypes(include=["object"]).columns
 label_encoders = {}
 for col in categorical_columns:
     le = LabelEncoder()
-    data[col] = le.fit_transform(data[col].iloc[:, 0] if len(data[col].shape) > 1 else data[col])
+    print(col)
+    data[col] = le.fit_transform(data[col])
     label_encoders[col] = le
 
 means = data.mean(axis=0)

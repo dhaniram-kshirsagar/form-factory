@@ -13,7 +13,7 @@ print(sample_data.columns)
 # Drop the target variable (Revenue ($)) for prediction
 X_sample = sample_data.drop(columns=["Production Volume (units)"])
 # Align features with training data
-X_sample = X_sample[model.feature_names_in_]
+#X_sample = X_sample[model.feature_names_in_]
 
 # Make predictions
 predictions = model.predict(X_sample)
