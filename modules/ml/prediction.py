@@ -7,8 +7,8 @@ import math
 
 
 def yearFilter(factory_profit_df): 
-    min_value = factory_profit_df['Month'].min()
-    max_value = factory_profit_df['Month'].max()
+    min_value = factory_profit_df['month'].min()
+    max_value = factory_profit_df['month'].max()
 
     from_year, to_year = st.slider(
         'Which months are you interested in?',
@@ -47,8 +47,8 @@ def lineGraph_rev(factory_profit_df, selected_factories, selected_locations, fro
     filtered_factory_df = factory_profit_df[
         (factory_profit_df['Factory'].isin(selected_factories)) &
         (factory_profit_df['Location'].isin(selected_locations)) &
-        (factory_profit_df['Month'] <= to_month) &
-        (factory_profit_df['Month'] >= from_month)
+        (factory_profit_df['month'] <= to_month) &
+        (factory_profit_df['month'] >= from_month)
     ]
 
     if filtered_factory_df.empty:
@@ -65,14 +65,14 @@ def lineGraph_rev(factory_profit_df, selected_factories, selected_locations, fro
     filtered_factory_df['Transformed Revenue'] += np.random.uniform(-1000, 1000, size=len(filtered_factory_df))
 
     # Create a copy of the dataframe for hover data
-    hover_df = filtered_factory_df[['Month', 'Location', 'Transformed Revenue']].copy()
+    hover_df = filtered_factory_df[['month', 'Location', 'Transformed Revenue']].copy()
 
     # Plot the graph
     st.header('Predicted Revenue ($)', divider='gray')
 
     fig = px.line(
         filtered_factory_df,
-        x='Month',
+        x='month',
         y='Predicted Revenue ($)',  # Use original values for the y-axis
         color='Location',
         hover_data=hover_df  # Use hover_df to avoid conflicts
@@ -85,7 +85,7 @@ def lineGraph_rev(factory_profit_df, selected_factories, selected_locations, fro
     # st.subheader("Predicted Data for Revenue")
     st.write("Preview of Predicted data (first 5 rows):")
     try:
-        st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Revenue ($)']].head(5))
+        st.table(filtered_factory_df[['month', 'Factory', 'Location', 'Predicted Revenue ($)']].head(5))
         with st.expander("Show Full Table"):
              st.write("Full Predicted data:")
              st.dataframe(filtered_factory_df)
@@ -97,8 +97,8 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
     filtered_factory_df = factory_profit_df[
         factory_profit_df['Factory'].isin(selected_factories)
         & factory_profit_df['Location'].isin(selected_locations)
-        & (factory_profit_df['Month'] <= to_month)
-        & (from_month <= factory_profit_df['Month'])
+        & (factory_profit_df['month'] <= to_month)
+        & (from_month <= factory_profit_df['month'])
     ].copy()
 
     if not filtered_factory_df.empty:
@@ -116,7 +116,7 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
 
     fig = px.line(
         filtered_factory_df, 
-        x='Month', 
+        x='month', 
         y='Predicted Foam Density', 
         color='Location', 
         title='Predicted Foam Density for Six Months'
@@ -131,7 +131,7 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
     # Add table with preview (5 rows) and expand for full table
     # st.subheader("Predicted Data for Foam Density")
     st.write("Preview of Predicted data (first 5 rows):")
-    st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Foam Density']].head(5))
+    st.table(filtered_factory_df[['month', 'Factory', 'Location', 'Predicted Foam Density']].head(5))
 
     with st.expander("Show Full Table"):
         st.write("Full Predicted data:")
@@ -144,8 +144,8 @@ def lineGraph_vol(factory_profit_df, selected_factories, selected_locations, fro
     filtered_factory_df = factory_profit_df[
         (factory_profit_df['Factory'].isin(selected_factories)) &
         (factory_profit_df['Location'].isin(selected_locations)) &
-        (factory_profit_df['Month'] <= to_month) &
-        (factory_profit_df['Month'] >= from_month)
+        (factory_profit_df['month'] <= to_month) &
+        (factory_profit_df['month'] >= from_month)
     ].copy()
 
     if filtered_factory_df.empty:
@@ -164,7 +164,7 @@ def lineGraph_vol(factory_profit_df, selected_factories, selected_locations, fro
     # Plot the graph
     fig = px.line(
         filtered_factory_df,
-        x='Month',
+        x='month',
         y='Predicted Production Volume (units)',
         color='Location',
         hover_data={
@@ -179,7 +179,7 @@ def lineGraph_vol(factory_profit_df, selected_factories, selected_locations, fro
     # Add table with preview (5 rows) and expand for full table
     # st.subheader("Predicted Data for Production Volume")
     st.write("Preview of Predicted data (first 5 rows):")
-    st.table(filtered_factory_df[['Month', 'Factory', 'Location', 'Predicted Production Volume (units)']].head(5))
+    st.table(filtered_factory_df[['month', 'Factory', 'Location', 'Predicted Production Volume (units)']].head(5))
 
     with st.expander("Show Full Table"):
         st.write("Full Predicted data:")

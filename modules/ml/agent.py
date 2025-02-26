@@ -36,10 +36,6 @@ keys = [
     "Predicted Revenue ($)"
 ]
 
-keys_revenue = ["month","year","Factory","Location","Cycle Time (minutes)","Product Category","Waste Generated (kg)","Production Volume (units)",
-    "Water Usage (liters)","Machine Utilization (%)",
-    "Machine Age (years)","Machine Type","Supplier","Operator Experience (years)"
-]
 
 values_row_1 = [
     2025, 1, 2, 1, 0.983, 
@@ -59,25 +55,10 @@ values_row_1 = [
    -487572.42814425984
 ]
 
-values_row_2 = [0,
-    6.521072796934866,
-    2022.0,
-    2.0,
-    2.0,
-    20.02371829958037,
-    1.0023718299580369,
-    297.2048896186827,
-    680.4226195949644,
-    6269.731800766283,
-    73.59872286079182,
-    6.0622437511403025,
-    1.0023718299580369,
-    1.0694033935413245,
-    4.963446086480569
-]
+
 
 dict_row_1 = dict(zip(keys, values_row_1))
-dict_row_2 = dict(zip(keys_revenue, values_row_2))
+
 
 MODEL_DESCRTIPTIONS_FILE = Path(__file__).parent.parent/"ml/model_descriptions.json"
 DATA_DESCRIPTIONS_FILE = Path(__file__).parent.parent/"ml/data_descriptions.json"
@@ -110,9 +91,9 @@ def generate_sample_data(model_name, years, months, factories, locations):
                         'Factory': [factory],
                         'Location': [location]
                     })
-                    for col in keys_revenue:
+                    for col in predictor.keys_revenue:
                         if col not in temp_data.columns:
-                            temp_data[col] = dict_row_2[col]
+                            temp_data[col] = predictor.rev_mean_dict[col]
 
                     future_data = pd.concat([future_data, temp_data], ignore_index=True)
 

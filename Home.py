@@ -57,7 +57,7 @@ if st.session_state.OPENAI_API_KEY is None:
 
 #st.set_page_config(initial_sidebar_state="collapsed")
 
-pages = ["Home","Factory Dashboard", "Predictive Performance Dashboard", "Factory Astro","Factory Bot", ]
+pages = ["Home","Factory Dashboard", "Predictive Performance Dashboard", "Factory Astro","Factory Bot","ML Prediction" ]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "no_bg_logo.svg")
 #urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
@@ -105,6 +105,7 @@ functions = {
     "Factory Astro":pg.Show_Factoryastro,
     "Factory Dashboard": pg.show_allmetrics,
     "Predictive Performance Dashboard": pg.show_PredictivePerformance,
+    "ML Prediction": pg.show_churn_pred,
     # "Financial": pg.show_currentPerformance,
     
     

@@ -13,9 +13,9 @@ import pickle
 
 from modules.ml import predictor
 
-PRODUCTION_MODEL_FILE = "production_volume_model.pkl"
-REVENUE_MODEL_FILE = "revenue_model.pkl"
-FOAM_DENSITY_MODEL_FILE = "foam_density_model.pkl"
+PRODUCTION_MODEL_FILE = Path(__file__).parent.parent/'ml/production_volume_model.pkl'
+REVENUE_MODEL_FILE = Path(__file__).parent.parent/'ml/revenue_prediction_model.pkl'
+FOAM_DENSITY_MODEL_FILE = Path(__file__).parent.parent/'ml/foam_density_model.pkl'
 
 
 import streamlit  as st
@@ -24,52 +24,7 @@ db_path = Path(__file__).parent.parent/'data/Factory_Data.db'
 table_name = "Sample_Data_5000_v1"
 
 # Function to load data from SQLite database
-def load_data(db_path, table_name):
-    """
-    Connects to the SQLite database and loads the data from the specified table.
-    """
-    try:
-        conn = sqlite3.connect(db_path)
-        query = f"SELECT * FROM {table_name}"
-        data = pd.read_sql(query, conn)
-        conn.close()
-        return data
-    except sqlite3.OperationalError as e:
-        return pd.DataFrame({"Message": [f"Error: {e}. Please ensure the table '{table_name}' exists in the database."]})
 
-# Function to preprocess the data
-def preprocess_data(data):
-    """
-    Preprocesses the data by encoding categorical variables, handling missing columns, and scaling numerical features.
-    """
-    output_df = pd.DataFrame()
-
-    # Check if 'Date' column exists
-    if 'Date' in data.columns:
-        data['Date'] = pd.to_datetime(data['Date'], format='%d-%m-%Y', errors='coerce')
-        data['Year'] = data['Date'].dt.year
-        data['Month'] = data['Date'].dt.month
-        data['Day'] = data['Date'].dt.day
-        data.drop(columns=['Date'], inplace=True)
-
-    # Encode categorical variables
-    categorical_columns = [
-        'Factory', 'Location', 'Machine Type', 'Operator Training Level', 'Raw Material Quality',
-        'Maintenance History', 'Defect Root Cause', 'Energy Efficiency Rating', 'Emission Limit Compliance',
-        'Shift', 'Product Category', 'Supplier'
-    ]
-    for col in categorical_columns:
-        if col in data.columns:
-            le = LabelEncoder()
-            data[col] = le.fit_transform(data[col])
-
-    # Handle missing values
-    imputer = SimpleImputer(strategy='mean')
-    numerical_columns = data.select_dtypes(include=['float64', 'int64']).columns
-    data[numerical_columns] = imputer.fit_transform(data[numerical_columns])
-
-    output_df['Message'] = ["Data Preprocessed Successfully"]
-    return data, output_df
 
 # Function to evaluate and choose the best regression method
 def choose_best_regression_method(X, y):
@@ -144,30 +99,6 @@ def predict_next_six_months(model, data, feature_columns, target):
     future_data[f'Predicted {target}'] = predictions
     return future_data
 
-def get_input_data(data, feature_columns, target):
-    """
-    Predicts target variable for all factories and locations for the next 6 months (Jan 2025 - June 2025)
-    and returns the predictions in a DataFrame.
-    """
-    factories = data['Factory'].unique()
-    locations = data['Location'].unique()
-
-    future_data = pd.DataFrame()
-    for factory in factories:
-        for location in locations:
-            temp_data = pd.DataFrame({
-                'Year': [2025] * 6,
-                'Month': [1, 2, 3, 4, 5, 6],
-                'Factory': [factory] * 6,
-                'Location': [location] * 6
-            })
-            for col in feature_columns:
-                if col not in temp_data.columns:
-                    temp_data[col] = data[col].mean()
-
-            future_data = pd.concat([future_data, temp_data], ignore_index=True)
-
-    return future_data
 
 # Function to calculate relationships between independent and dependent variables
 def calculate_relationships(data, independent_columns, dependent_column):
@@ -264,33 +195,7 @@ def train_vol_prediction_for_6month(target):
         pickle.dump(model, file)
 
 #targets = ['Production Volume (units)', 'Revenue ($)', 'Foam Density']
-@st.cache_data
-def get_vol_prediction_for_6month(target):
-    """
-    Allows the user to interactively predict targets and analyze parameters.
-    """
 
-    output_df = pd.DataFrame()
-    data = load_data(db_path, table_name)
-
-    if data.empty:
-        return pd.DataFrame({"Message": ["Error: Data could not be loaded or is empty."]})
-
-    if target not in data.columns:
-        output_df = pd.concat([output_df, pd.DataFrame({"Message": [f"Error: '{target}' column is missing from the data."]})])
-        return output_df
-
-    data, preprocess_output = preprocess_data(data)
-    #output_df = pd.concat([output_df, preprocess_output])
-
-    independent_variables = data.drop(columns=[target], errors='ignore').columns
-
-    input_data = get_input_data(data, independent_variables, target)
-    future_predictions = predictor.get_vol_prediction_for_6month(input_data)
-    input_data[f'Predicted {target}'] = future_predictions
-    output_df = pd.concat([output_df, input_data])
-
-    return output_df
 
 def train_rev_prediction_for_6month(target):
     """
@@ -327,32 +232,7 @@ def train_rev_prediction_for_6month(target):
     with open(REVENUE_MODEL_FILE, 'wb') as file:
         pickle.dump(model, file)
 
-@st.cache_data
-def get_rev_prediction_for_6month(target):
-    """
-    Allows the user to interactively predict targets and analyze parameters.
-    """
-    output_df = pd.DataFrame()
-    data = load_data(db_path, table_name)
 
-    if data.empty:
-        return pd.DataFrame({"Message": ["Error: Data could not be loaded or is empty."]})
-
-    if target not in data.columns:
-        output_df = pd.concat([output_df, pd.DataFrame({"Message": [f"Error: '{target}' column is missing from the data."]})])
-        return output_df
-
-    data, preprocess_output = preprocess_data(data)
-    #output_df = pd.concat([output_df, preprocess_output])
-
-    independent_variables = data.drop(columns=[target], errors='ignore').columns
-
-    input_data = get_input_data(data, independent_variables, target)
-    future_predictions = predictor.get_rev_prediction_for_6month(input_data)
-    input_data[f'Predicted {target}'] = future_predictions
-    output_df = pd.concat([output_df, input_data])
-
-    return output_df
 
 def train_foam_prediction_for_6month(target):
     """
@@ -390,32 +270,6 @@ def train_foam_prediction_for_6month(target):
     with open(FOAM_DENSITY_MODEL_FILE, 'wb') as file:
         pickle.dump(model, file)
 
-@st.cache_data
-def get_foam_prediction_for_6month(target):
-    """
-    Allows the user to interactively predict targets and analyze parameters.
-    """
-    output_df = pd.DataFrame()
-    data = load_data(db_path, table_name)
-
-    if data.empty:
-        return pd.DataFrame({"Message": ["Error: Data could not be loaded or is empty."]})
-
-    if target not in data.columns:
-        output_df = pd.concat([output_df, pd.DataFrame({"Message": [f"Error: '{target}' column is missing from the data."]})])
-        return output_df
-
-    data, preprocess_output = preprocess_data(data)
-    #output_df = pd.concat([output_df, preprocess_output])
-
-    independent_variables = data.drop(columns=[target], errors='ignore').columns
-
-    input_data = get_input_data(data, independent_variables, target)
-    future_predictions = predictor.get_foam_prediction_for_6month(input_data)
-    input_data[f'Predicted {target}'] = future_predictions
-    output_df = pd.concat([output_df, input_data])
-
-    return output_df
 
 # Execute and save outputs to a DataFrame
 if __name__ == "__main__":

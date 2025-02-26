@@ -1,6 +1,30 @@
 import joblib
 from pathlib import Path
 
+
+keys_revenue = ["month","year","Factory","Location","Cycle Time (minutes)","Product Category","Waste Generated (kg)","Production Volume (units)",
+    "Water Usage (liters)","Machine Utilization (%)",
+    "Machine Age (years)","Machine Type","Supplier","Operator Experience (years)"
+]
+
+values_row_2 = [0,
+    6.521072796934866,
+    2022.0,
+    2.0,
+    2.0,
+    20.02371829958037,
+    1.0023718299580369,
+    297.2048896186827,
+    680.4226195949644,
+    6269.731800766283,
+    73.59872286079182,
+    6.0622437511403025,
+    1.0023718299580369,
+    1.0694033935413245,
+    4.963446086480569
+]
+
+rev_mean_dict = dict(zip(keys_revenue, values_row_2))
 # Configuration
 REVENUE_MODEL_FILE = Path(__file__).parent.parent/"ml/revenue_prediction_model.pkl"
 

@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
-from modules.ml import Prediction_5000_data_with_data_frame_v1_0 as p
+from modules.ml import performance_pred as p
 from modules.ml import prediction
 
 
@@ -61,15 +61,15 @@ def show_PredictivePerformance():
 
     # Get predictions for each target variable.
     # Note: For revenue, we now use 'Revenue ($)' so that the column exists in the data.
-    result_vol_df = p.get_vol_prediction_for_6month('Production Volume (units)')
+    # result_vol_df = p.get_vol_prediction_for_6month('Production Volume (units)')
     result_rev_df = p.get_rev_prediction_for_6month('Revenue ($)')
-    result_foam_df = p.get_foam_prediction_for_6month('Foam Density')
+    # result_foam_df = p.get_foam_prediction_for_6month('Foam Density')
 
     # Define main menu options for the prediction targets.
     menu_options = [
-        "Predicted Production Volume",
+        # "Predicted Production Volume",
         "Predicted Revenue ($)",
-        "Predicted Foam Density for Six Months"
+        # "Predicted Foam Density for Six Months"
     ]
 
     # Create two columns: left for menu and filters, right for the graph/table content.
@@ -107,15 +107,16 @@ def show_PredictivePerformance():
         # Filters placed inside an expander.
         with st.expander("Filters", expanded=True):
             # Based on the selected option, choose the corresponding dataframe.
-            if selected == "Predicted Production Volume":
-                df = result_vol_df
-            elif selected == "Predicted Revenue ($)":
+            if selected == "Predicted Revenue ($)":
                 df = result_rev_df
+            elif selected == "Predicted Production Volume":
+                df = result_vol_df
             else:
                 df = result_foam_df
 
             st.write("Select the time range:")
-            from_month, to_month = prediction.yearFilter(df)
+            factory_profit_df = result_rev_df  # Assuming result_rev_df contains the 'Month' column
+            from_month, to_month = prediction.yearFilter(factory_profit_df)
 
             st.write("Select factories:")
             selected_factories = prediction.selectedFactories(df)
@@ -125,13 +126,10 @@ def show_PredictivePerformance():
 
     with col_right:
         # Display only one graph and its table based on the selected menu option.
-        if selected == "Predicted Production Volume":
-            prediction.lineGraph_vol(result_vol_df, selected_factories, selected_locations, from_month, to_month)
-
-        elif selected == "Predicted Revenue ($)":
-
+        if selected == "Predicted Revenue ($)":
             prediction.lineGraph_rev(result_rev_df, selected_factories, selected_locations, from_month, to_month)
 
-        elif selected == "Predicted Foam Density for Six Months":
-            prediction.lineGraph_foam(result_foam_df, selected_factories, selected_locations, from_month, to_month)
-
+        # elif selected == "Predicted Foam Density for Six Months":
+        #     prediction.lineGraph_foam(result_foam_df, selected_factories, selected_locations, from_month, to_month)
+        # elif selected == "Predicted Production Volume":
+        #     prediction.lineGraph_vol(result_vol_df, selected_factories, selected_locations, from_month, to_month)
