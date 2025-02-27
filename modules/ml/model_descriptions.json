@@ -1,9 +1,9 @@
 {
     "production_volume_model": {
       "target_variable": "Production Volume (units)",
-      "input_features": ["Year","Month","Factory","Location"],
+      "input_features": ["Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)", "month", "year","Factory", "Location"],
       "model_type": "RandomForestRegressor",
-      "description": "Predicts production volume based on year, month, factory, location"
+      "description": "Predicts production volume based on year, Machine Utilization (%), Operator Experience (years), Market Demand Index, Breakdowns (count), Absenteeism Rate (%), Raw Material Quality,  Revenue ($), Batch Quality (Pass %), Cost of Downtime ($), month, year,Factory, Location"
     },
     "revenue_model": {
       "target_variable": "Revenue ($)",
@@ -11,10 +11,10 @@
       "model_type": "RandomForestRegressor",
       "description": "Predicts revenue based on production metrics, machine utilization, operational parameters, and temporal factors"
     },
-    "foam_density_model": {
-      "target_variable": "Foam Density",
-      "input_features": ["Year","Month","Factory","Location"],
+    "profit_margin_model": {
+      "target_variable": "Profit Margin (%) ",
+      "input_features": ["month", "year", "Factory", "Location", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"],
       "model_type": "RandomForestRegressor",
-      "description": "Predicts foam density based on year, month, factory, location"
+      "description": "Predicts foam density based on month,year,Factory,Location,CO2 Emissions (kg),Energy Consumption (kWh),Product Category,Supplier,Machine Type,Machine Utilization (%),Water Usage (liters)"
     }
 }
