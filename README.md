@@ -45,3 +45,34 @@ Collecting usage statistics. To deactivate, set browser.gatherUsageStats to fals
   Network URL: http://<ip>:8501
   
   External URL: http://<ip>:8501
+
+### Project Documentation
+
+# Foam Factory Predictive Maintenance
+
+## Overview
+Machine learning system for predicting equipment failures in foam manufacturing equipment using sensor data and maintenance records.
+
+## Features
+- Data preprocessing pipeline
+- Random Forest classifier with hyperparameter tuning
+- Model evaluation metrics and visualization
+- Production-ready configuration management
+
+## Quick Start
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run pipeline
+python -m src.main
+```
+
+## Directory Structure
+```
+form-factory/
+├── config/       # Configuration settings
+├── data/         # Raw sensor data
+├── models/       # Saved model files
+├── src/          # Source code
+└── output/       # Evaluation results

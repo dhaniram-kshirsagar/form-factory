@@ -80,6 +80,17 @@ def generate_sample_data(model_name, years, months, factories, locations):
     Returns:
         pd.DataFrame: Generated sample data
     """
+    keys = None
+    if model_name == 'production_volume_model':
+        keys = predictor.keys_prod_volume
+        val_dict = predictor.prodvol_mean_dict
+    if model_name == 'revenue_model':
+        keys = predictor.keys_revenue
+        val_dict = predictor.rev_mean_dict
+    if model_name == 'profit_margin_model':
+        keys = predictor.keys_prof_margin
+        val_dict = predictor.prof_margin_mean_dict
+
     future_data = pd.DataFrame()
     for year in years:
         for month in months:
@@ -91,9 +102,9 @@ def generate_sample_data(model_name, years, months, factories, locations):
                         'Factory': [factory],
                         'Location': [location]
                     })
-                    for col in predictor.keys_revenue:
+                    for col in keys:
                         if col not in temp_data.columns:
-                            temp_data[col] = predictor.rev_mean_dict[col]
+                            temp_data[col] = val_dict[col]
 
                     future_data = pd.concat([future_data, temp_data], ignore_index=True)
 

@@ -104,25 +104,25 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
     if not filtered_factory_df.empty:
         def adjust_foam(row): #same logic for foam
             location = row['Location']
-            Predicted_Foam_Density = row['Predicted Foam Density']  # assuming you have a 'Foam' column
+            Predicted_Profit_Margin = row['Predicted Profit Margin (%)']  # assuming you have a 'Foam' column
             if location in selected_locations:
                 bonus_index = sorted(selected_locations).index(location)
-                return Predicted_Foam_Density + (bonus_index + 1) * 120000
-            return Predicted_Foam_Density
+                return Predicted_Profit_Margin + (bonus_index + 1) * 120000
+            return Predicted_Profit_Margin
 
-        filtered_factory_df['Predicted Foam Density'] = filtered_factory_df.apply(adjust_foam, axis=1)
+        filtered_factory_df['Predicted Profit Margin (%)'] = filtered_factory_df.apply(adjust_foam, axis=1)
 
     # st.title('Predicted Foam Density for Six Months')
 
     fig = px.line(
         filtered_factory_df, 
         x='month', 
-        y='Predicted Foam Density', 
+        y='Predicted Profit Margin (%)', 
         color='Location', 
-        title='Predicted Foam Density for Six Months'
+        title='Predicted Profit Margin for Six Months'
     )
     fig.update_layout(
-            yaxis_title="Predicted Foam Density <br><sup>(Divide the given value by 120000 to see the exact prediction)</sup>" 
+            yaxis_title="Predicted Profit Margin (%)<br><sup>(Divide the given value by 120000 to see the exact prediction)</sup>" 
         )
     st.plotly_chart(fig)
 
@@ -131,7 +131,7 @@ def lineGraph_foam(factory_profit_df, selected_factories, selected_locations, fr
     # Add table with preview (5 rows) and expand for full table
     # st.subheader("Predicted Data for Foam Density")
     st.write("Preview of Predicted data (first 5 rows):")
-    st.table(filtered_factory_df[['month', 'Factory', 'Location', 'Predicted Foam Density']].head(5))
+    st.table(filtered_factory_df[['month', 'Factory', 'Location', 'Predicted Profit Margin (%)']].head(5))
 
     with st.expander("Show Full Table"):
         st.write("Full Predicted data:")

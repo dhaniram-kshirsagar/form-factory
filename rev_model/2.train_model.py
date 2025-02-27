@@ -4,12 +4,18 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
+from pathlib import Path
+
+PKL_PATH = Path(__file__).parent.parent/"modules/ml"/"revenue_prediction_model.pkl"
+PROCESSED_CSV = Path(__file__).parent/"preprocessed_data.csv"
+FEATURES_PATH = Path(__file__).parent/"imp_rev_features.md"
+MEAN_VALUES_PATH = Path(__file__).parent/"mean_values.pkl"
 
 # Load the preprocessed data
-data = pd.read_csv("C:\\Users\\athar\\OneDrive\\Documents\\GitHub\\form-factory\\rev_model\\preprocessed_data.csv")
+data = pd.read_csv(PROCESSED_CSV)
 
 # Load the important features from imp_rev_features.md
-with open("C:\\Users\\athar\\OneDrive\\Documents\\GitHub\\form-factory\\rev_model\\imp_rev_features.md", "r") as file:
+with open(FEATURES_PATH, "r") as file:
     lines = file.readlines()
     important_features = [line.split("|")[1].strip() for line in lines[2:]]  # Skip header and footer
 
@@ -55,5 +61,5 @@ for name, model in models.items():
         best_model_name = name
 
 # Save the best model to a .pkl file
-joblib.dump(best_model, "C:\\Users\\athar\\OneDrive\\Documents\\GitHub\\form-factory\\rev_model\\revenue_prediction_model.pkl")
+joblib.dump(best_model, PKL_PATH)
 print(f"Best model saved: {best_model_name} with R2 score: {best_score}")

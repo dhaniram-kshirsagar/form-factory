@@ -7,7 +7,7 @@ keys_revenue = ["month","year","Factory","Location","Cycle Time (minutes)","Prod
     "Machine Age (years)","Machine Type","Supplier","Operator Experience (years)"
 ]
 
-keys_prod_volume = ["Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)", "month", "year","Factory", "Location"]
+keys_prod_volume = ["month", "year","Factory", "Location", "Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)"]
 keys_prof_margin = ["month", "year", "Factory", "Location", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"]
 revs_mean_values_row_2 = [0,
     6.521072796934866,

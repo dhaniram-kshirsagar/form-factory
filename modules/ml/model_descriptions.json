@@ -15,6 +15,6 @@
       "target_variable": "Profit Margin (%) ",
       "input_features": ["month", "year", "Factory", "Location", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"],
       "model_type": "RandomForestRegressor",
-      "description": "Predicts foam density based on month,year,Factory,Location,CO2 Emissions (kg),Energy Consumption (kWh),Product Category,Supplier,Machine Type,Machine Utilization (%),Water Usage (liters)"
+      "description": "Predicts profit margin based on month,year,Factory,Location,CO2 Emissions (kg),Energy Consumption (kWh),Product Category,Supplier,Machine Type,Machine Utilization (%),Water Usage (liters)"
     }
 }

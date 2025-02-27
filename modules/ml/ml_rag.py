@@ -66,15 +66,23 @@ Output:
 
 Question: Give production volume  for march months
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"month":[3],"factories":[0],"locations":[0]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[3],"factories":[0],"locations":[0]}}}}
 
 Question: Give production volume numbers for 7 months for factory 2
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"month":[1, 2, 3, 4, 5, 6, 7],"factories":[1],"locations":[0]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2, 3, 4, 5, 6, 7],"factories":[1],"locations":[0]}}}}
 
-Question: Give production volume numbers for October for factory 4 City B
+Question: Give production volume numbers for October for factory 4 Location B
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"month":[10],"factories":[3],"locations":[1]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3],"locations":[1]}}}}
+
+Question: Give profit margin numbers for October for factory 4 Location B
+Output:
+{{"model_name": "profit_margin_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3],"locations":[1]}}}}
+
+Question: Give revenue numbers for October for factory 4 Location B
+Output:
+{{"model_name": "revenue_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3],"locations":[1]}}}}
 
 **General Instructions:**
 

@@ -57,7 +57,7 @@ if st.session_state.OPENAI_API_KEY is None:
 
 #st.set_page_config(initial_sidebar_state="collapsed")
 
-pages = ["Home","Factory Dashboard", "Predictive Performance Dashboard", "Factory Astro","Factory Bot","ML Prediction" ]
+pages = ["Home","Factory Dashboard", "Predictive Performance Dashboard", "Factory Astro","Factory Bot" ]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "no_bg_logo.svg")
 #urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}

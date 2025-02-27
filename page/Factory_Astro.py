@@ -63,7 +63,7 @@ def Show_Factoryastro():
 
         # Display chat history
         st.markdown('<h5>Chat History</h5>', unsafe_allow_html=True)
-        st.write("**NOTE:** Factory names and locations are being mapped. Assume City A for 'location 0', City B for 'location 1', etc.\n")
+        st.write("**NOTE:** Factory names and locations are being mapped. Assume Location A for 'location 0', Location B for 'location 1', etc.\n")
         hcol1, hcol2 = st.columns([1, 1])
         with hcol1:
             for i in range(len(st.session_state.chat_history_astro)-1, -1, -2):
@@ -151,11 +151,11 @@ def Show_Factoryastro():
         st.subheader("Example Questions")
         examples = [
             "What will the revenue for factory 3 be next year?",
-            "What will the revenue over the next 2 months for factory 3 in city C be?",
-            "What will the foam density be in July for factory 2?",
-            "What will the foam density of factory 1 in city A be?",
+            "What will the revenue over the next 2 months for factory 3 in location C be?",
+            "What will the profit margin be in July for factory 2?",
+            "What will the profit margin of factory 1 in location A be?",
             "What will the production volume be over the next 2 months?",
-            "Get me the production volume for factory 4 in city C in the month of July."
+            "Get me the production volume for factory 4 in location C in the month of July."
         ]
 
         for i, example in enumerate(examples):

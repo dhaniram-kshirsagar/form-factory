@@ -61,15 +61,15 @@ def show_PredictivePerformance():
 
     # Get predictions for each target variable.
     # Note: For revenue, we now use 'Revenue ($)' so that the column exists in the data.
-    # result_vol_df = p.get_vol_prediction_for_6month('Production Volume (units)')
+    result_vol_df = p.get_vol_prediction_for_6month('Production Volume (units)')
     result_rev_df = p.get_rev_prediction_for_6month('Revenue ($)')
-    # result_foam_df = p.get_foam_prediction_for_6month('Foam Density')
+    result_foam_df = p.get_foam_prediction_for_6month('Profit Margin (%)')
 
     # Define main menu options for the prediction targets.
     menu_options = [
-        # "Predicted Production Volume",
-        "Predicted Revenue ($)",
-        # "Predicted Foam Density for Six Months"
+         "Predicted Production Volume",
+        "Predicted Revenue",
+         "Predicted Profit Margin"
     ]
 
     # Create two columns: left for menu and filters, right for the graph/table content.
@@ -90,9 +90,9 @@ def show_PredictivePerformance():
                     "background-color": "transparent",
                     "margin-left": "-30px"
                 },
-                "icon": {"color": "var(--primary-color)", "font-size": "10px"},
+                "icon": {"color": "var(--primary-color)", "font-size": "20px"},
                 "nav-link": {
-                    "font-size": "12px",  # Reduced text size
+                    "font-size": "20px",  # Reduced text size
                     "text-align": "left",
                     "margin": "0px","margin-bottom": "0rem !important",
                     "--hover-color": "rgba(255, 255, 255, 0.1)"
@@ -126,10 +126,9 @@ def show_PredictivePerformance():
 
     with col_right:
         # Display only one graph and its table based on the selected menu option.
-        if selected == "Predicted Revenue ($)":
+        if selected == "Predicted Revenue":
             prediction.lineGraph_rev(result_rev_df, selected_factories, selected_locations, from_month, to_month)
-
-        # elif selected == "Predicted Foam Density for Six Months":
-        #     prediction.lineGraph_foam(result_foam_df, selected_factories, selected_locations, from_month, to_month)
-        # elif selected == "Predicted Production Volume":
-        #     prediction.lineGraph_vol(result_vol_df, selected_factories, selected_locations, from_month, to_month)
+        elif selected == "Predicted Profit Margin":
+            prediction.lineGraph_foam(result_foam_df, selected_factories, selected_locations, from_month, to_month)
+        elif selected == "Predicted Production Volume":
+            prediction.lineGraph_vol(result_vol_df, selected_factories, selected_locations, from_month, to_month)
