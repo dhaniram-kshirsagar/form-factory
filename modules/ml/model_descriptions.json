@@ -1,9 +1,9 @@
 {
     "production_volume_model": {
       "target_variable": "Production Volume (units)",
-      "input_features": ["Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)", "month", "year","Factory", "Location"],
+      "input_features": ["Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)", "month", "year","Factory"],
       "model_type": "RandomForestRegressor",
-      "description": "Predicts production volume based on year, Machine Utilization (%), Operator Experience (years), Market Demand Index, Breakdowns (count), Absenteeism Rate (%), Raw Material Quality,  Revenue ($), Batch Quality (Pass %), Cost of Downtime ($), month, year,Factory, Location"
+      "description": "Predicts production volume based on year, Machine Utilization (%), Operator Experience (years), Market Demand Index, Breakdowns (count), Absenteeism Rate (%), Raw Material Quality,  Revenue ($), Batch Quality (Pass %), Cost of Downtime ($), month, year,Factory"
     },
     "revenue_model": {
       "target_variable": "Revenue ($)",
@@ -13,8 +13,8 @@
     },
     "profit_margin_model": {
       "target_variable": "Profit Margin (%) ",
-      "input_features": ["month", "year", "Factory", "Location", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"],
-      "model_type": "RandomForestRegressor",
-      "description": "Predicts profit margin based on month,year,Factory,Location,CO2 Emissions (kg),Energy Consumption (kWh),Product Category,Supplier,Machine Type,Machine Utilization (%),Water Usage (liters)"
+      "input_features": ["month", "year", "Factory", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"],
+      "model_type": "GradientBoostingRegressor",
+      "description": "Predicts profit margin based on month,year,Factory,CO2 Emissions (kg),Energy Consumption (kWh),Product Category,Supplier,Machine Type,Machine Utilization (%),Water Usage (liters)"
     }
 }

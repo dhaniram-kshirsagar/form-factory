@@ -42,8 +42,8 @@ Instructions:
 2. Select the most appropriate ML model to answer the question. If no suitable model is found, respond with "No suitable model found."
 3. Extract the necessary input parameters/variables from the question and provided information. 
 4. Return the selected model name and the input parameters in JSON format. If no suitable model is found, return "No suitable model found."
-5. In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4 and locations should be 0-4
-6. if default values in case following are not mentioned: factories: [0], locations: [0], years:[2025], months:[1]
+5. In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4.
+6. if default values in case following are not mentioned: factories: [0], years:[2025], months:[1]
 7. Strictly return output in format listed under 'Output Format:' section
 6. Use this mapping:
     Factories:
@@ -51,46 +51,40 @@ Instructions:
         Factory 2 -> 1
         ...
         Factory 10 -> 9
-    Location:
-        City A -> 0
-        City B -> 1
-        City C -> 2
-        ...
-        City E -> 4
 
 Examples:
 
 Question: Give production volume numbers for 2 months
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2],"factories":[0],"locations":[0]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2],"factories":[0]}}}}
 
 Question: Give production volume  for march months
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[3],"factories":[0],"locations":[0]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[3],"factories":[0]}}}}
 
 Question: Give production volume numbers for 7 months for factory 2
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2, 3, 4, 5, 6, 7],"factories":[1],"locations":[0]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2, 3, 4, 5, 6, 7],"factories":[1]}}}}
 
-Question: Give production volume numbers for October for factory 4 Location B
+Question: Give production volume numbers for October for factory 4
 Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3],"locations":[1]}}}}
+{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
 
-Question: Give profit margin numbers for October for factory 4 Location B
+Question: Give profit margin numbers for October for factory 4
 Output:
-{{"model_name": "profit_margin_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3],"locations":[1]}}}}
+{{"model_name": "profit_margin_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
 
-Question: Give revenue numbers for October for factory 4 Location B
+Question: Give revenue numbers for October for factory 4
 Output:
-{{"model_name": "revenue_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3],"locations":[1]}}}}
+{{"model_name": "revenue_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
 
 **General Instructions:**
 
 *   Select the most appropriate ML model to answer the question. If no suitable model is found, respond with "No suitable model found."
 *   Extract the necessary input parameters/variables from the question and provided information. 
 *   Return the selected model name and the input parameters in JSON format. If no suitable model is found, return "No suitable model found."
-*   In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4 and locations should be 0 to 4
-*   In case year(s), month(s), factorie(s) or location(s) are not mentioned in question then use following: factories: [0], locations: [0], years:[2025], months:[1]
+*   In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4.
+*   In case year(s), month(s), or factories are not mentioned in question then use following: factories: [0], years:[2025], months:[1]
 *   Strictly return output in format listed under 'Output Format:' section
 *   Focus on providing a clear and concise answer in natural language.
 *   Handle empty results gracefully by stating that no data is available.
@@ -99,7 +93,7 @@ Output:
 
 Output Format:
 
-{{"model_name": "model_name", "input_parameters": {{"years":[year],"months":[month],"factories":[factory],"locations":[location]}}}}
+{{"model_name": "model_name", "input_parameters": {{"years":[year],"months":[month],"factories":[factory]}}}}
 
 or
 
@@ -107,14 +101,13 @@ No suitable model found.
 """
 
 def extract_params_from_question(question):
-    """Extracts year, month, factory, and location from the question using regex."""
+    """Extracts year, month, and factory from the question using regex."""
     try:
         current_year = datetime.now().year
         current_month = datetime.now().month
         years = [current_year]
         months = [current_month]
         factories = []
-        locations = []
 
         year_matches = re.findall(r"\b(20\d{2})\b", question)
         if year_matches:
@@ -137,15 +130,10 @@ def extract_params_from_question(question):
         if factory_matches:
             factories = factory_matches
 
-        location_matches = re.findall(r"\b(City [A-E])\b", question)
-        if location_matches:
-            locations = location_matches
-
-        return {"years": years, "months": months, "factories": factories, "locations": locations}
+        return {"years": years, "months": months, "factories": factories}
     except Exception as e:
         print(f"Error during parameter extraction: {e}")
         return {}
-
 
 def get_model_and_params(question):
     """Retrieves the appropriate ML model and input parameters for a given question."""
