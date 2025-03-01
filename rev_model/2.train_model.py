@@ -9,7 +9,7 @@ from pathlib import Path
 PKL_PATH = Path(__file__).parent.parent/"modules/ml"/"revenue_prediction_model.pkl"
 PROCESSED_CSV = Path(__file__).parent/"preprocessed_data.csv"
 FEATURES_PATH = Path(__file__).parent/"imp_rev_features.md"
-MEAN_VALUES_PATH = Path(__file__).parent/"mean_values.pkl"
+#MEAN_VALUES_PATH = Path(__file__).parent/"mean_values.pkl"
 
 # Load the preprocessed data
 data = pd.read_csv(PROCESSED_CSV)
@@ -19,8 +19,8 @@ with open(FEATURES_PATH, "r") as file:
     lines = file.readlines()
     important_features = [line.split("|")[1].strip() for line in lines[2:]]  # Skip header and footer
 
-# Prepend month, year, Factory, and Location to the important features list
-important_features = ['month', 'year', 'Factory', 'Location'] + important_features
+# Prepend month, year, Factory to the important features list
+important_features = ['month', 'year', 'Factory'] + important_features
 
 # Define features and target
 X = data[important_features]

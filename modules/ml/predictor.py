@@ -2,17 +2,16 @@ import joblib
 from pathlib import Path
 
 
-keys_revenue = ["month","year","Factory","Location","Cycle Time (minutes)","Product Category","Waste Generated (kg)","Production Volume (units)",
+keys_revenue = ["month","year","Factory","Cycle Time (minutes)","Product Category","Waste Generated (kg)","Production Volume (units)",
     "Water Usage (liters)","Machine Utilization (%)",
     "Machine Age (years)","Machine Type","Supplier","Operator Experience (years)"
 ]
 
-keys_prod_volume = ["month", "year","Factory", "Location", "Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)"]
-keys_prof_margin = ["month", "year", "Factory", "Location", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"]
+keys_prod_volume = ["month", "year","Factory", "Machine Utilization (%)", "Operator Experience (years)", "Market Demand Index", "Breakdowns (count)", "Absenteeism Rate (%)", "Raw Material Quality",  "Revenue ($)", "Batch Quality (Pass %)", "Cost of Downtime ($)"]
+keys_prof_margin = ["month", "year", "Factory", "CO2 Emissions (kg)", "Energy Consumption (kWh)", "Product Category", "Supplier", "Machine Type", "Machine Utilization (%)", "Water Usage (liters)"]
 revs_mean_values_row_2 = [0,
     6.521072796934866,
     2022.0,
-    2.0,
     2.0,
     20.02371829958037,
     1.0023718299580369,
@@ -23,39 +22,38 @@ revs_mean_values_row_2 = [0,
     6.0622437511403025,
     1.0023718299580369,
     1.0694033935413245,
-    4.963446086480569
+    4.963446086480569,
+    429484.10147162934
 ]
 
 prodvol_mean_values_row_2 = [0,
-6.521072796934866,
-2022.0,
-2.0,
-2.0,
-73.59872286079182,
-4.963446086480569,
-96.77613574165298,
-3.7264349571246123,
-3.0199069512862615,
-0.4005108556832695,
-429484.10147162934,
-90.36329246487867,
-9786.44189819376,
-680.4226195949644
+    6.521072796934866,
+    2022.0,
+    2.0,
+    73.59872286079182,
+    4.963446086480569,
+    96.77613574165298,
+    3.7264349571246123,
+    3.0199069512862615,
+    0.4005108556832695,
+    429484.10147162934,
+    90.36329246487867,
+    9786.44189819376,
+    680.4226195949644
 ]
 
 prof_margin_mean_values_row_2 = [0,
-6.521072796934866,
-2022.0,
-2.0,
-2.0,
-696.4505017332604,
-652.7277869002007,
-1.0023718299580369,
-1.0694033935413245,
-1.0023718299580369,
-73.59872286079182,
-6269.731800766283,
-21.426483853311442
+    6.521072796934866,
+    2022.0,
+    2.0,
+    696.4505017332604,
+    652.7277869002007,
+    1.0023718299580369,
+    1.0694033935413245,
+    1.0023718299580369,
+    73.59872286079182,
+    6269.731800766283,
+    21.426483853311442
 ]
 
 
