@@ -121,14 +121,11 @@ def show_PredictivePerformance():
             st.write("Select factories:")
             selected_factories = prediction.selectedFactories(df)
 
-            st.write("Select locations:")
-            selected_locations = prediction.selectedLocations(df)
-
     with col_right:
         # Display only one graph and its table based on the selected menu option.
         if selected == "Predicted Revenue":
-            prediction.lineGraph_rev(result_rev_df, selected_factories, selected_locations, from_month, to_month)
+            prediction.lineGraph_rev(result_rev_df, selected_factories, from_month, to_month)
         elif selected == "Predicted Profit Margin":
-            prediction.lineGraph_foam(result_foam_df, selected_factories, selected_locations, from_month, to_month)
+            prediction.lineGraph_foam(result_foam_df, selected_factories, from_month, to_month)
         elif selected == "Predicted Production Volume":
-            prediction.lineGraph_vol(result_vol_df, selected_factories, selected_locations, from_month, to_month)
+            prediction.lineGraph_vol(result_vol_df, selected_factories, from_month, to_month)

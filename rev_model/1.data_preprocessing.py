@@ -5,7 +5,7 @@ from pathlib import Path
 CSV_PATH = Path(__file__).parent.parent/"modules/data"/"large-data"/"FoamFactory_V2_27K.csv"
 PROCESSED_CSV = Path(__file__).parent/"preprocessed_data.csv"
 FEATURES_PATH = Path(__file__).parent/"imp_rev_features.md"
-MEAN_VALUES_PATH = Path(__file__).parent/"mean_values.pkl"
+MEAN_VALUES_PATH = "mean_values.csv"
 
 # Load the dataset
 data = pd.read_csv(CSV_PATH)
@@ -35,6 +35,7 @@ for col in categorical_columns:
     data[col] = le.fit_transform(data[col])
     label_encoders[col] = le
 
+print(data.dtypes)
 means = data.mean(axis=0)
 # Save the preprocessed data to a CSV file
 #print(means)
