@@ -29,7 +29,7 @@ from modules.ml import agent
 
 agent.init(llm)
 
-MODEL_SELECTION_PROMPT = """
+BASIC_INSTRUCTIONS = """
 You are an expert system designed to select the best machine learning model and extract input parameters to answer user questions about foam factory data.
 
 Question: {question}
@@ -52,7 +52,8 @@ Instructions:
         ...
         Factory 10 -> 9
 7. Return model names only from this list : ["production_volume_model", "revenue_model", "profit_margin_model"]. If no model is found, return "No suitable model found."
-
+"""
+EXAMPLES = """
 Examples:
 
 Question: Give production volume numbers for 2 months
@@ -79,6 +80,8 @@ Question: Give revenue numbers for October for factory 4
 Output:
 {{"model_name": "revenue_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
 
+"""
+GENERAL_INSTRUCTIONS = """
 **General Instructions:**
 
 *   Select the most appropriate ML model to answer the question. If no suitable model is found, respond with "No suitable model found."
@@ -91,7 +94,9 @@ Output:
 *   Handle empty results gracefully by stating that no data is available.
 *   If there are multiple results, present them clearly and informatively.
 *   Only use the information provided in the query results. Do not make assumptions or add extra information.
+"""
 
+OUTPUT_FORMAT = """
 Output Format:
 
 {{"model_name": "model_name", "input_parameters": {{"years":[year],"months":[month],"factories":[factory]}}}}
@@ -150,13 +155,25 @@ def get_model_and_params(question):
     docs = vector_db.similarity_search(question, k=5)
     context = "\n".join([doc.page_content for doc in docs])
 
+    from datetime import datetime
+
+    current_month = datetime.now().strftime("%B")  # Returns full month name (e.g., "March")
+    current_year = datetime.now().year             # Returns year as integer (e.g., 2025)
+    current_month_year = f"{current_month}-{current_year}"  # Combines them (e.g., "March-2025")
+
+    FINAL_GENERAL_INSTRUCTIONS = GENERAL_INSTRUCTIONS + f"*   Assume that current Month is {current_month_year} \n"
+
+    print(FINAL_GENERAL_INSTRUCTIONS)
+
     # Prompt Engineering
-    prompt = MODEL_SELECTION_PROMPT # Use the externally defined prompt
+    prompt = BASIC_INSTRUCTIONS + FINAL_GENERAL_INSTRUCTIONS + EXAMPLES + OUTPUT_FORMAT
+     # Use the externally defined prompt
     if isinstance(prompt, str):
       prompt = PromptTemplate(
-          input_variables=["question", "context"],
+          input_variables=["question", "context", "current_month", "current_year"],
           template=prompt,
       )
+
     final_prompt = prompt.format(question=question, context=context)
 
 
