@@ -51,6 +51,7 @@ Instructions:
         Factory 2 -> 1
         ...
         Factory 10 -> 9
+7. Return model names only from this list : ["production_volume_model", "revenue_model", "profit_margin_model"]. If no model is found, return "No suitable model found."
 
 Examples:
 
@@ -171,27 +172,27 @@ def get_model_and_params(question):
 
         print('llm json output:\n '+str(llm_output))
 
-        response = json.loads(llm_output[0])
-        
-        if "model_name" in response and "input_parameters" in response:
-            # extracted_params = extract_params_from_question(question)
-            final_params = response["input_parameters"]
-            # for key in extracted_params:
-            #     if extracted_params[key]:
-            #         final_params[key] = extracted_params[key]
-            return response["model_name"], final_params
-        else:
-            print("LLM output is not in the expected JSON format:")
+        try:
+            if llm_output and len(llm_output) > 0 and "No suitable model found" in llm_output[0]:
+                return None, None
+
+            response = json.loads(llm_output[0])
+
+            if response and "model_name" in response and "input_parameters" in response:
+                final_params = response["input_parameters"]
+                return response["model_name"], final_params
+            else:
+                print("LLM output is not in the expected JSON format:")
+                print(llm_output)
+                return None, None
+        except (json.JSONDecodeError, IndexError, Exception) as e:
+            print(f"Error processing LLM output: {str(e)}")
             print(llm_output)
             return None, None
 
-    except json.JSONDecodeError:
-        if "No suitable model found." in llm_output:
-            return None, None
-        else:
-            print("Error decoding JSON from LLM output:")
-            print(llm_output)
-            return None, None
+    except Exception as e:
+        print(f"Error during model and parameter retrieval: {e}")
+        return None, None
         
 def get_ml_answer(query):
     #ToBeFix
@@ -207,13 +208,16 @@ def get_ml_answer(query):
     #query = "What will be revenue over next 2 months for factory 3 in city c?"
     print(query)
     model_name, model_params = get_model_and_params(query)
-    print(str(model_name)+' '+str(model_params))
+    print("Output of get_model_and_params " + str(model_name)+' '+str(model_params))
     if model_name is not None:
         data = agent.run_agent(model_name, model_params)
     else:
         data = 'Unable to map model for given query!!'
     
-    print(data)
+    print("Data output final " + str(data))
+    print(type(data))
+    if isinstance(data, str):
+        return data
     return data['output']
 
 #Before uncommenting following call, uncomment one of the query in following function
