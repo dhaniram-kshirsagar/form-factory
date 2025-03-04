@@ -60,6 +60,8 @@ def Show_Factoryastro():
 
                 finally:
                     st.rerun()  # Rerun to show the message
+                    
+        st.markdown('NOTE: The graph will not be displayed if the prediction data has fewer than 3 records.', unsafe_allow_html=True)
 
         # Display chat history
         st.markdown('<h5>Chat History</h5>', unsafe_allow_html=True)
@@ -149,6 +151,12 @@ def Show_Factoryastro():
          )
         st.subheader("Example Questions")
         examples = [
+            "What will the revenue for factory 3 be over the next 6 months?",
+            "What will the revenue over the next year for factory 3?",
+            "What will the profit margin be from July to December for factory 2?",
+            "What will the profit margin of factory 1 over the next quarter?",
+            "What will the production volume be over the next 6 months?",
+            "Get me the production volume for factory 4 from July to December."
             "What will the revenue for factory 3 be next year?",
             "What will the revenue over the next 2 months for factory 3?",
             "What will the profit margin be in July for factory 2?",

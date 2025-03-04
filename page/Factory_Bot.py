@@ -5,6 +5,7 @@ from streamlit_feedback import streamlit_feedback
 import trubrics
 
 from modules.kg_rag import kg_rag
+from modules.kg_rag.cache import Cache
 
 def set_custom_css():
     st.markdown("""
@@ -158,6 +159,28 @@ def chatbot(query):
 # Chat interface
 def chat_interface():
     st.subheader('Ask Questions! to analyze and understand your Factories data')
+    
+    # Cache status and toggle
+    if 'bypass_cache' not in st.session_state:
+        st.session_state.bypass_cache = False
+    cache_button_text = "Cache Enabled" if not st.session_state.bypass_cache else " Cache Bypassed"
+    st.markdown(
+        """
+        <style>
+            div[data-testid="stButton"] > button[kind="secondary"] {
+                padding: 0.25rem 0.75rem !important;
+                width: fit-content !important;
+                min-width: unset !important;
+                margin: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    if st.button(cache_button_text, key="cache_toggle", type="secondary"):
+        st.session_state.bypass_cache = not st.session_state.bypass_cache
+        st.rerun()
+    
     if prompt := st.chat_input(placeholder='Hello! I am here to help. What would you like to know?'):
         if prompt:
             with st.spinner("Analyzing data... ⏳"): # Added hourglass emoji
@@ -188,6 +211,12 @@ def show_factorybot():
     # Initialize session state for chat history
     if 'chat_history_bot' not in st.session_state:
         st.session_state.chat_history_bot = []
+        
+    # Initialize cache bypass session state if not exists
+    if 'bypass_cache' not in st.session_state:
+        st.session_state.bypass_cache = False
+    
+    
 
     col1, col2 = st.columns([3, 1])  # Adjust column widths here - col2 is smaller
 
