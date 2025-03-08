@@ -29,7 +29,9 @@ Foam Factory Data Intelligence is a comprehensive analytics and prediction platf
 - AI-powered chatbot for querying factory data
 - Natural language interface for complex data analysis
 - Knowledge graph-based retrieval for accurate responses
-- Caching mechanism for improved performance
+- Caching mechanism with toggle functionality for improved performance
+- Example questions for quick insights into factory operations
+- RESTful API endpoints for headless integration
 
 ## Installation & Setup
 
@@ -82,6 +84,7 @@ Foam Factory Data Intelligence is a comprehensive analytics and prediction platf
 ```
 form-factory/
 ├── app.py                  # Main application entry point
+├── api.py                  # FastAPI backend for chatbot integration
 ├── Home.py                 # Home page dashboard
 ├── modules/                # Core functionality modules
 │   ├── data/               # Data processing and management
@@ -119,6 +122,8 @@ form-factory/
    - Query complex relationships between machines, production, and performance
    - Analyze trends and patterns across different factories
    - Toggle cache functionality for improved performance
+   - Use example questions for quick insights
+   - View chat history with threaded conversation interface
 
 ## Development
 
@@ -144,14 +149,35 @@ The platform incorporates a Knowledge Graph Retrieval-Augmented Generation (RAG)
 - **Entity Schema**: Includes Factories, Machines, Teams, Members, Products, and more
 - **Performance Optimization**: Implements caching for frequently asked questions
 
+### API Integration
+
+The platform provides a FastAPI backend for integrating the knowledge graph capabilities with external applications:
+
+- **RESTful Endpoints**: `/chat` and `/cquery` for different query types
+- **JSON Interface**: Simple request/response format for easy integration
+- **CORS Support**: Configured for cross-origin requests
+
+```python
+# Example API usage with Python requests
+import requests
+
+response = requests.post(
+    "http://localhost:8000/chat",
+    json={"message": "What is the average batch quality for each product category?"}
+)
+print(response.json())
+```
+
 ### Environment Setup
 
-To use the Knowledge Graph features, set up the following environment variables:
+To use the Knowledge Graph features and API, set up the following environment variables:
 
 ```bash
 # .env file
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD=your_password
+API_HOST=localhost
+API_PORT=8000
 ```
 
