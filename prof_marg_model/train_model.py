@@ -14,7 +14,7 @@ with open("imp_prof_margin_features.md", "r") as file:
     important_features = [line.split("|")[1].strip() for line in lines[2:]]  # Skip header and footer
 
 # Prepend month, year, Factory, and Location to the important features list
-important_features = ['month', 'year', 'Factory', 'Location'] + important_features
+#important_features = ['month', 'year', 'Factory', 'Location'] + important_features
 
 # Define features and target
 X = data[important_features]

@@ -1,5 +1,8 @@
 | Feature                     |   Importance |
 |:----------------------------|-------------:|
+| month                       |   0.00947211  |
+| year                        |   0.009339104  |
+| Factory                     |   0.00924221  |
 | CO2 Emissions (kg)          |   0.530502   |
 | Energy Consumption (kWh)    |   0.270148   |
 | Product Category            |   0.054406   |
