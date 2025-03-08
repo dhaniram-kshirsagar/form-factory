@@ -60,10 +60,11 @@ def Show_Factoryastro():
 
                 finally:
                     st.rerun()  # Rerun to show the message
+                    
+        st.markdown('NOTE: The graph will not be displayed if the prediction data has fewer than 3 records.', unsafe_allow_html=True)
 
         # Display chat history
         st.markdown('<h5>Chat History</h5>', unsafe_allow_html=True)
-        st.write("**NOTE:** Factory names and locations are being mapped. Assume Location A for 'location 0', Location B for 'location 1', etc.\n")
         hcol1, hcol2 = st.columns([1, 1])
         with hcol1:
             for i in range(len(st.session_state.chat_history_astro)-1, -1, -2):
@@ -110,7 +111,7 @@ def Show_Factoryastro():
 
                             fig = px.line(
                                 data, x=x_col, y=y_col, 
-                                color='Location' if 'Location' in data.columns else None,
+                                color=None,
                                 height=300, width=600
                             )
                             st.plotly_chart(fig)
@@ -150,12 +151,18 @@ def Show_Factoryastro():
          )
         st.subheader("Example Questions")
         examples = [
+            "What will the revenue for factory 3 be over the next 6 months?",
+            "What will the revenue over the next year for factory 3?",
+            "What will the profit margin be from July to December for factory 2?",
+            "What will the profit margin of factory 1 over the next quarter?",
+            "What will the production volume be over the next 6 months?",
+            "Get me the production volume for factory 4 from July to December."
             "What will the revenue for factory 3 be next year?",
-            "What will the revenue over the next 2 months for factory 3 in location C be?",
+            "What will the revenue over the next 2 months for factory 3?",
             "What will the profit margin be in July for factory 2?",
-            "What will the profit margin of factory 1 in location A be?",
+            "What will the profit margin of factory 1?",
             "What will the production volume be over the next 2 months?",
-            "Get me the production volume for factory 4 in location C in the month of July."
+            "Get me the production volume for factory 4 in the month of July."
         ]
 
         for i, example in enumerate(examples):

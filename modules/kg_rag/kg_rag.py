@@ -83,6 +83,8 @@ from langchain_neo4j import (
 from modules.kg_rag.cypher_prompt_template import CYPHER_GENERATION_PROMPT
 #from modules.kg_rag.cypher_prompt import CYPHER_GENERATION_PROMPT
 from modules.kg_rag.qa_prompt_template import QA_PROMPT
+from modules.kg_rag.cache import Cache
+from .cache import cacheable
 
 # Load environment variables
 load_dotenv()
@@ -97,7 +99,8 @@ class Neo4jGraphChatAssistant:
             username=os.getenv("NEO4J_USERNAME"),
             password=os.getenv("NEO4J_PASSWORD"),
             database="neo4j",
-            enhanced_schema=True
+            enhanced_schema=True,
+            refresh_schema=False  # Disable schema refresh to avoid APOC dependency
         )
         
         # Initialize Neo4j-backed chat history
@@ -123,6 +126,9 @@ class Neo4jGraphChatAssistant:
             allow_dangerous_requests=True,
             return_intermediate_steps=True,
         )
+        
+        # Initialize cache
+        self.cache = Cache()
 
     def _format_history(self) -> str:
         """Format last 3 exchanges for context"""
@@ -131,6 +137,7 @@ class Neo4jGraphChatAssistant:
             for msg in self.history.messages[-5:] if msg.type == "ai" # 3 pairs of Q/A
         )
 
+    @cacheable()
     def query(self, question: str) -> str:
         try:
             # Execute chain with context
@@ -150,7 +157,14 @@ class Neo4jGraphChatAssistant:
         
         except Exception as e:
             print(f"Research error: {str(e)}")
-            return {"result": "I do not understand this type of queries"}
+            import traceback
+            print(f"Full error traceback: {traceback.format_exc()}")
+            return {"result": f"An error occurred while processing your query: {str(e)}. Please try again or contact support."}
+
+    def __del__(self):
+        # Close the cache connection when the object is garbage collected
+        if hasattr(self, 'cache'):
+            self.cache.close()
 
 import inspect
 lock = threading.Lock()
@@ -174,22 +188,17 @@ import streamlit as st
 
 def get_kg_answer(question):
     global assistant
-
-    result = {}
     if assistant is None:
         init_graph()
-        if assistant is None:
-            result['result'] = 'I am still initializing. Please try again later'
-            return result
-
-    try:
-        result = assistant.query(question)
-        print("RESULT: "+str(result))
-    except Exception as e:
-        print(e)
-        result['result'] = 'I do not understand this type of queries'
-    finally:
-        return result
+    
+    # Check if bypass_cache is set in session state
+    bypass_cache = False
+    if hasattr(st, 'session_state') and 'bypass_cache' in st.session_state:
+        bypass_cache = st.session_state.bypass_cache
+    
+    # Use the assistant's query method which handles caching
+    result = assistant.query(question)
+    return result
     
 # Example Usage
 if __name__ == "__main__":
