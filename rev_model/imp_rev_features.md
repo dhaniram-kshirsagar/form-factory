@@ -1,5 +1,8 @@
 | Feature                     |   Importance |
 |:----------------------------|-------------:|
+| month                       |    0.00947211  |
+| year                        |    0.009339104  |
+| Factory                     |    0.00924221  |
 | Cycle Time (minutes)        |    0.270901  |
 | Product Category            |    0.14265   |
 | Waste Generated (kg)        |    0.142579  |

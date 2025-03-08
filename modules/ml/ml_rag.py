@@ -2,6 +2,7 @@ from concurrent.futures import wait
 import json
 import re
 from datetime import datetime
+import streamlit as st
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -11,26 +12,43 @@ from langchain.schema import HumanMessage
 
 import os
 from pathlib import Path
+import pandas as pd
+from typing import Dict
+# from dotenv import load_dotenv
 
-# --- Configuration ---
-#VECTOR_DB_PATH = '/workspaces/form-factory/modules/ml/'+"factory_vector_db"
+# # Load environment variables from .env file
+# load_dotenv()
+# st.session_state.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# print("OpenAI API key loaded successfully.")
+
 VECTOR_DB_PATH = Path(__file__).parent.parent/"ml/factory_vector_db"
 EMBEDDINGS_MODEL = "all-mpnet-base-v2"
 
 
-if "OPENAI_API_KEY" not in os.environ:
-    os.environ["OPENAI_API_KEY"] = ""
+# if "OPENAI_API_KEY" not in os.environ:
+#     os.environ["OPENAI_API_KEY"] = ""
 
 LLM_MODEL = "gpt-4"
  # LLM Call
 llm = ChatOpenAI(temperature=0, model=LLM_MODEL)
 
+# from feature_registry import FeatureRegistry
+# import agent
+
+from modules.ml.feature_registry import FeatureRegistry
 from modules.ml import agent
+
+feature_registry = FeatureRegistry()
 
 agent.init(llm)
 
-BASIC_INSTRUCTIONS = """
+# Updated prompt template with feature awareness and examples
+PROMPT_TEMPLATE = '''
 You are an expert system designed to select the best machine learning model and extract input parameters to answer user questions about foam factory data.
+Your tasks are:
+1. Understand the user's query and identify the relevant prediction model
+2. Extract parameters based on the model's required features
+3. Return the model name and parameters in JSON format
 
 Question: {question}
 
@@ -42,7 +60,7 @@ Instructions:
 2. Select the most appropriate ML model to answer the question. If no suitable model is found, respond with "No suitable model found."
 3. Extract the necessary input parameters/variables from the question and provided information. 
 4. Return the selected model name and the input parameters in JSON format. If no suitable model is found, return "No suitable model found."
-5. In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4.
+5. In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4
 6. if default values in case following are not mentioned: factories: [0], years:[2025], months:[1]
 7. Strictly return output in format listed under 'Output Format:' section
 6. Use this mapping:
@@ -50,53 +68,79 @@ Instructions:
         Factory 1 -> 0
         Factory 2 -> 1
         ...
-        Factory 10 -> 9
-7. Return model names only from this list : ["production_volume_model", "revenue_model", "profit_margin_model"]. If no model is found, return "No suitable model found."
-"""
-EXAMPLES = """
+        Factory 5 -> 4
+
 Examples:
+Examples for Production Volume Model
+1. Question: Predict production volume for March with 75% machine utilization and 5 years operator experience
+Output: {{"model_name": "production_volume_model", "input_parameters": {{
+    "Machine Utilization (%)": 75, 
+    "Operator Experience (years)": 5,
+    "Months": [3],
+    "Years": [2025],
+    "Factories": [1]
+}}}}
 
-Question: Give production volume numbers for 2 months
-Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2],"factories":[0]}}}}
+2. Question: Estimate production volume for March and April across factories 1 and 2 with 90% machine utilization
+Output: {{"model_name": "production_volume_model", "input_parameters": {{
+    "Machine Utilization (%)": 90,
+    "Months": [3, 4],
+    "Years": [2025],
+    "Factories": [1, 2]
+}}}}
 
-Question: Give production volume  for march months
-Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[3],"factories":[0]}}}}
+3. Question: Predict production volume for March with 75% machine utilization and 5 years operator experience
+Output: {{"model_name": "production_volume_model", "input_parameters": {{
+    "Machine Utilization (%)": 75, 
+    "Operator Experience (years)": 5,
+    "months": [3],
+    "years": [2025],
+    "factories": [0]
+}}}}
 
-Question: Give production volume numbers for 7 months for factory 2
-Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[1, 2, 3, 4, 5, 6, 7],"factories":[1]}}}}
+Examples for Revenue Model
+3. Question: Forecast revenue for Q1 (Jan-Mar) across all factories with 5000 units production volume
+Output: {{"model_name": "revenue_model", "input_parameters": {{
+    "Production Volume (units)": 5000,
+    "Months": [1, 2, 3],
+    "Years": [2025],
+    "Factories": [0, 1, 2, 3]
+}}}}
 
-Question: Give production volume numbers for October for factory 4
-Output:
-{{"model_name": "production_volume_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
+4. Question: Predict revenue for June and July in factories 2 and 3 with 90% machine utilization
+Output: {{"model_name": "revenue_model", "input_parameters": {{
+    "Machine Utilization (%)": 90,
+    "Months": [6, 7],
+    "Years": [2025],
+    "Factories": [2, 3]
+}}}}
 
-Question: Give profit margin numbers for October for factory 4
-Output:
-{{"model_name": "profit_margin_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
+Examples for Profit Margin Model
+5. Question: Estimate profit margin for Q2 (Apr-Jun) in factory 1 with 500 kg CO2 emissions
+Output: {{"model_name": "profit_margin_model", "input_parameters": {{
+    "CO2 Emissions (kg)": 500,
+    "Months": [4, 5, 6],
+    "Years": [2025],
+    "Factories": [1]
+}}}}
 
-Question: Give revenue numbers for October for factory 4
-Output:
-{{"model_name": "revenue_model", "input_parameters": {{"years":[2025],"months":[10],"factories":[3]}}}}
+6. Question: Predict profit margin for September and October across factories 1, 2 and 3
+Output: {{"model_name": "profit_margin_model", "input_parameters": {{
+    "Months": [9, 10],
+    "Years": [2025],
+    "Factories": [1, 2, 3]
+}}}}
 
-"""
-GENERAL_INSTRUCTIONS = """
 **General Instructions:**
 
 *   Select the most appropriate ML model to answer the question. If no suitable model is found, respond with "No suitable model found."
 *   Extract the necessary input parameters/variables from the question and provided information. 
 *   Return the selected model name and the input parameters in JSON format. If no suitable model is found, return "No suitable model found."
-*   In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4.
-*   In case year(s), month(s), or factories are not mentioned in question then use following: factories: [0], years:[2025], months:[1]
+*   In output, year should be number like 2025, month should be 1 to 12, factories should be 0 to 4 and locations should be 0 to 4
+*   In case year(s), month(s), factorie(s) or location(s) are not mentioned in question then use following: factories: [0], years:[2025], months:[1]
 *   Strictly return output in format listed under 'Output Format:' section
-*   Focus on providing a clear and concise answer in natural language.
 *   Handle empty results gracefully by stating that no data is available.
-*   If there are multiple results, present them clearly and informatively.
-*   Only use the information provided in the query results. Do not make assumptions or add extra information.
-"""
 
-OUTPUT_FORMAT = """
 Output Format:
 
 {{"model_name": "model_name", "input_parameters": {{"years":[year],"months":[month],"factories":[factory]}}}}
@@ -104,46 +148,10 @@ Output Format:
 or
 
 No suitable model found.
-"""
-
-def extract_params_from_question(question):
-    """Extracts year, month, and factory from the question using regex."""
-    try:
-        current_year = datetime.now().year
-        current_month = datetime.now().month
-        years = [current_year]
-        months = [current_month]
-        factories = []
-
-        year_matches = re.findall(r"\b(20\d{2})\b", question)
-        if year_matches:
-            years = [int(year) for year in year_matches]
-
-        month_matches = re.findall(
-            r"\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b",
-            question, re.IGNORECASE,
-        )
-        if month_matches:
-            month_numbers = {
-                "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
-                "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
-                "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
-                "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
-            }
-            months = [month_numbers[month.lower()] for month in month_matches]
-
-        factory_matches = re.findall(r"\b(Factory [1-10])\b", question)
-        if factory_matches:
-            factories = factory_matches
-
-        return {"years": years, "months": months, "factories": factories}
-    except Exception as e:
-        print(f"Error during parameter extraction: {e}")
-        return {}
+'''
 
 def get_model_and_params(question):
-    """Retrieves the appropriate ML model and input parameters for a given question."""
-
+    
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDINGS_MODEL)
     try:
         vector_db = FAISS.load_local(VECTOR_DB_PATH, embeddings, allow_dangerous_deserialization=True)
@@ -155,27 +163,14 @@ def get_model_and_params(question):
     docs = vector_db.similarity_search(question, k=5)
     context = "\n".join([doc.page_content for doc in docs])
 
-    from datetime import datetime
-
-    current_month = datetime.now().strftime("%B")  # Returns full month name (e.g., "March")
-    current_year = datetime.now().year             # Returns year as integer (e.g., 2025)
-    current_month_year = f"{current_month}-{current_year}"  # Combines them (e.g., "March-2025")
-
-    FINAL_GENERAL_INSTRUCTIONS = GENERAL_INSTRUCTIONS + f"*   Assume that current Month is {current_month_year} \n"
-
-    print(FINAL_GENERAL_INSTRUCTIONS)
-
     # Prompt Engineering
-    prompt = BASIC_INSTRUCTIONS + FINAL_GENERAL_INSTRUCTIONS + EXAMPLES + OUTPUT_FORMAT
-     # Use the externally defined prompt
+    prompt = PROMPT_TEMPLATE # Use the externally defined prompt
     if isinstance(prompt, str):
       prompt = PromptTemplate(
-          input_variables=["question", "context", "current_month", "current_year"],
+          input_variables=["question", "context"],
           template=prompt,
       )
-
     final_prompt = prompt.format(question=question, context=context)
-
 
     try:
         messages = [HumanMessage(content=final_prompt)] # Create a list of messages
@@ -189,27 +184,23 @@ def get_model_and_params(question):
 
         print('llm json output:\n '+str(llm_output))
 
-        try:
-            if llm_output and len(llm_output) > 0 and "No suitable model found" in llm_output[0]:
-                return None, None
-
-            response = json.loads(llm_output[0])
-
-            if response and "model_name" in response and "input_parameters" in response:
-                final_params = response["input_parameters"]
-                return response["model_name"], final_params
-            else:
-                print("LLM output is not in the expected JSON format:")
-                print(llm_output)
-                return None, None
-        except (json.JSONDecodeError, IndexError, Exception) as e:
-            print(f"Error processing LLM output: {str(e)}")
+        response = json.loads(llm_output[0])
+        
+        if "model_name" in response and "input_parameters" in response:
+            final_params = response["input_parameters"]
+            return response["model_name"], final_params
+        else:
+            print("LLM output is not in the expected JSON format:")
             print(llm_output)
             return None, None
 
-    except Exception as e:
-        print(f"Error during model and parameter retrieval: {e}")
-        return None, None
+    except json.JSONDecodeError:
+        if "No suitable model found." in llm_output:
+            return None, None
+        else:
+            print("Error decoding JSON from LLM output:")
+            print(llm_output)
+            return None, None
         
 def get_ml_answer(query):
     #ToBeFix
@@ -225,17 +216,61 @@ def get_ml_answer(query):
     #query = "What will be revenue over next 2 months for factory 3 in city c?"
     print(query)
     model_name, model_params = get_model_and_params(query)
-    print("Output of get_model_and_params " + str(model_name)+' '+str(model_params))
+    print(str(model_name)+' '+str(model_params))
     if model_name is not None:
-        data = agent.run_agent(model_name, model_params)
+        data = agent.run_agent(model_name, **model_params)
     else:
         data = 'Unable to map model for given query!!'
     
-    print("Data output final " + str(data))
-    print(type(data))
-    if isinstance(data, str):
-        return data
+    print(data)
     return data['output']
 
-#Before uncommenting following call, uncomment one of the query in following function
-#get_ml_answer()
+def get_ml_answer_with_feedback(model_name: str, input_data: pd.DataFrame) -> Dict:
+    # Check feature completeness
+    feature_status = feature_registry.validate_features(model_name, input_data)
+    missing_features = [f for f, present in feature_status.items() if not present]
+    
+    # Display feature status
+    if missing_features:
+        st.warning(f"Missing features: {', '.join(missing_features)}")
+        st.info("Using mean values for missing features")
+    
+    # Get feature importance visualization
+    feature_importance = feature_registry.get_feature_importance(model_name)
+    if feature_importance:
+        st.subheader("Feature Importance")
+        st.bar_chart(feature_importance)
+    
+    # Make prediction
+    try:
+        prediction = agent.run_agent(model_name, input_data)
+        return {
+            'status': 'success',
+            'prediction': prediction,
+            'feature_status': feature_status,
+            'feature_importance': feature_importance
+        }
+    except Exception as e:
+        return {
+            'status': 'error',
+            'message': str(e)
+        }
+
+# if __name__ == "__main__":
+#     # Test queries
+#     queries = [
+#         #"Predict production volume for March with 75% machine utilization and 5 years operator experience",
+#          "Estimate profit margin with 500 kg CO2 emissions, 3000 kWh energy consumption, and 90% machine utilization",
+#          "Forecast revenue with 5000 units production volume, 3000 kWh energy consumption, and 80% machine utilization"
+#     ]
+    
+#     # Test each query
+#     for query in queries:
+#         print(f"Query: {query}")
+#         try:
+#             result = get_ml_answer(query)
+#             print(f"Result: {result}")
+#             print()
+#         except Exception as e:
+#             print(f"Error processing query: {e}")
+#             print()

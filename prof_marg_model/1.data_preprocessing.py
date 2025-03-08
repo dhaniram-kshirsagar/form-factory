@@ -16,7 +16,7 @@ with open("imp_prof_margin_features.md", "r") as file:
     important_features = [line.split("|")[1].strip() for line in lines[2:]]  # Skip header and footer
 
 # Prepend month, year, Factory, and Location to the important features list
-important_features = ['month', 'year', 'Factory'] + important_features
+#important_features = ['month', 'year', 'Factory', 'Location'] + important_features
 
 # Select only the important features and the target variable
 data = data[important_features + ["Profit Margin (%)"]]

@@ -1,5 +1,8 @@
 | Feature                     |   Importance |
 |:----------------------------|-------------:|
+| month                       |   0.00947211  |
+| year                        |   0.009339104  |
+| Factory                     |   0.00924221  |
 | Machine Utilization (%)     |   0.705573   |
 | Operator Experience (years) |   0.136268   |
 | Market Demand Index         |   0.0267991  |

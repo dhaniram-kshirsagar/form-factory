@@ -14,7 +14,7 @@ with open("imp_prod_features.md", "r") as file:
     important_features = [line.split("|")[1].strip() for line in lines[2:]]  # Skip header and footer
 
 # Prepend month, year, Factory, and Location to the important features list
-important_features = ['month', 'year', 'Factory'] + important_features
+#important_features = ['month', 'year', 'Factory', 'Location'] + important_features
 
 # Define features and target
 X = data[important_features]
@@ -42,6 +42,7 @@ for name, model in models.items():
     # Make predictions
     y_pred = model.predict(X_test)
     
+    # Evaluate the model
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
     
