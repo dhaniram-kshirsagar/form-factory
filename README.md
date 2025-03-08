@@ -1,7 +1,7 @@
 # 🏭 Foam Factory Data Intelligence Platform
 
 ## Overview
-Foam Factory Data Intelligence is a comprehensive analytics and prediction platform for foam manufacturing operations. The application leverages machine learning models to provide insights into production metrics, maintenance needs, and operational efficiency.
+Foam Factory Data Intelligence is a comprehensive analytics and prediction platform for foam manufacturing operations. The application leverages machine learning models and knowledge graph technology to provide insights into production metrics, maintenance needs, and operational efficiency.
 
 ## Key Features
 
@@ -24,6 +24,12 @@ Foam Factory Data Intelligence is a comprehensive analytics and prediction platf
 - Random Forest classifiers with hyperparameter tuning
 - Comprehensive feature engineering pipeline
 - Model evaluation metrics and visualization tools
+
+### 🤖 Factory Bot
+- AI-powered chatbot for querying factory data
+- Natural language interface for complex data analysis
+- Knowledge graph-based retrieval for accurate responses
+- Caching mechanism for improved performance
 
 ## Installation & Setup
 
@@ -83,9 +89,17 @@ form-factory/
 │   │   ├── predictor.py    # Prediction model implementations
 │   │   ├── prediction.py   # Visualization of predictions
 │   │   └── performance_pred.py # Performance prediction utilities
+│   ├── kg_rag/             # Knowledge Graph RAG components
+│   │   ├── kg_rag.py       # Main RAG implementation
+│   │   ├── cypher_prompt_template.py # Neo4j Cypher query templates
+│   │   ├── qa_prompt_template.py # QA prompt templates
+│   │   ├── cache.py        # Response caching system
+│   │   ├── schema.cypher   # Knowledge graph schema definition
+│   │   └── populate_neo4j.py # Database population utilities
 │   └── utils/              # Utility functions
 ├── page/                   # Streamlit page definitions
 │   ├── Predictive_Performance.py # Predictive analytics dashboard
+│   ├── Factory_Bot.py      # AI chatbot interface
 │   └── ...                 # Other application pages
 ├── models/                 # Saved ML model files
 ├── data/                   # Sample and historical data
@@ -100,6 +114,11 @@ form-factory/
    - Apply categorical filters specific to each model
    - View time-series predictions with interactive charts
    - Analyze detailed prediction data tables
+3. **Factory Bot**: Interact with the AI-powered assistant:
+   - Ask natural language questions about factory data
+   - Query complex relationships between machines, production, and performance
+   - Analyze trends and patterns across different factories
+   - Toggle cache functionality for improved performance
 
 ## Development
 
@@ -111,6 +130,28 @@ streamlit run Home.py --server.runOnSave=true
 
 # Train or update ML models
 python -m modules.ml.train
+
+# Populate the knowledge graph database
+python -m modules.kg_rag.populate_neo4j
 ```
 
+## Knowledge Graph RAG System
+
+The platform incorporates a Knowledge Graph Retrieval-Augmented Generation (RAG) system that enables natural language querying of complex factory data relationships:
+
+- **Neo4j Backend**: Graph database storing factory data with relationships between entities
+- **LLM Integration**: Combines graph queries with language model capabilities
+- **Entity Schema**: Includes Factories, Machines, Teams, Members, Products, and more
+- **Performance Optimization**: Implements caching for frequently asked questions
+
+### Environment Setup
+
+To use the Knowledge Graph features, set up the following environment variables:
+
+```bash
+# .env file
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your_password
+```
 
